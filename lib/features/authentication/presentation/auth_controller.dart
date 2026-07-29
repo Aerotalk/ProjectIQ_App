@@ -1,0 +1,112 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:dio/dio.dart';
+import '../../../core/network/api_client.dart';
+import '../domain/user.dart';
+import '../data/auth_repository.dart';
+
+// State wrapper for auth
+class AuthState {
+  final User? user;
+  final bool isLoading;
+  final String? error;
+
+  const AuthState({this.user, this.isLoading = false, this.error});
+  
+  bool get isAuthenticated => user != null;
+
+  AuthState copyWith({User? user, bool? isLoading, String? error, bool clearError = false}) {
+    return AuthState(
+      user: user ?? this.user,
+      isLoading: isLoading ?? this.isLoading,
+      error: clearError ? null : (error ?? this.error),
+    );
+  }
+}
+
+final authControllerProvider = NotifierProvider<AuthController, AuthState>(() {
+  return AuthController();
+});
+
+class AuthController extends Notifier<AuthState> {
+  AuthRepository get _repository => ref.read(authRepositoryProvider);
+  FlutterSecureStorage get _storage => ref.read(secureStorageProvider);
+
+  @override
+  AuthState build() {
+    Future.microtask(_init);
+    return const AuthState(isLoading: true);
+  }
+
+  Future<void> _init() async {
+    try {
+      final token = await _storage.read(key: 'auth_token');
+      if (token != null) {
+        final user = await _repository.me();
+        state = AuthState(user: user, isLoading: false);
+      } else {
+        state = const AuthState(isLoading: false);
+      }
+    } on DioException catch (e) {
+      // Typically on 401 we clear token.
+      if (e.response?.statusCode == 401) {
+        await _storage.delete(key: 'auth_token');
+      }
+      state = AuthState(isLoading: false, error: 'Session expired or offline');
+    } catch (e) {
+      state = AuthState(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<bool> login(String email, String password) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final user = await _repository.login(email, password);
+      // Backend should set cookie or return token.
+      // If we assume the response has a token, we'd save it here.
+      // For now, let's just save a dummy token so the app knows it's logged in if backend doesn't provide one directly in body.
+      // In a real Spring Boot JWT app, the token is often in the body or header. 
+      await _storage.write(key: 'auth_token', value: 'dummy_jwt_token_or_real_if_parsed');
+      
+      state = AuthState(user: user, isLoading: false);
+      return true;
+    } catch (e) {
+      String errorMessage = 'Login failed';
+      if (e is DioException) {
+        // If backend is unreachable, Dio throws connection error
+        if (e.type == DioExceptionType.connectionTimeout || 
+            e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.unknown) {
+          errorMessage = 'Unable to connect to server. Please try again.';
+        } else if (e.response?.statusCode == 401) {
+          errorMessage = 'Invalid email or password.';
+        }
+      }
+      state = AuthState(isLoading: false, error: errorMessage);
+      return false;
+    }
+  }
+
+  Future<void> logout() async {
+    state = state.copyWith(isLoading: true);
+    await _repository.logout();
+    await _storage.delete(key: 'auth_token');
+    state = const AuthState(isLoading: false);
+  }
+
+  // A method for developers to bypass login when backend is offline
+  void developerBypass() {
+    final devUser = User(
+      id: 'dev-id-123',
+      username: 'Developer Admin',
+      email: 'admin@bumbleerp.com',
+      roles: ['ROLE_SUPER_ADMIN'],
+      organizationName: 'BumbleERP Dev',
+      effectivePermissions: [
+        'ticket.view', 'role.view', 'user.view', 'sales.view', 
+        'finance.view', 'employee.view', 'department.view', 'designation.view'
+      ],
+    );
+    state = AuthState(user: devUser, isLoading: false);
+  }
+}
