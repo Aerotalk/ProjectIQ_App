@@ -15,6 +15,9 @@ import '../../features/hrms/presentation/add_employee_screen.dart';
 import '../../features/departments/presentation/screens/department_list_screen.dart';
 import '../../features/departments/presentation/screens/department_details_screen.dart';
 import '../../features/departments/presentation/screens/department_form_screen.dart';
+import '../../features/designations/presentation/screens/designation_list_screen.dart';
+import '../../features/designations/presentation/screens/designation_details_screen.dart';
+import '../../features/designations/presentation/screens/designation_form_screen.dart';
 import 'module_registry.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -92,6 +95,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return DepartmentDetailsScreen(departmentId: id);
+        },
+      ),
+      GoRoute(
+        path: '/hrms/designations',
+        builder: (context, state) => const DesignationListScreen(),
+      ),
+      GoRoute(
+        path: '/designations/new',
+        builder: (context, state) => const DesignationFormScreen(),
+      ),
+      GoRoute(
+        path: '/designations/:id/edit',
+        builder: (context, state) {
+          final desig = state.extra;
+          return DesignationFormScreen(designation: desig as dynamic);
+        },
+      ),
+      GoRoute(
+        path: '/designations/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return DesignationDetailsScreen(designationId: id);
         },
       ),
       StatefulShellRoute.indexedStack(
