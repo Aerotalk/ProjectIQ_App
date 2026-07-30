@@ -11,10 +11,10 @@ class AppBadge extends StatelessWidget {
   final AppBadgeVariant variant;
 
   const AppBadge({
-    Key? key,
+    super.key,
     required this.text,
     this.variant = AppBadgeVariant.defaultVariant,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +44,11 @@ class AppBadge extends StatelessWidget {
         foregroundColor = isDark ? AppColors.destructiveForegroundDark : AppColors.destructiveForegroundLight;
         break;
       case AppBadgeVariant.success:
-        backgroundColor = AppColors.success.withOpacity(0.2);
+        backgroundColor = AppColors.success.withValues(alpha: 0.2);
         foregroundColor = AppColors.success;
         break;
       case AppBadgeVariant.warning:
-        backgroundColor = AppColors.warning.withOpacity(0.2);
+        backgroundColor = AppColors.warning.withValues(alpha: 0.2);
         foregroundColor = AppColors.warning;
         break;
     }

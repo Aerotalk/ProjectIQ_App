@@ -21,7 +21,7 @@ void main() async {
   AppConfig.init(
     AppConfig(
       environment: Environment.dev,
-      apiBaseUrl: kIsWeb ? 'http://localhost:8080/api' : 'http://10.0.2.2:8080/api', 
+      apiBaseUrl: 'https://projectiqbackend-production.up.railway.app/api', 
     ),
   );
 

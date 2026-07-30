@@ -7,10 +7,10 @@ class AppLoader extends StatelessWidget {
   final Color? color;
   
   const AppLoader({
-    Key? key,
+    super.key,
     this.size = AppSpacing.s24,
     this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

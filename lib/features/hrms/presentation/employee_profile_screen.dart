@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../shared/widgets/avatars/profile_avatar.dart';
 import '../../../shared/widgets/badges/app_badge.dart';
-import '../../../shared/widgets/loaders/skeleton.dart';
 import '../../authentication/presentation/auth_controller.dart';
 import 'providers/employee_providers.dart';
 

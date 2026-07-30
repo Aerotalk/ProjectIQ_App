@@ -50,7 +50,7 @@ dependencies:
   dio_cookie_manager: ^3.5.0
   cookie_jar: ^4.0.9
   path_provider: ^2.1.6
-  file_picker: ^3.0.4
+  file_picker: ^11.0.2
 
 dev_dependencies:
   flutter_test:

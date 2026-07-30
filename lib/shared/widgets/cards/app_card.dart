@@ -12,13 +12,13 @@ class AppCard extends StatelessWidget {
   final bool hasBorder;
 
   const AppCard({
-    Key? key,
+    super.key,
     required this.child,
     this.padding = const EdgeInsets.all(AppSpacing.s24),
     this.onTap,
     this.hasShadow = true,
     this.hasBorder = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

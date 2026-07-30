@@ -45,7 +45,7 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          _buildSliverAppBar(context, user, isLoading),
+          _buildSliverAppBar(context, ref, user, isLoading),
           SliverToBoxAdapter(
             child: _buildWelcomeHeader(context, user, isLoading),
           ),
@@ -81,7 +81,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSliverAppBar(BuildContext context, dynamic user, bool isLoading) {
+  Widget _buildSliverAppBar(BuildContext context, WidgetRef ref, dynamic user, bool isLoading) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final orgName = user?.companyName ?? user?.organizationName ?? 'BumbleERP';
@@ -292,14 +292,19 @@ class DashboardScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.s16),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.cardDark : AppColors.cardLight,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.go('/approvals'),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
-        ),
-        child: Row(
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.cardDark : AppColors.cardLight,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+            ),
+            child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
@@ -319,9 +324,11 @@ class DashboardScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const Icon(LucideIcons.chevronRight, color: Colors.grey, size: 20),
-          ],
+              const Icon(LucideIcons.chevronRight, color: Colors.grey, size: 20),
+            ],
+          ),
         ),
+      ),
       ),
     );
   }

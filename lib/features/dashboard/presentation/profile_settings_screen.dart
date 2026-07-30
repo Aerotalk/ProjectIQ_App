@@ -179,18 +179,15 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                     child: ElevatedButton(
                       onPressed: _isLoadingPersonal ? null : () async {
                         setState(() => _isLoadingPersonal = true);
+                        final messenger = ScaffoldMessenger.of(context);
                         try {
                           await ref.read(profileSettingsRepositoryProvider).updatePersonalInformation(
                                 _usernameController.text,
                                 null, // Pass photoId if changed
                               );
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile updated successfully')));
-                          }
+                          messenger.showSnackBar(const SnackBar(content: Text('Profile updated successfully')));
                         } catch (e) {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile: $e')));
-                          }
+                          messenger.showSnackBar(SnackBar(content: Text('Failed to update profile: $e')));
                         } finally {
                           if (mounted) setState(() => _isLoadingPersonal = false);
                         }
@@ -250,21 +247,20 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                           return;
                         }
                         setState(() => _isLoadingPassword = true);
+                        final messenger = ScaffoldMessenger.of(context);
                         try {
                           await ref.read(profileSettingsRepositoryProvider).updatePassword(
                                 _currentPasswordController.text,
                                 _newPasswordController.text,
                               );
+                          messenger.showSnackBar(const SnackBar(content: Text('Password updated successfully')));
                           if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password updated successfully')));
                             _currentPasswordController.clear();
                             _newPasswordController.clear();
                             _confirmPasswordController.clear();
                           }
                         } catch (e) {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update password: $e')));
-                          }
+                          messenger.showSnackBar(SnackBar(content: Text('Failed to update password: $e')));
                         } finally {
                           if (mounted) setState(() => _isLoadingPassword = false);
                         }
@@ -405,7 +401,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: Colors.purple,
+            activeThumbColor: Colors.purple,
           ),
         ],
       ),

@@ -64,6 +64,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return '/dashboard';
       }
 
+      if (state.matchedLocation == '/' && authState.isAuthenticated) {
+        return '/dashboard';
+      }
+      
+      if (state.matchedLocation == '/' && !authState.isAuthenticated) {
+        return '/login';
+      }
+
       return null;
     },
     routes: [
@@ -251,6 +259,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   }
                   if (module.route == '/notifications') {
                     return const NotificationsScreen();
+                  }
+                  if (module.route == '/approvals') {
+                    return const ApprovalCenterScreen();
                   }
                   
                   // Placeholder for dynamic module injection
