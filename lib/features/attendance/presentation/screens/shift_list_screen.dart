@@ -39,16 +39,9 @@ class ShiftListScreen extends ConsumerWidget {
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Theme.of(context).primaryColor.withValues(alpha: 0.15),
-                      width: 1.5,
+                      color: Colors.grey.shade300,
+                      width: 1.0,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.s16),

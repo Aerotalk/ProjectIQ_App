@@ -5,6 +5,9 @@ import '../models/regularization_model.dart';
 import '../models/leave_model.dart';
 import '../models/shift_model.dart';
 import '../models/attendance_calendar_model.dart';
+import '../models/daily_attendance_model.dart';
+import '../models/attendance_exception_model.dart';
+import '../models/permission_model.dart';
 
 final attendanceRepositoryProvider = Provider<AttendanceRepository>((ref) {
   return AttendanceRepository();
@@ -189,6 +192,134 @@ class AttendanceRepository {
       }
     }
     return days;
+  }
+
+  // --- Daily Attendance Logs ---
+  Future<List<DailyAttendanceModel>> getDailyAttendanceLogs() async {
+    await Future.delayed(const Duration(seconds: 1));
+    return [
+      DailyAttendanceModel(
+        id: '1',
+        employeeName: 'John Doe',
+        employeeCode: 'EMP001',
+        department: 'Engineering',
+        shiftName: 'General Shift',
+        checkIn: '09:00 AM',
+        checkOut: '06:00 PM',
+        workingHours: '09:00',
+        status: 'Present',
+      ),
+      DailyAttendanceModel(
+        id: '2',
+        employeeName: 'Jane Smith',
+        employeeCode: 'EMP002',
+        department: 'HR',
+        shiftName: 'General Shift',
+        checkIn: '09:15 AM',
+        checkOut: '06:00 PM',
+        workingHours: '08:45',
+        status: 'Late',
+        exceptionType: 'Late Arrival',
+        isRegularized: false,
+      ),
+      DailyAttendanceModel(
+        id: '3',
+        employeeName: 'Mike Johnson',
+        employeeCode: 'EMP003',
+        department: 'Engineering',
+        shiftName: 'Night Shift',
+        checkIn: '--:--',
+        checkOut: '--:--',
+        workingHours: '00:00',
+        status: 'Absent',
+      ),
+      DailyAttendanceModel(
+        id: '4',
+        employeeName: 'Emily Davis',
+        employeeCode: 'EMP004',
+        department: 'HR',
+        shiftName: 'General Shift',
+        checkIn: '--:--',
+        checkOut: '--:--',
+        workingHours: '00:00',
+        status: 'Leave',
+      ),
+    ];
+  }
+
+  // --- Exceptions ---
+  Future<List<AttendanceExceptionModel>> getAttendanceExceptions() async {
+    await Future.delayed(const Duration(seconds: 1));
+    return [
+      AttendanceExceptionModel(
+        id: '1',
+        employeeName: 'Jane Smith',
+        employeeCode: 'EMP002',
+        date: '2023-11-01',
+        exceptionType: 'Late Arrival',
+        severity: 'Medium',
+        description: 'Checked in 15 mins past grace period.',
+        resolved: false,
+      ),
+      AttendanceExceptionModel(
+        id: '2',
+        employeeName: 'Mike Johnson',
+        employeeCode: 'EMP003',
+        date: '2023-11-02',
+        exceptionType: 'Missing Swipes',
+        severity: 'High',
+        description: 'No check-in or check-out recorded for scheduled shift.',
+        resolved: false,
+      ),
+      AttendanceExceptionModel(
+        id: '3',
+        employeeName: 'Emily Davis',
+        employeeCode: 'EMP004',
+        date: '2023-10-25',
+        exceptionType: 'Early Checkout',
+        severity: 'Low',
+        description: 'Checked out 5 mins early.',
+        resolved: true,
+      ),
+    ];
+  }
+
+  // --- Permissions ---
+  Future<List<PermissionModel>> getPermissions() async {
+    await Future.delayed(const Duration(seconds: 1));
+    return [
+      PermissionModel(
+        id: '1',
+        permissionNumber: 'PRM-001',
+        employeeName: 'John Doe',
+        department: 'Engineering',
+        permissionDate: '2023-11-05',
+        permissionType: 'Personal',
+        startTime: '04:00 PM',
+        endTime: '06:00 PM',
+        totalHours: '2.0',
+        reason: 'Doctor Appointment',
+        status: 'Approved',
+      ),
+      PermissionModel(
+        id: '2',
+        permissionNumber: 'PRM-002',
+        employeeName: 'John Doe',
+        department: 'Engineering',
+        permissionDate: '2023-11-10',
+        permissionType: 'Official',
+        startTime: '10:00 AM',
+        endTime: '11:00 AM',
+        totalHours: '1.0',
+        reason: 'Bank Work',
+        status: 'Pending',
+      ),
+    ];
+  }
+
+  Future<PermissionModel> submitPermission(PermissionModel model) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return model;
   }
 }
 

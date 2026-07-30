@@ -26,6 +26,11 @@ import '../../features/attendance/presentation/screens/leave_list_screen.dart';
 import '../../features/attendance/presentation/screens/leave_form_screen.dart';
 import '../../features/attendance/presentation/screens/shift_list_screen.dart';
 import '../../features/attendance/presentation/screens/shift_form_screen.dart';
+import '../../features/attendance/presentation/screens/daily_attendance_list_screen.dart';
+import '../../features/attendance/presentation/screens/attendance_exception_list_screen.dart';
+import '../../features/attendance/presentation/screens/permission_list_screen.dart';
+import '../../features/attendance/presentation/screens/permission_form_screen.dart';
+import '../../features/attendance/presentation/screens/approval_center_screen.dart';
 import 'module_registry.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -87,15 +92,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/departments/:id/edit',
         builder: (context, state) {
-          // This should ideally pass the department object or fetch it inside the screen.
-          // In our implementation, we'd need to pass the state if we want synchronous edit, 
-          // but we can just use the ID and fetch, or we can use Riverpod to fetch the dept.
-          // For simplicity, we just pass the ID and let the screen fetch it, OR we pass null 
-          // and rely on a selectedDept state. But DepartmentFormScreen currently accepts 
-          // `DepartmentModel? department`. Let's handle that properly. 
-          // The easiest way is to push passing `extra: department`.
           final dept = state.extra;
-          return DepartmentFormScreen(department: dept as dynamic); // Casting dynamically or changing screen.
+          return DepartmentFormScreen(department: dept as dynamic);
         },
       ),
       GoRoute(
@@ -144,6 +142,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RegularizationFormScreen(),
       ),
       GoRoute(
+        path: '/hrms/attendance/daily-logs',
+        builder: (context, state) => const DailyAttendanceListScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/attendance/exceptions',
+        builder: (context, state) => const AttendanceExceptionListScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/attendance/permissions',
+        builder: (context, state) => const PermissionListScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/attendance/permissions/new',
+        builder: (context, state) => const PermissionFormScreen(),
+      ),
+      GoRoute(
         path: '/hrms/attendance/shifts',
         builder: (context, state) => const ShiftListScreen(),
       ),
@@ -158,6 +172,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/hrms/attendance/leaves/new',
         builder: (context, state) => const LeaveFormScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/attendance/approval-center',
+        builder: (context, state) => const ApprovalCenterScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

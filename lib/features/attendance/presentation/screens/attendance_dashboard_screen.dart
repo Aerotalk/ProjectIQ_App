@@ -108,6 +108,24 @@ class AttendanceDashboardScreen extends ConsumerWidget {
           color: Colors.purple,
           onTap: () => context.push('/hrms/attendance/leaves'),
         ),
+        QuickActionButton(
+          icon: LucideIcons.clipboardList,
+          label: 'Daily Logs',
+          color: Colors.indigo,
+          onTap: () => context.push('/hrms/attendance/daily-logs'),
+        ),
+        QuickActionButton(
+          icon: LucideIcons.alertTriangle,
+          label: 'Exceptions',
+          color: Colors.red,
+          onTap: () => context.push('/hrms/attendance/exceptions'),
+        ),
+        QuickActionButton(
+          icon: LucideIcons.doorOpen,
+          label: 'Out-pass',
+          color: Colors.teal,
+          onTap: () => context.push('/hrms/attendance/permissions'),
+        ),
       ],
     );
   }

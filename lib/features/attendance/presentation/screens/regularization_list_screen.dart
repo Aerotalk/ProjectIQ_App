@@ -39,16 +39,9 @@ class RegularizationListScreen extends ConsumerWidget {
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Theme.of(context).primaryColor.withValues(alpha: 0.15),
-                      width: 1.5,
+                      color: Colors.grey.shade300,
+                      width: 1.0,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.s16),
@@ -144,6 +137,21 @@ class RegularizationListScreen extends ConsumerWidget {
                             style: TextStyle(color: Colors.grey.shade800, fontSize: 13),
                           ),
                         ),
+                        if (req.status == 'Pending') ...[
+                          const SizedBox(height: AppSpacing.s16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: TextButton.icon(
+                              onPressed: () => context.push('/hrms/attendance/approval-center'),
+                              icon: const Icon(LucideIcons.externalLink, size: 16),
+                              label: const Text('View in Approval Center'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Theme.of(context).primaryColor,
+                                backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
