@@ -3,6 +3,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppTextField extends StatefulWidget {
   final String? label;
@@ -143,7 +144,7 @@ class _AppTextFieldState extends State<AppTextField> {
             suffixIcon: widget.isPassword
                 ? IconButton(
                     icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                      _obscureText ? LucideIcons.eyeOff : LucideIcons.eye,
                       color: placeholderColor,
                       size: AppSpacing.s20,
                     ),

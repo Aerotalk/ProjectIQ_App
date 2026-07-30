@@ -6,6 +6,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/router/module_registry.dart';
 import '../../authentication/presentation/auth_controller.dart';
 import '../../../shared/widgets/avatars/profile_avatar.dart'; // We will create this
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomeShell extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -31,31 +32,6 @@ class HomeShell extends ConsumerWidget {
     final orgName = user?.companyName ?? user?.organizationName ?? 'My Organization';
     
     return Scaffold(
-      appBar: AppBar(
-        title: Text(orgName, style: AppTypography.title.copyWith(fontWeight: FontWeight.w700)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Badge(
-              child: Icon(Icons.notifications_none_rounded),
-            ),
-            onPressed: () {},
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0, left: 8.0),
-            child: ProfileAvatar(
-              name: user?.username ?? 'User',
-              photoId: user?.profilePhotoId,
-              onTap: () {
-                // Open profile or drawer
-              },
-            ),
-          ),
-        ],
-      ),
       body: navigationShell,
       bottomNavigationBar: bottomNavModules.isEmpty ? null : NavigationBar(
         selectedIndex: navigationShell.currentIndex,

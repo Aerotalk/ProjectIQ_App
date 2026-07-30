@@ -40,8 +40,8 @@ class AuthController extends Notifier<AuthState> {
 
   Future<void> _init() async {
     try {
-      final token = await _storage.read(key: 'auth_token');
-      if (token != null) {
+      final hasSession = await _storage.read(key: 'has_session');
+      if (hasSession == 'true') {
         final user = await _repository.me();
         state = AuthState(user: user, isLoading: false);
       } else {
@@ -50,7 +50,7 @@ class AuthController extends Notifier<AuthState> {
     } on DioException catch (e) {
       // Typically on 401 we clear token.
       if (e.response?.statusCode == 401) {
-        await _storage.delete(key: 'auth_token');
+        await _storage.delete(key: 'has_session');
       }
       state = AuthState(isLoading: false, error: 'Session expired or offline');
     } catch (e) {
@@ -62,11 +62,9 @@ class AuthController extends Notifier<AuthState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final user = await _repository.login(email, password);
-      // Backend should set cookie or return token.
-      // If we assume the response has a token, we'd save it here.
-      // For now, let's just save a dummy token so the app knows it's logged in if backend doesn't provide one directly in body.
-      // In a real Spring Boot JWT app, the token is often in the body or header. 
-      await _storage.write(key: 'auth_token', value: 'dummy_jwt_token_or_real_if_parsed');
+      // Since backend relies on HttpOnly cookies, we just save a flag indicating we have an active session
+      // For mobile, dio_cookie_manager will handle the cookie. For web, the browser handles it.
+      await _storage.write(key: 'has_session', value: 'true');
       
       state = AuthState(user: user, isLoading: false);
       return true;
@@ -90,7 +88,7 @@ class AuthController extends Notifier<AuthState> {
   Future<void> logout() async {
     state = state.copyWith(isLoading: true);
     await _repository.logout();
-    await _storage.delete(key: 'auth_token');
+    await _storage.delete(key: 'has_session');
     state = const AuthState(isLoading: false);
   }
 

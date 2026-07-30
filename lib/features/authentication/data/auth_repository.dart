@@ -17,9 +17,7 @@ class AuthRepository {
       'email': email,
       'password': password,
     });
-    // The backend might return token + user, or just user.
-    // For now we map it directly based on User definition.
-    // The web ERP stores cookies or gets token. Let's assume it returns User json.
+    // The web ERP stores cookies. The backend nullifies the token in the response body.
     return User.fromJson(response.data);
   }
 

@@ -7,6 +7,7 @@ import 'core/environment/environment.dart';
 import 'core/router/app_router.dart';
 
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_provider.dart';
 
 import 'package:flutter/foundation.dart';
 
@@ -14,7 +15,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize SharedPreferences
-  await SharedPreferences.getInstance();
+  final prefs = await SharedPreferences.getInstance();
 
   // Initialize AppConfig (Development by default for now)
   AppConfig.init(
@@ -27,7 +28,7 @@ void main() async {
   runApp(
     ProviderScope(
       overrides: [
-        // We will override providers here if needed, like local storage
+        sharedPreferencesProvider.overrideWithValue(prefs),
       ],
       child: const HRMSApp(),
     ),
@@ -43,7 +44,7 @@ class HRMSApp extends ConsumerWidget {
       title: 'HRMS Mobile App',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system, // Will eventually be managed by state
+      themeMode: ref.watch(themeProvider),
       routerConfig: ref.watch(appRouterProvider),
       debugShowCheckedModeBanner: false,
     );

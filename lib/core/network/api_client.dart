@@ -1,9 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/foundation.dart';
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:path_provider/path_provider.dart';
 import '../environment/app_config.dart';
 
 final secureStorageProvider = Provider((ref) => const FlutterSecureStorage());
+
+// Create a singleton cookie jar for persistence on mobile
+final cookieJarProvider = Provider<CookieJar>((ref) {
+  // We don't initialize the directory here because it's async, we will do it in main or lazily
+  return CookieJar();
+});
 
 final dioProvider = Provider<Dio>((ref) {
   final dio = Dio(
@@ -12,17 +22,20 @@ final dioProvider = Provider<Dio>((ref) {
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       contentType: 'application/json',
+      // Required for web to send cookies
+      extra: const {'withCredentials': true},
     ),
   );
+
+  // Add CookieManager only on non-web platforms because the browser handles cookies automatically on web
+  if (!kIsWeb) {
+    dio.interceptors.add(CookieManager(ref.read(cookieJarProvider)));
+  }
 
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final storage = ref.read(secureStorageProvider);
-        final token = await storage.read(key: 'auth_token');
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
+        // We no longer inject auth_token because we rely on cookies
         return handler.next(options);
       },
       onError: (DioException e, handler) async {

@@ -11,8 +11,13 @@ import '../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../shared/widgets/buttons/app_button.dart';
 import '../../../shared/widgets/cards/app_card.dart';
 import 'auth_controller.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class GeometricBackgroundPainter extends CustomPainter {
+  final double animationValue;
+
+  GeometricBackgroundPainter(this.animationValue);
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -25,23 +30,33 @@ class GeometricBackgroundPainter extends CustomPainter {
       ..color = const Color(0xFFCBD5E1).withValues(alpha: 0.5)
       ..strokeWidth = 1.0;
     
-    for (double i = 0; i < size.width; i += 40) {
-      canvas.drawLine(Offset(i, 0), Offset(i, size.height), gridPaint);
+    // The frontend animation is a 3-second loop translating Y by -40px.
+    // Our animationValue spans 15s, so we loop it 5 times for a 3s loop.
+    final double gridPhase = (animationValue * 5) % 1.0;
+    
+    canvas.save();
+    canvas.translate(0, -40.0 * gridPhase);
+    
+    for (double i = 0; i <= size.width + 40; i += 40) {
+      canvas.drawLine(Offset(i, 0), Offset(i, size.height + 40), gridPaint);
     }
-    for (double i = 0; i < size.height; i += 40) {
-      canvas.drawLine(Offset(0, i), Offset(size.width, i), gridPaint);
+    for (double i = 0; i <= size.height + 40; i += 40) {
+      canvas.drawLine(Offset(0, i), Offset(size.width + 40, i), gridPaint);
     }
+    canvas.restore();
       
+    final double animPhase = animationValue * 2 * math.pi;
+
     // Circle top left
-    canvas.drawCircle(Offset(size.width * 0.15, size.height * 0.15), 45, paint);
+    canvas.drawCircle(Offset(size.width * 0.15, size.height * 0.15 + math.sin(animPhase) * 15), 45, paint);
     
     // Circle right middle
-    canvas.drawCircle(Offset(size.width * 0.85, size.height * 0.45), 25, paint);
+    canvas.drawCircle(Offset(size.width * 0.85 + math.cos(animPhase) * 15, size.height * 0.45), 25, paint);
 
     // Square bottom left rotated
     canvas.save();
-    canvas.translate(size.width * 0.2, size.height * 0.65);
-    canvas.rotate(15 * math.pi / 180);
+    canvas.translate(size.width * 0.2, size.height * 0.65 + math.cos(animPhase) * 10);
+    canvas.rotate(15 * math.pi / 180 + animationValue * math.pi * 2);
     final fillPaint = Paint()..color = AppColors.primaryLight.withValues(alpha: 0.1);
     canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(-35, -35, 70, 70), const Radius.circular(12)), fillPaint);
     canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(-35, -35, 70, 70), const Radius.circular(12)), paint..color = AppColors.primaryLight.withValues(alpha: 0.2));
@@ -49,14 +64,15 @@ class GeometricBackgroundPainter extends CustomPainter {
     
     // Diamond bottom right
     canvas.save();
-    canvas.translate(size.width * 0.85, size.height * 0.75);
-    canvas.rotate(45 * math.pi / 180);
+    canvas.translate(size.width * 0.85, size.height * 0.75 + math.sin(animPhase) * 15);
+    canvas.rotate(45 * math.pi / 180 - animationValue * math.pi * 2);
     canvas.drawRect(const Rect.fromLTWH(-50, -50, 100, 100), paint..color = AppColors.primaryLight.withValues(alpha: 0.3));
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant GeometricBackgroundPainter oldDelegate) => 
+      oldDelegate.animationValue != animationValue;
 }
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -66,10 +82,28 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _rememberMe = false;
+  late final AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 15),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   void _handleLogin() async {
     final authController = ref.read(authControllerProvider.notifier);
@@ -111,8 +145,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           children: [
             // Background Layer
             Positioned.fill(
-              child: CustomPaint(
-                painter: GeometricBackgroundPainter(),
+              child: AnimatedBuilder(
+                animation: _animationController,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: GeometricBackgroundPainter(_animationController.value),
+                  );
+                },
               ),
             ),
             
@@ -146,7 +185,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ],
                               ),
                               child: Center(
-                                child: Icon(Icons.hexagon, color: AppColors.primaryLight, size: 32), // Placeholder for BumbleERP Logo
+                                child: Icon(LucideIcons.layers, color: AppColors.primaryLight, size: 32), // Placeholder for BumbleERP Logo
                               ),
                             ),
                             const SizedBox(width: AppSpacing.s12),

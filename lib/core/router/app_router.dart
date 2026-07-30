@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../../features/authentication/presentation/login_screen.dart';
 import '../../features/authentication/presentation/auth_controller.dart';
 import '../../features/dashboard/presentation/home_shell.dart';
+import '../../features/dashboard/presentation/dashboard_screen.dart';
+import '../../features/dashboard/presentation/hrms_screen.dart';
+import '../../features/dashboard/presentation/profile_screen.dart';
+import '../../features/dashboard/presentation/notifications_screen.dart';
 import 'module_registry.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -45,6 +49,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: module.route,
                 builder: (context, state) {
+                  if (module.route == '/dashboard') {
+                    return const DashboardScreen();
+                  }
+                  if (module.route == '/hrms') {
+                    return const HRMSScreen();
+                  }
+                  if (module.route == '/profile') {
+                    return const ProfileScreen();
+                  }
+                  if (module.route == '/notifications') {
+                    return const NotificationsScreen();
+                  }
+                  
                   // Placeholder for dynamic module injection
                   return Scaffold(
                     body: Center(

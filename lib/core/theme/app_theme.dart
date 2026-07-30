@@ -21,7 +21,7 @@ class AppTheme {
         error: AppColors.destructiveLight,
         onError: AppColors.destructiveForegroundLight,
       ),
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         displayLarge: AppTypography.display,
         headlineLarge: AppTypography.headline,
         titleLarge: AppTypography.title,
@@ -72,7 +72,7 @@ class AppTheme {
         error: AppColors.destructiveDark,
         onError: AppColors.destructiveForegroundDark,
       ),
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         displayLarge: AppTypography.display,
         headlineLarge: AppTypography.headline,
         titleLarge: AppTypography.title,

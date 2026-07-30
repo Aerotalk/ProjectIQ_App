@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../permissions/permission_service.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum ModuleVisibility {
   bottomNav, // Shows up in the primary bottom navigation
@@ -26,52 +27,117 @@ class AppModule {
   });
 }
 
-// The master list of all possible modules in the HRMS
-const List<AppModule> _allModules = [
+// Core Modules (Bottom Navigation)
+const List<AppModule> _coreModules = [
   AppModule(
     id: 'dashboard',
-    title: 'Dashboard',
-    icon: Icons.dashboard_rounded,
+    title: 'Home',
+    icon: LucideIcons.home,
     route: '/dashboard',
   ),
   AppModule(
-    id: 'employees',
-    title: 'Employees',
-    icon: Icons.people_rounded,
-    route: '/employees',
-    permission: 'employee.view',
-  ),
-  AppModule(
-    id: 'attendance',
+    id: 'attendance_nav',
     title: 'Attendance',
-    icon: Icons.access_time_rounded,
+    icon: LucideIcons.clock,
     route: '/attendance',
     permission: 'attendance.view',
   ),
   AppModule(
-    id: 'leave',
-    title: 'Leave',
-    icon: Icons.date_range_rounded,
-    route: '/leave',
-    permission: 'leave.view',
+    id: 'requests',
+    title: 'Requests',
+    icon: LucideIcons.fileText,
+    route: '/requests',
+    permission: 'requests.view', // Assumed permission for employee requests
+  ),
+  AppModule(
+    id: 'hrms',
+    title: 'HRMS',
+    icon: LucideIcons.layers,
+    route: '/hrms',
+    permission: 'employee.view', // Only those who can view employees get the HRMS tab
+  ),
+  AppModule(
+    id: 'approvals',
+    title: 'Approvals',
+    icon: LucideIcons.checkCircle,
+    route: '/approvals',
+    permission: 'approvals.view', // Managers/HR
+  ),
+  AppModule(
+    id: 'notifications',
+    title: 'Notifications',
+    icon: LucideIcons.bell,
+    route: '/notifications',
+  ),
+  AppModule(
+    id: 'profile',
+    title: 'Profile',
+    icon: LucideIcons.user,
+    route: '/profile',
+  ),
+];
+
+// HRMS Inner Modules (The App Launcher inside the HRMS tab)
+const List<AppModule> _hrmsModules = [
+  AppModule(
+    id: 'employees',
+    title: 'Directory',
+    icon: LucideIcons.users,
+    route: '/hrms/employees',
+    permission: 'employee.view',
+    visibility: ModuleVisibility.hidden,
+  ),
+  AppModule(
+    id: 'departments',
+    title: 'Departments',
+    icon: LucideIcons.building,
+    route: '/hrms/departments',
+    permission: 'department.view',
+    visibility: ModuleVisibility.hidden,
+  ),
+  AppModule(
+    id: 'designations',
+    title: 'Designations',
+    icon: LucideIcons.briefcase,
+    route: '/hrms/designations',
+    permission: 'designation.view',
+    visibility: ModuleVisibility.hidden,
+  ),
+  AppModule(
+    id: 'attendance_admin',
+    title: 'Attendance',
+    icon: LucideIcons.clock,
+    route: '/hrms/attendance',
+    permission: 'attendance.admin',
+    visibility: ModuleVisibility.hidden,
   ),
   AppModule(
     id: 'payroll',
     title: 'Payroll',
-    icon: Icons.payments_rounded,
-    route: '/payroll',
+    icon: LucideIcons.banknote,
+    route: '/hrms/payroll',
     permission: 'payroll.view',
-    visibility: ModuleVisibility.drawer,
+    visibility: ModuleVisibility.hidden,
   ),
   AppModule(
     id: 'expense',
     title: 'Expenses',
-    icon: Icons.receipt_long_rounded,
-    route: '/expense-claims',
+    icon: LucideIcons.receipt,
+    route: '/hrms/expense-claims',
     permission: 'expense.view',
-    visibility: ModuleVisibility.drawer,
+    visibility: ModuleVisibility.hidden,
+  ),
+  AppModule(
+    id: 'performance',
+    title: 'Performance',
+    icon: LucideIcons.trendingUp,
+    route: '/hrms/performance',
+    permission: 'performance.view',
+    visibility: ModuleVisibility.hidden,
   ),
 ];
+
+final List<AppModule> _allModules = [..._coreModules, ..._hrmsModules];
 
 final moduleRegistryProvider = Provider<ModuleRegistry>((ref) {
   return ModuleRegistry(ref.watch(permissionServiceProvider));
@@ -92,15 +158,29 @@ class ModuleRegistry {
 
   // Helper for Bottom Navigation
   List<AppModule> get bottomNavModules {
-    return permittedModules
+    final modules = permittedModules
         .where((m) => m.visibility == ModuleVisibility.bottomNav)
         .toList();
+        
+    // Conflict resolution: If user has BOTH Requests and Approvals, combine them or just show Approvals if HRMS is present.
+    // The spec requires maximum 5 items to look good.
+    final hasHrms = modules.any((m) => m.id == 'hrms');
+    
+    return modules.where((m) {
+      // If user has HRMS (HR role), hide Requests & generic Attendance in bottom nav to save space, 
+      // because Attendance is also in HRMS module for HR.
+      if (hasHrms) {
+        if (m.id == 'requests' || m.id == 'attendance_nav') return false;
+      }
+      return true;
+    }).take(5).toList(); // Ensure max 5 items
   }
 
-  // Helper for Drawer or More Menu
-  List<AppModule> get drawerModules {
-    return permittedModules
-        .where((m) => m.visibility == ModuleVisibility.drawer)
-        .toList();
+  // Helper for HRMS Grid (App Launcher)
+  List<AppModule> get hrmsGridModules {
+    return _hrmsModules.where((module) {
+      if (module.permission == null) return true;
+      return _permissionService.can(module.permission!);
+    }).toList();
   }
 }
