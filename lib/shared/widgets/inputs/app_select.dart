@@ -89,7 +89,7 @@ class AppSelect<T> extends StatelessWidget {
           const SizedBox(height: AppSpacing.s8),
         ],
         DropdownButtonFormField<T>(
-          value: value,
+          value: items.any((item) => item.value == value) ? value : null,
           items: items,
           onChanged: onChanged,
           style: AppTypography.body.copyWith(color: textColor),

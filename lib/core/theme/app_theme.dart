@@ -84,6 +84,40 @@ class AppTheme {
           overlayColor: _transparentOverlay,
         ),
       ),
+      dialogTheme: const DialogThemeData(
+        elevation: 0,
+        shadowColor: Colors.transparent,
+      ),
+      popupMenuTheme: const PopupMenuThemeData(
+        elevation: 0,
+        shadowColor: Colors.transparent,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        elevation: 0,
+        shadowColor: Colors.transparent,
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        elevation: 0,
+        focusElevation: 0,
+        hoverElevation: 0,
+        highlightElevation: 0,
+        splashColor: Colors.transparent,
+      ),
+      drawerTheme: const DrawerThemeData(
+        elevation: 0,
+        shadowColor: Colors.transparent,
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.transparent,
+        // Removes any default shadow or weird focus effects
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        elevation: 0,
+      ),
+      scrollbarTheme: const ScrollbarThemeData(
+        // Sometimes scrollbars trigger shader compilation on fade out
+      ),
       extensions: const [
         AppThemeExtension(
           success: AppColors.success,
@@ -169,6 +203,36 @@ class AppTheme {
           splashFactory: _noSplash,
           overlayColor: _transparentOverlay,
         ),
+      ),
+      dialogTheme: const DialogThemeData(
+        elevation: 0,
+        shadowColor: Colors.transparent,
+      ),
+      popupMenuTheme: const PopupMenuThemeData(
+        elevation: 0,
+        shadowColor: Colors.transparent,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        elevation: 0,
+        shadowColor: Colors.transparent,
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        elevation: 0,
+        focusElevation: 0,
+        hoverElevation: 0,
+        highlightElevation: 0,
+        splashColor: Colors.transparent,
+      ),
+      drawerTheme: const DrawerThemeData(
+        elevation: 0,
+        shadowColor: Colors.transparent,
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.transparent,
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        elevation: 0,
       ),
       extensions: const [
         AppThemeExtension(

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:projectiq_app/shared/widgets/inputs/app_text_field.dart';
 import 'package:projectiq_app/shared/widgets/inputs/app_select.dart';
@@ -431,7 +431,7 @@ class FamilyNomineeStep extends ConsumerWidget {
           TextButton.icon(
             onPressed: () {
               final updated = List<Map<String, dynamic>>.from(families.map((e) => Map<String, dynamic>.from(e as Map)));
-              updated.add({'name': '', 'relationship': '', 'dateOfBirth': '', 'gender': '', 'phone': '', 'nomineePercentage': 0, 'isDependent': false, 'isNominee': false});
+              updated.add({'name': '', 'relationship': '', 'dateOfBirth': '', 'gender': null, 'phone': '', 'nomineePercentage': 0, 'isDependent': false, 'isNominee': false});
               n.updateField('families', updated);
             },
             icon: const Icon(Icons.add, size: 16),
@@ -472,7 +472,7 @@ class FamilyNomineeStep extends ConsumerWidget {
                 sp,
                 AppDatePicker(label: 'Date of Birth', initialDate: m['dateOfBirth'] != null && m['dateOfBirth'].toString().isNotEmpty ? DateTime.tryParse(m['dateOfBirth'].toString()) : null, onChanged: (v) { if (v != null) { final u = _updateList(families, i, 'dateOfBirth', _fmtDate(v)); n.updateField('families', u); } }),
                 sp,
-                AppSelect<String>(value: m['gender'] as String?, label: 'Gender', placeholder: 'Select', items: ['Male', 'Female', 'Other'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(), onChanged: (v) { final u = _updateList(families, i, 'gender', v); n.updateField('families', u); }),
+                AppSelect<String>(value: (m['gender'] == null || m['gender'].toString().isEmpty) ? null : m['gender'] as String?, label: 'Gender', placeholder: 'Select', items: ['Male', 'Female', 'Other'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(), onChanged: (v) { final u = _updateList(families, i, 'gender', v); n.updateField('families', u); }),
                 sp,
                 AppTextField(label: 'Phone', initialValue: m['phone']?.toString(), keyboardType: TextInputType.phone, onChanged: (v) { final u = _updateList(families, i, 'phone', v); n.updateField('families', u); }),
                 sp,
@@ -612,7 +612,7 @@ class DocumentsStep extends ConsumerWidget {
           TextButton.icon(
             onPressed: () {
               final updated = List<Map<String, dynamic>>.from(docs.map((e) => Map<String, dynamic>.from(e as Map)));
-              updated.add({'documentCategory': '', 'documentName': '', 'fileName': null, 'filePath': null, 'expiryDate': ''});
+              updated.add({'documentCategory': null, 'documentName': '', 'fileName': null, 'filePath': null, 'expiryDate': ''});
               n.updateField('documents', updated);
             },
             icon: const Icon(Icons.add, size: 16),
@@ -645,7 +645,7 @@ class DocumentsStep extends ConsumerWidget {
                   ),
                 ]),
                 AppSelect<String>(
-                  value: m['documentCategory'] as String?,
+                  value: (m['documentCategory'] == null || m['documentCategory'].toString().isEmpty) ? null : m['documentCategory'] as String?,
                   label: 'Document Category *',
                   placeholder: 'Select',
                   items: ['Identity Proof', 'Address Proof', 'Educational', 'Experience', 'Other'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
