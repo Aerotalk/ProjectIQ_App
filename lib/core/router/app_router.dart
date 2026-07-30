@@ -18,6 +18,14 @@ import '../../features/departments/presentation/screens/department_form_screen.d
 import '../../features/designations/presentation/screens/designation_list_screen.dart';
 import '../../features/designations/presentation/screens/designation_details_screen.dart';
 import '../../features/designations/presentation/screens/designation_form_screen.dart';
+import '../../features/attendance/presentation/screens/attendance_dashboard_screen.dart';
+import '../../features/attendance/presentation/screens/attendance_calendar_screen.dart';
+import '../../features/attendance/presentation/screens/regularization_list_screen.dart';
+import '../../features/attendance/presentation/screens/regularization_form_screen.dart';
+import '../../features/attendance/presentation/screens/leave_list_screen.dart';
+import '../../features/attendance/presentation/screens/leave_form_screen.dart';
+import '../../features/attendance/presentation/screens/shift_list_screen.dart';
+import '../../features/attendance/presentation/screens/shift_form_screen.dart';
 import 'module_registry.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -118,6 +126,38 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final id = state.pathParameters['id']!;
           return DesignationDetailsScreen(designationId: id);
         },
+      ),
+      GoRoute(
+        path: '/hrms/attendance',
+        builder: (context, state) => const AttendanceDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/attendance/calendar',
+        builder: (context, state) => const AttendanceCalendarScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/attendance/regularization',
+        builder: (context, state) => const RegularizationListScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/attendance/regularization/new',
+        builder: (context, state) => const RegularizationFormScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/attendance/shifts',
+        builder: (context, state) => const ShiftListScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/attendance/shifts/new',
+        builder: (context, state) => const ShiftFormScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/attendance/leaves',
+        builder: (context, state) => const LeaveListScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/attendance/leaves/new',
+        builder: (context, state) => const LeaveFormScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

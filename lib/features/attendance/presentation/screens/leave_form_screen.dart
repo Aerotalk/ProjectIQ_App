@@ -1,0 +1,103 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../shared/widgets/inputs/app_text_field.dart';
+import '../../data/models/leave_model.dart';
+import '../providers/leave_providers.dart';
+import 'package:uuid/uuid.dart';
+
+class LeaveFormScreen extends ConsumerStatefulWidget {
+  const LeaveFormScreen({super.key});
+
+  @override
+  ConsumerState<LeaveFormScreen> createState() => _LeaveFormScreenState();
+}
+
+class _LeaveFormScreenState extends ConsumerState<LeaveFormScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _leaveTypeController = TextEditingController();
+  final _startDateController = TextEditingController();
+  final _endDateController = TextEditingController();
+  final _reasonController = TextEditingController();
+
+  @override
+  void dispose() {
+    _leaveTypeController.dispose();
+    _startDateController.dispose();
+    _endDateController.dispose();
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (!_formKey.currentState!.validate()) return;
+
+    final newReq = LeaveModel(
+      id: const Uuid().v4(),
+      leaveType: _leaveTypeController.text,
+      employeeName: 'Current User', // Mocked
+      startDate: _startDateController.text,
+      endDate: _endDateController.text,
+      durationDays: 1, // Mocked for now
+      reason: _reasonController.text,
+      status: 'Pending',
+    );
+
+    ref.read(submitLeaveProvider.notifier).submit(newReq).then((_) {
+      if (mounted) context.pop();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final submitState = ref.watch(submitLeaveProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Apply Leave')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSpacing.s16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              AppTextField(
+                label: 'Leave Type (e.g. Sick, Casual)',
+                controller: _leaveTypeController,
+                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: AppSpacing.s16),
+              AppTextField(
+                label: 'Start Date (YYYY-MM-DD)',
+                controller: _startDateController,
+                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: AppSpacing.s16),
+              AppTextField(
+                label: 'End Date (YYYY-MM-DD)',
+                controller: _endDateController,
+                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: AppSpacing.s16),
+              AppTextField(
+                label: 'Reason',
+                controller: _reasonController,
+                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: AppSpacing.s32),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: submitState.isLoading ? null : _submit,
+                  child: submitState.isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Submit Application'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

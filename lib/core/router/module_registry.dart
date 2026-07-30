@@ -105,10 +105,9 @@ const List<AppModule> _hrmsModules = [
   ),
   AppModule(
     id: 'attendance_admin',
-    title: 'Attendance',
+    title: 'Workforce',
     icon: LucideIcons.clock,
     route: '/hrms/attendance',
-    permission: 'attendance.admin',
     visibility: ModuleVisibility.hidden,
   ),
   AppModule(
