@@ -31,6 +31,15 @@ import '../../features/attendance/presentation/screens/attendance_exception_list
 import '../../features/attendance/presentation/screens/permission_list_screen.dart';
 import '../../features/attendance/presentation/screens/permission_form_screen.dart';
 import '../../features/attendance/presentation/screens/approval_center_screen.dart';
+import '../../features/payroll/presentation/screens/payroll_dashboard_screen.dart';
+import '../../features/payroll/presentation/screens/payslips_screen.dart';
+import '../../features/payroll/presentation/screens/salary_details_screen.dart';
+import '../../features/payroll/presentation/screens/reimbursement_list_screen.dart';
+import '../../features/payroll/presentation/screens/it_declaration_screen.dart';
+import '../../features/payroll/presentation/screens/payroll_runs_screen.dart';
+import '../../features/payroll/presentation/screens/salary_inputs_screen.dart';
+import '../../features/payroll/presentation/screens/payroll_processing_screen.dart';
+import '../../features/payroll/presentation/screens/verification_screen.dart';
 import 'module_registry.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -176,6 +185,50 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/hrms/attendance/approval-center',
         builder: (context, state) => const ApprovalCenterScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/payroll',
+        builder: (context, state) => const PayrollDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/payroll/payslips',
+        builder: (context, state) => const PayslipsScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/payroll/salary-details',
+        builder: (context, state) => const SalaryDetailsScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/payroll/reimbursements',
+        builder: (context, state) => const ReimbursementListScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/payroll/it-declarations',
+        builder: (context, state) => const ITDeclarationScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/payroll/runs',
+        builder: (context, state) => const PayrollRunsScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/payroll/inputs',
+        builder: (context, state) => const SalaryInputsScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/payroll/processing',
+        builder: (context, state) => const PayrollProcessingScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/payroll/verification',
+        builder: (context, state) => const VerificationScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/payroll/payouts',
+        builder: (context, state) => Scaffold(appBar: AppBar(title: const Text('Payouts')), body: const Center(child: Text('Payouts module coming soon'))),
+      ),
+      GoRoute(
+        path: '/hrms/payroll/settlements',
+        builder: (context, state) => Scaffold(appBar: AppBar(title: const Text('Settlements')), body: const Center(child: Text('Final Settlements coming soon'))),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

@@ -111,9 +111,27 @@ class AuthController extends Notifier<AuthState> {
       organizationName: 'BumbleERP Dev',
       effectivePermissions: [
         'ticket.view', 'role.view', 'user.view', 'sales.view', 
-        'finance.view', 'employee.view', 'department.view', 'designation.view'
+        'finance.view', 'employee.view', 'department.view', 'designation.view', 'payroll.view', 'approvals.view'
       ],
     );
     state = AuthState(user: devUser, isLoading: false);
+  }
+
+  // Toggle between HR and Employee roles for testing the UI
+  void toggleDeveloperRole() {
+    if (state.user == null) return;
+    
+    final currentUser = state.user!;
+    final isCurrentlyHR = currentUser.roles.contains('ROLE_SUPER_ADMIN') || currentUser.roles.contains('ROLE_HR');
+    
+    final newUser = currentUser.copyWith(
+      roles: isCurrentlyHR ? ['ROLE_EMPLOYEE'] : ['ROLE_SUPER_ADMIN'],
+      effectivePermissions: isCurrentlyHR ? [] : [
+        'ticket.view', 'role.view', 'user.view', 'sales.view', 
+        'finance.view', 'employee.view', 'department.view', 'designation.view', 'payroll.view', 'approvals.view'
+      ],
+    );
+    
+    state = state.copyWith(user: newUser);
   }
 }

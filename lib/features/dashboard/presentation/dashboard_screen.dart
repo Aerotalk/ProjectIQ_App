@@ -12,6 +12,7 @@ import 'widgets/dashboard_section.dart';
 import 'widgets/module_card.dart';
 import '../../../../shared/widgets/loaders/skeleton.dart';
 import '../../../../shared/widgets/search/global_search_delegate.dart';
+import '../../../../core/theme/theme_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
@@ -103,22 +104,44 @@ class DashboardScreen extends ConsumerWidget {
                 ? const Skeleton(height: 24, width: 120)
                 : Text(
                     orgName,
-                    style: AppTypography.title.copyWith(fontWeight: FontWeight.w700),
+                    style: AppTypography.title.copyWith(fontWeight: FontWeight.w700, fontSize: 18),
                     overflow: TextOverflow.ellipsis,
                   ),
           ),
         ],
       ),
       actions: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              user?.hasRole('ROLE_SUPER_ADMIN') == true ? 'HR' : 'EMP',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+              ),
+            ),
+            Transform.scale(
+              scale: 0.6,
+              child: Switch(
+                value: user?.hasRole('ROLE_SUPER_ADMIN') == true,
+                onChanged: (_) {
+                  ref.read(authControllerProvider.notifier).toggleDeveloperRole();
+                },
+              ),
+            ),
+          ],
+        ),
         IconButton(
-          icon: const Icon(LucideIcons.search),
+          icon: Icon(isDark ? LucideIcons.sun : LucideIcons.moon, size: 20),
           onPressed: () {
-            showSearch(context: context, delegate: GlobalSearchDelegate());
+            ref.read(themeProvider.notifier).toggleTheme();
           },
         ),
         IconButton(
           icon: const Badge(
-            child: Icon(LucideIcons.bell),
+            child: Icon(LucideIcons.bell, size: 20),
           ),
           onPressed: () {
             context.go('/notifications');

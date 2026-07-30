@@ -20,7 +20,7 @@ class ThemeNotifier extends Notifier<ThemeMode> {
     
     if (themeStr == 'light') return ThemeMode.light;
     if (themeStr == 'dark') return ThemeMode.dark;
-    return ThemeMode.system;
+    return ThemeMode.light;
   }
 
   void setThemeMode(ThemeMode mode) {

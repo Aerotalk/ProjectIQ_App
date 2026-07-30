@@ -65,6 +65,38 @@ class User {
     };
   }
 
+  User copyWith({
+    String? id,
+    String? username,
+    String? email,
+    List<String>? roles,
+    String? organizationId,
+    String? organizationName,
+    String? companyId,
+    String? companyName,
+    List<String>? effectivePermissions,
+    String? profilePhotoId,
+    String? companyLogoId,
+    String? primaryColor,
+    String? secondaryColor,
+  }) {
+    return User(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      roles: roles ?? this.roles,
+      organizationId: organizationId ?? this.organizationId,
+      organizationName: organizationName ?? this.organizationName,
+      companyId: companyId ?? this.companyId,
+      companyName: companyName ?? this.companyName,
+      effectivePermissions: effectivePermissions ?? this.effectivePermissions,
+      profilePhotoId: profilePhotoId ?? this.profilePhotoId,
+      companyLogoId: companyLogoId ?? this.companyLogoId,
+      primaryColor: primaryColor ?? this.primaryColor,
+      secondaryColor: secondaryColor ?? this.secondaryColor,
+    );
+  }
+
   // Helper method for roles
   bool hasRole(String role) => roles.contains(role);
   
