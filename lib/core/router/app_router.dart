@@ -9,6 +9,9 @@ import '../../features/dashboard/presentation/hrms_screen.dart';
 import '../../features/dashboard/presentation/profile_screen.dart';
 import '../../features/dashboard/presentation/profile_settings_screen.dart';
 import '../../features/dashboard/presentation/notifications_screen.dart';
+import '../../features/hrms/presentation/employee_directory_screen.dart';
+import '../../features/hrms/presentation/employee_profile_screen.dart';
+import '../../features/hrms/presentation/add_employee_screen.dart';
 import 'module_registry.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -43,6 +46,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile-settings',
         builder: (context, state) => const ProfileSettingsScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/employees',
+        builder: (context, state) => const EmployeeDirectoryScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/employees/new',
+        builder: (context, state) => const AddEmployeeScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/employees/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return EmployeeProfileScreen(employeeId: id);
+        },
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

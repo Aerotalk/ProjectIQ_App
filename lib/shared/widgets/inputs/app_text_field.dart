@@ -21,6 +21,7 @@ class AppTextField extends StatefulWidget {
   final int maxLines;
   final bool isRequired;
   final Widget? labelTrailing;
+  final String? initialValue;
 
   const AppTextField({
     super.key,
@@ -39,6 +40,7 @@ class AppTextField extends StatefulWidget {
     this.maxLines = 1,
     this.isRequired = false,
     this.labelTrailing,
+    this.initialValue,
   });
 
   @override
@@ -122,6 +124,7 @@ class _AppTextFieldState extends State<AppTextField> {
           const SizedBox(height: AppSpacing.s8),
         ],
         TextFormField(
+          initialValue: widget.initialValue,
           controller: widget.controller,
           obscureText: _obscureText,
           keyboardType: widget.keyboardType,

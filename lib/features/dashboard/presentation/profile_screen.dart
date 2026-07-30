@@ -73,7 +73,15 @@ class ProfileScreen extends ConsumerWidget {
                 employeeProfileAsync.when(
                   data: (profile) {
                     if (profile == null) {
-                      return const Center(child: Text('Employee profile not found'));
+                      return Column(
+                        children: [
+                          _buildProfileDetailRow(context, 'Role', user?.roles.join(', ') ?? 'Admin'),
+                          if (user?.organizationName != null) 
+                            _buildProfileDetailRow(context, 'Organization', user!.organizationName!),
+                          if (user?.companyName != null)
+                            _buildProfileDetailRow(context, 'Company', user!.companyName!),
+                        ],
+                      );
                     }
                     return Column(
                       children: [
@@ -155,6 +163,7 @@ class ProfileScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.s8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
@@ -162,9 +171,13 @@ class ProfileScreen extends ConsumerWidget {
               color: isDark ? AppColors.mutedForegroundDark : AppColors.mutedForegroundLight,
             ),
           ),
-          Text(
-            value,
-            style: AppTypography.body.copyWith(fontWeight: FontWeight.w500),
+          const SizedBox(width: AppSpacing.s16),
+          Expanded(
+            child: Text(
+              value,
+              style: AppTypography.body.copyWith(fontWeight: FontWeight.w500),
+              textAlign: TextAlign.right,
+            ),
           ),
         ],
       ),

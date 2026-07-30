@@ -176,13 +176,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(AppRadius.md),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.1),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  )
-                                ],
+                                boxShadow: const [],
                               ),
                               child: Center(
                                 child: Icon(LucideIcons.layers, color: AppColors.primaryLight, size: 32), // Placeholder for BumbleERP Logo
