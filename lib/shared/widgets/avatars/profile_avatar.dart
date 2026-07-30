@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../core/environment/app_config.dart';
+import 'profile_photo_provider.dart';
 
-class ProfileAvatar extends StatelessWidget {
+class ProfileAvatar extends ConsumerWidget {
   final String name;
   final String? photoId;
   final VoidCallback? onTap;
@@ -18,9 +19,8 @@ class ProfileAvatar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final initials = name.isNotEmpty ? name.substring(0, name.length >= 2 ? 2 : 1).toUpperCase() : '?';
-    final photoUrl = photoId != null ? '${AppConfig.instance.apiBaseUrl}/admin/files/$photoId' : null;
 
     final Widget avatar = Container(
       width: size,
@@ -31,12 +31,27 @@ class ProfileAvatar extends StatelessWidget {
         border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.2)),
       ),
       clipBehavior: Clip.antiAlias,
-      child: photoUrl != null
-          ? Image.network(
-              photoUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _buildInitials(initials),
-            )
+      child: photoId != null
+          ? ref.watch(profilePhotoProvider(photoId!)).when(
+                data: (bytes) {
+                  if (bytes != null) {
+                    return Image.memory(
+                      bytes,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _buildInitials(initials),
+                    );
+                  }
+                  return _buildInitials(initials);
+                },
+                loading: () => const Center(
+                  child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+                error: (_, __) => _buildInitials(initials),
+              )
           : _buildInitials(initials),
     );
 

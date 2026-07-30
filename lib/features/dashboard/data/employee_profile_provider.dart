@@ -9,8 +9,9 @@ final employeeProfileProvider = FutureProvider.autoDispose<EmployeeProfile?>((re
     final response = await dio.get('/admin/employees/me');
     return EmployeeProfile.fromJson(response.data);
   } on DioException catch (e) {
-    if (e.response?.statusCode == 403 || e.response?.statusCode == 404) {
-      // User might not have an employee profile or permission to view it
+    if (e.response?.statusCode == 400 || e.response?.statusCode == 403 || e.response?.statusCode == 404) {
+      // User might not have an employee profile or permission to view it.
+      // Backend returns 400 Bad Request for RuntimeException("Employee profile not found").
       return null;
     }
     rethrow;

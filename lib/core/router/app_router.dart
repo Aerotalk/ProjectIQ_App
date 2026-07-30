@@ -7,6 +7,7 @@ import '../../features/dashboard/presentation/home_shell.dart';
 import '../../features/dashboard/presentation/dashboard_screen.dart';
 import '../../features/dashboard/presentation/hrms_screen.dart';
 import '../../features/dashboard/presentation/profile_screen.dart';
+import '../../features/dashboard/presentation/profile_settings_screen.dart';
 import '../../features/dashboard/presentation/notifications_screen.dart';
 import 'module_registry.dart';
 
@@ -38,6 +39,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/profile-settings',
+        builder: (context, state) => const ProfileSettingsScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

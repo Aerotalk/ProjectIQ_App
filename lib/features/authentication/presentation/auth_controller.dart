@@ -92,6 +92,15 @@ class AuthController extends Notifier<AuthState> {
     state = const AuthState(isLoading: false);
   }
 
+  Future<void> refreshUser() async {
+    try {
+      final user = await _repository.me();
+      state = state.copyWith(user: user);
+    } catch (e) {
+      // Ignored for refresh purposes
+    }
+  }
+
   // A method for developers to bypass login when backend is offline
   void developerBypass() {
     final devUser = User(

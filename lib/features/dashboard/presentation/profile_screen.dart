@@ -9,6 +9,7 @@ import '../../authentication/presentation/auth_controller.dart';
 import '../../../../shared/widgets/avatars/profile_avatar.dart';
 import '../../../../shared/widgets/loaders/skeleton.dart';
 import '../data/employee_profile_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -25,6 +26,14 @@ class ProfileScreen extends ConsumerWidget {
         title: Text('Profile', style: AppTypography.title.copyWith(fontWeight: FontWeight.w700)),
         backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(LucideIcons.settings),
+            onPressed: () {
+              context.push('/profile-settings');
+            },
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.s16),
