@@ -57,7 +57,7 @@ class _ExpenseClaimFormScreenState
   }
 
   void _pickAttachment() async {
-    final result = await FilePicker.pickFiles(
+    final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: [
         'jpg',
