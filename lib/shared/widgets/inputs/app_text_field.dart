@@ -22,6 +22,7 @@ class AppTextField extends StatefulWidget {
   final bool isRequired;
   final Widget? labelTrailing;
   final String? initialValue;
+  final FormFieldValidator<String>? validator;
 
   const AppTextField({
     super.key,
@@ -41,6 +42,7 @@ class AppTextField extends StatefulWidget {
     this.isRequired = false,
     this.labelTrailing,
     this.initialValue,
+    this.validator,
   });
 
   @override
@@ -134,6 +136,7 @@ class _AppTextFieldState extends State<AppTextField> {
           maxLines: widget.maxLines,
           style: AppTypography.body.copyWith(color: textColor),
           cursorColor: focusColor,
+          validator: widget.validator,
           decoration: InputDecoration(
             filled: true,
             fillColor: backgroundColor, // Note: dynamically changing on focus is complex in standard InputDecoration, so this uses the unfocused base color

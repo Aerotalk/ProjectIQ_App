@@ -12,6 +12,9 @@ import '../../features/dashboard/presentation/notifications_screen.dart';
 import '../../features/hrms/presentation/employee_directory_screen.dart';
 import '../../features/hrms/presentation/employee_profile_screen.dart';
 import '../../features/hrms/presentation/add_employee_screen.dart';
+import '../../features/departments/presentation/screens/department_list_screen.dart';
+import '../../features/departments/presentation/screens/department_details_screen.dart';
+import '../../features/departments/presentation/screens/department_form_screen.dart';
 import 'module_registry.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -60,6 +63,35 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return EmployeeProfileScreen(employeeId: id);
+        },
+      ),
+      GoRoute(
+        path: '/hrms/departments',
+        builder: (context, state) => const DepartmentListScreen(),
+      ),
+      GoRoute(
+        path: '/departments/new',
+        builder: (context, state) => const DepartmentFormScreen(),
+      ),
+      GoRoute(
+        path: '/departments/:id/edit',
+        builder: (context, state) {
+          // This should ideally pass the department object or fetch it inside the screen.
+          // In our implementation, we'd need to pass the state if we want synchronous edit, 
+          // but we can just use the ID and fetch, or we can use Riverpod to fetch the dept.
+          // For simplicity, we just pass the ID and let the screen fetch it, OR we pass null 
+          // and rely on a selectedDept state. But DepartmentFormScreen currently accepts 
+          // `DepartmentModel? department`. Let's handle that properly. 
+          // The easiest way is to push passing `extra: department`.
+          final dept = state.extra;
+          return DepartmentFormScreen(department: dept as dynamic); // Casting dynamically or changing screen.
+        },
+      ),
+      GoRoute(
+        path: '/departments/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return DepartmentDetailsScreen(departmentId: id);
         },
       ),
       StatefulShellRoute.indexedStack(
