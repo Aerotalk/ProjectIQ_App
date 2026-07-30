@@ -31,13 +31,15 @@ class EmployeeFormState {
 class EmployeeFormController extends Notifier<EmployeeFormState> {
   @override
   EmployeeFormState build() {
-    return EmployeeFormState(formData: {
-      'gender': 'Male',
-      'employmentStatus': 'Active',
-      'maritalStatus': 'Single',
-      'bloodGroup': 'O+',
-      'employmentType': 'Full Time',
-    });
+    return EmployeeFormState(
+      formData: {
+        'gender': 'Male',
+        'employmentStatus': 'Active',
+        'maritalStatus': 'Single',
+        'bloodGroup': 'O+',
+        'employmentType': 'Full Time',
+      },
+    );
   }
 
   void updateField(String key, dynamic value) {
@@ -77,6 +79,7 @@ class EmployeeFormController extends Notifier<EmployeeFormState> {
   }
 }
 
-final employeeFormProvider = NotifierProvider.autoDispose<EmployeeFormController, EmployeeFormState>(
-  EmployeeFormController.new,
-);
+final employeeFormProvider =
+    NotifierProvider.autoDispose<EmployeeFormController, EmployeeFormState>(
+      EmployeeFormController.new,
+    );

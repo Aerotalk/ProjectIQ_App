@@ -10,6 +10,7 @@ import '../../../shared/widgets/loaders/skeleton.dart';
 import '../../authentication/presentation/auth_controller.dart';
 import 'providers/employee_providers.dart';
 import 'widgets/employee_card.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class EmployeeDirectoryScreen extends ConsumerWidget {
   const EmployeeDirectoryScreen({super.key});
@@ -23,13 +24,23 @@ class EmployeeDirectoryScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Employee Directory', style: AppTypography.title.copyWith(fontWeight: FontWeight.w700)),
-        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+        title: Text(
+          'Employee Directory',
+          style: AppTypography.title.copyWith(fontWeight: FontWeight.w700),
+        ),
+        backgroundColor: isDark
+            ? AppColors.backgroundDark
+            : AppColors.backgroundLight,
         elevation: 0,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.s16, 0, AppSpacing.s16, AppSpacing.s12),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.s16,
+              0,
+              AppSpacing.s16,
+              AppSpacing.s12,
+            ),
             child: Row(
               children: [
                 Expanded(
@@ -38,23 +49,33 @@ class EmployeeDirectoryScreen extends ConsumerWidget {
                     prefixIcon: Icon(
                       LucideIcons.search,
                       size: 20,
-                      color: isDark ? AppColors.mutedForegroundDark : AppColors.mutedForegroundLight,
+                      color: isDark
+                          ? AppColors.mutedForegroundDark
+                          : AppColors.mutedForegroundLight,
                     ),
                     onChanged: (value) {
-                      ref.read(employeeSearchQueryProvider.notifier).updateState(value);
+                      ref
+                          .read(employeeSearchQueryProvider.notifier)
+                          .updateState(value);
                     },
                   ),
                 ),
                 const SizedBox(width: AppSpacing.s12),
                 Container(
                   decoration: BoxDecoration(
-                    color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.1),
+                    color:
+                        (isDark
+                                ? AppColors.primaryDark
+                                : AppColors.primaryLight)
+                            .withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: IconButton(
                     icon: Icon(
                       LucideIcons.filter,
-                      color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                      color: isDark
+                          ? AppColors.primaryDark
+                          : AppColors.primaryLight,
                     ),
                     onPressed: () {
                       // TODO: Implement Bottom Sheet Filters
@@ -76,13 +97,12 @@ class EmployeeDirectoryScreen extends ConsumerWidget {
                   Icon(
                     LucideIcons.users,
                     size: 64,
-                    color: isDark ? AppColors.mutedForegroundDark.withValues(alpha: 0.5) : AppColors.mutedForegroundLight.withValues(alpha: 0.5),
+                    color: isDark
+                        ? AppColors.mutedForegroundDark.withValues(alpha: 0.5)
+                        : AppColors.mutedForegroundLight.withValues(alpha: 0.5),
                   ),
                   const SizedBox(height: AppSpacing.s16),
-                  Text(
-                    'No employees found',
-                    style: AppTypography.subtitle,
-                  ),
+                  Text('No employees found', style: AppTypography.subtitle),
                 ],
               ),
             );
@@ -98,11 +118,14 @@ class EmployeeDirectoryScreen extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final employee = employees[index];
                 return EmployeeCard(
-                  employee: employee,
-                  onTap: () {
-                    context.push('/hrms/employees/${employee.id}');
-                  },
-                );
+                      employee: employee,
+                      onTap: () {
+                        context.push('/hrms/employees/${employee.id}');
+                      },
+                    )
+                    .animate()
+                    .fade(duration: 400.ms, delay: (index * 50).ms)
+                    .slideY(begin: 0.1, curve: Curves.easeOutQuad);
               },
             ),
           );
@@ -112,16 +135,17 @@ class EmployeeDirectoryScreen extends ConsumerWidget {
           itemCount: 5,
           itemBuilder: (context, index) => _buildSkeletonCard(),
         ),
-        error: (err, stack) => Center(
-          child: Text('Error loading employees: $err'),
-        ),
+        error: (err, stack) =>
+            Center(child: Text('Error loading employees: $err')),
       ),
       floatingActionButton: hasCreatePermission
           ? FloatingActionButton(
               onPressed: () {
                 context.push('/hrms/employees/new');
               },
-              backgroundColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+              backgroundColor: isDark
+                  ? AppColors.primaryDark
+                  : AppColors.primaryLight,
               child: const Icon(LucideIcons.plus, color: Colors.white),
             )
           : null,

@@ -35,7 +35,13 @@ final dioProvider = Provider<Dio>((ref) {
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) async {
-        // We no longer inject auth_token because we rely on cookies
+        // Dio overrides the baseUrl path if the request path starts with a slash.
+        // To fix this, we ensure the path always starts with /api if it doesn't already.
+        if (options.path.startsWith('/')) {
+           options.path = '/api${options.path}';
+        } else if (!options.path.startsWith('http')) {
+           options.path = '/api/${options.path}';
+        }
         return handler.next(options);
       },
       onError: (DioException e, handler) async {

@@ -8,6 +8,7 @@ import '../../../../shared/widgets/loaders/skeleton.dart';
 import '../providers/attendance_dashboard_providers.dart';
 import '../widgets/attendance_kpi_card.dart';
 import '../widgets/quick_action_button.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class AttendanceDashboardScreen extends ConsumerWidget {
   const AttendanceDashboardScreen({super.key});
@@ -127,7 +128,7 @@ class AttendanceDashboardScreen extends ConsumerWidget {
           onTap: () => context.push('/hrms/attendance/permissions'),
         ),
       ],
-    );
+    ).animate().fade(duration: 400.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
   }
 
   Widget _buildKpiGrid(BuildContext context, dynamic kpis) {
@@ -172,7 +173,7 @@ class AttendanceDashboardScreen extends ConsumerWidget {
           onTap: () {},
         ),
       ],
-    );
+    ).animate().fade(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
   }
 
   Widget _buildKpiSkeletons() {
@@ -212,7 +213,7 @@ class AttendanceDashboardScreen extends ConsumerWidget {
           );
         },
       ),
-    );
+    ).animate().fade(duration: 400.ms, delay: 200.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
   }
 
   Widget _buildPendingLeaves(BuildContext context, List<dynamic> leaves) {
@@ -240,7 +241,7 @@ class AttendanceDashboardScreen extends ConsumerWidget {
           );
         },
       ),
-    );
+    ).animate().fade(duration: 400.ms, delay: 300.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
   }
 
   Widget _buildStatusBadge(String status) {

@@ -15,6 +15,7 @@ import '../../../../shared/widgets/search/global_search_delegate.dart';
 import '../../../../core/theme/theme_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class QuickActionItem {
   final String label;
@@ -239,7 +240,7 @@ class DashboardScreen extends ConsumerWidget {
             child: _buildSummaryCard(context, 'Attendance', 'Present', LucideIcons.checkCircle, isDark),
           ),
         ],
-      ),
+      ).animate().fade(duration: 400.ms).slideY(begin: 0.2, curve: Curves.easeOutQuad),
     );
   }
 
@@ -330,7 +331,7 @@ class DashboardScreen extends ConsumerWidget {
         ),
       ),
       ),
-    );
+    ).animate().fade(duration: 400.ms, delay: 100.ms).slideY(begin: 0.2, curve: Curves.easeOutQuad);
   }
 
   Widget _buildRecentActivity(BuildContext context, bool isLoading) {
@@ -378,7 +379,7 @@ class DashboardScreen extends ConsumerWidget {
           ),
         );
       },
-    );
+    ).animate().fade(duration: 400.ms, delay: 200.ms).slideY(begin: 0.2, curve: Curves.easeOutQuad);
   }
 
   String _getGreeting() {

@@ -23,8 +23,13 @@ class EmployeeProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Employee Profile', style: AppTypography.title.copyWith(fontWeight: FontWeight.w700)),
-        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+        title: Text(
+          'Employee Profile',
+          style: AppTypography.title.copyWith(fontWeight: FontWeight.w700),
+        ),
+        backgroundColor: isDark
+            ? AppColors.backgroundDark
+            : AppColors.backgroundLight,
         elevation: 0,
         actions: [
           if (canEdit)
@@ -48,7 +53,9 @@ class EmployeeProfileScreen extends ConsumerWidget {
                   color: isDark ? AppColors.cardDark : AppColors.cardLight,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                    color: isDark
+                        ? AppColors.borderDark
+                        : AppColors.borderLight,
                   ),
                 ),
                 child: Column(
@@ -72,17 +79,32 @@ class EmployeeProfileScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: AppSpacing.s24),
-              
+
               // Actions Bar (if permitted)
               if (canEdit) ...[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildActionButton(context, LucideIcons.powerOff, 'Deactivate', Colors.orange),
-                    _buildActionButton(context, LucideIcons.arrowRightLeft, 'Transfer', AppColors.primaryLight),
-                    _buildActionButton(context, LucideIcons.trash2, 'Delete', AppColors.destructiveLight),
+                    _buildActionButton(
+                      context,
+                      LucideIcons.powerOff,
+                      'Deactivate',
+                      Colors.orange,
+                    ),
+                    _buildActionButton(
+                      context,
+                      LucideIcons.arrowRightLeft,
+                      'Transfer',
+                      AppColors.primaryLight,
+                    ),
+                    _buildActionButton(
+                      context,
+                      LucideIcons.trash2,
+                      'Delete',
+                      AppColors.destructiveLight,
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.s24),
@@ -91,7 +113,9 @@ class EmployeeProfileScreen extends ConsumerWidget {
               // Employment Info
               Text(
                 'Employment Information',
-                style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.w600),
+                style: AppTypography.subtitle.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: AppSpacing.s8),
               Container(
@@ -100,30 +124,56 @@ class EmployeeProfileScreen extends ConsumerWidget {
                   color: isDark ? AppColors.cardDark : AppColors.cardLight,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                    color: isDark
+                        ? AppColors.borderDark
+                        : AppColors.borderLight,
                   ),
                 ),
                 child: Column(
                   children: [
-                    _buildDetailRow(context, 'Employee Code', employee.employeeCode.isNotEmpty ? employee.employeeCode : 'N/A'),
+                    _buildDetailRow(
+                      context,
+                      'Employee Code',
+                      employee.employeeCode.isNotEmpty
+                          ? employee.employeeCode
+                          : 'N/A',
+                    ),
                     const Divider(height: AppSpacing.s24),
-                    _buildDetailRow(context, 'Department', employee.departmentName ?? 'N/A'),
+                    _buildDetailRow(
+                      context,
+                      'Department',
+                      employee.departmentName ?? 'N/A',
+                    ),
                     const Divider(height: AppSpacing.s24),
-                    _buildDetailRow(context, 'Designation', employee.designationName ?? 'N/A'),
+                    _buildDetailRow(
+                      context,
+                      'Designation',
+                      employee.designationName ?? 'N/A',
+                    ),
                     const Divider(height: AppSpacing.s24),
-                    _buildDetailRow(context, 'Joining Date', employee.joiningDate ?? 'N/A'),
+                    _buildDetailRow(
+                      context,
+                      'Joining Date',
+                      employee.joiningDate ?? 'N/A',
+                    ),
                     const Divider(height: AppSpacing.s24),
-                    _buildDetailRow(context, 'Reporting Manager', employee.reportingManagerName ?? 'N/A'),
+                    _buildDetailRow(
+                      context,
+                      'Reporting Manager',
+                      employee.reportingManagerName ?? 'N/A',
+                    ),
                   ],
                 ),
               ),
 
               const SizedBox(height: AppSpacing.s24),
-              
+
               // Personal Info
               Text(
                 'Personal Information',
-                style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.w600),
+                style: AppTypography.subtitle.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: AppSpacing.s8),
               Container(
@@ -132,26 +182,41 @@ class EmployeeProfileScreen extends ConsumerWidget {
                   color: isDark ? AppColors.cardDark : AppColors.cardLight,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                    color: isDark
+                        ? AppColors.borderDark
+                        : AppColors.borderLight,
                   ),
                 ),
                 child: Column(
                   children: [
-                    _buildDetailRow(context, 'Gender', employee.gender ?? 'N/A'),
+                    _buildDetailRow(
+                      context,
+                      'Gender',
+                      employee.gender ?? 'N/A',
+                    ),
                     const Divider(height: AppSpacing.s24),
-                    _buildDetailRow(context, 'Date of Birth', employee.dateOfBirth ?? 'N/A'),
+                    _buildDetailRow(
+                      context,
+                      'Date of Birth',
+                      employee.dateOfBirth ?? 'N/A',
+                    ),
                     const Divider(height: AppSpacing.s24),
-                    _buildDetailRow(context, 'Email Address', employee.email ?? 'N/A'),
+                    _buildDetailRow(
+                      context,
+                      'Email Address',
+                      employee.email ?? 'N/A',
+                    ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: AppSpacing.s32),
             ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Failed to load profile: $err')),
+        error: (err, stack) =>
+            Center(child: Text('Failed to load profile: $err')),
       ),
     );
   }
@@ -166,7 +231,9 @@ class EmployeeProfileScreen extends ConsumerWidget {
           child: Text(
             label,
             style: AppTypography.label.copyWith(
-              color: isDark ? AppColors.mutedForegroundDark : AppColors.mutedForegroundLight,
+              color: isDark
+                  ? AppColors.mutedForegroundDark
+                  : AppColors.mutedForegroundLight,
             ),
           ),
         ),
@@ -182,13 +249,21 @@ class EmployeeProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionButton(BuildContext context, IconData icon, String label, Color color) {
+  Widget _buildActionButton(
+    BuildContext context,
+    IconData icon,
+    String label,
+    Color color,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: () {},
       borderRadius: BorderRadius.circular(8),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s12, vertical: AppSpacing.s8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.s12,
+          vertical: AppSpacing.s8,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -205,7 +280,9 @@ class EmployeeProfileScreen extends ConsumerWidget {
               label,
               style: AppTypography.label.copyWith(
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.foregroundDark : AppColors.foregroundLight,
+                color: isDark
+                    ? AppColors.foregroundDark
+                    : AppColors.foregroundLight,
               ),
             ),
           ],

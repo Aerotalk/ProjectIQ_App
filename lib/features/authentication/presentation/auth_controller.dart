@@ -69,15 +69,12 @@ class AuthController extends Notifier<AuthState> {
       state = AuthState(user: user, isLoading: false);
       return true;
     } catch (e) {
-      String errorMessage = 'Login failed';
+      String errorMessage = 'Login failed: $e';
       if (e is DioException) {
-        // If backend is unreachable, Dio throws connection error
-        if (e.type == DioExceptionType.connectionTimeout || 
-            e.type == DioExceptionType.connectionError ||
-            e.type == DioExceptionType.unknown) {
-          errorMessage = 'Unable to connect to server. Please try again.';
-        } else if (e.response?.statusCode == 401) {
-          errorMessage = 'Invalid email or password.';
+        if (e.response != null) {
+          errorMessage = 'Server error: ${e.response?.statusCode} - ${e.response?.data}';
+        } else {
+          errorMessage = 'Network error: ${e.message}';
         }
       }
       state = AuthState(isLoading: false, error: errorMessage);

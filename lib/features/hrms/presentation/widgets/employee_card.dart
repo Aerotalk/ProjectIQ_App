@@ -11,11 +11,7 @@ class EmployeeCard extends StatelessWidget {
   final Employee employee;
   final VoidCallback onTap;
 
-  const EmployeeCard({
-    super.key,
-    required this.employee,
-    required this.onTap,
-  });
+  const EmployeeCard({super.key, required this.employee, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +69,9 @@ class EmployeeCard extends StatelessWidget {
                     Text(
                       employee.designationName ?? 'No Designation',
                       style: AppTypography.body.copyWith(
-                        color: isDark ? AppColors.mutedForegroundDark : AppColors.mutedForegroundLight,
+                        color: isDark
+                            ? AppColors.mutedForegroundDark
+                            : AppColors.mutedForegroundLight,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.s8),
@@ -82,26 +80,36 @@ class EmployeeCard extends StatelessWidget {
                         Icon(
                           LucideIcons.briefcase,
                           size: 14,
-                          color: isDark ? AppColors.mutedForegroundDark : AppColors.mutedForegroundLight,
+                          color: isDark
+                              ? AppColors.mutedForegroundDark
+                              : AppColors.mutedForegroundLight,
                         ),
                         const SizedBox(width: AppSpacing.s4),
                         Text(
                           employee.departmentName ?? 'No Department',
                           style: AppTypography.label.copyWith(
-                            color: isDark ? AppColors.mutedForegroundDark : AppColors.mutedForegroundLight,
+                            color: isDark
+                                ? AppColors.mutedForegroundDark
+                                : AppColors.mutedForegroundLight,
                           ),
                         ),
                         const SizedBox(width: AppSpacing.s16),
                         Icon(
                           LucideIcons.hash,
                           size: 14,
-                          color: isDark ? AppColors.mutedForegroundDark : AppColors.mutedForegroundLight,
+                          color: isDark
+                              ? AppColors.mutedForegroundDark
+                              : AppColors.mutedForegroundLight,
                         ),
                         const SizedBox(width: AppSpacing.s4),
                         Text(
-                          employee.employeeCode.isNotEmpty ? employee.employeeCode : 'No ID',
+                          employee.employeeCode.isNotEmpty
+                              ? employee.employeeCode
+                              : 'No ID',
                           style: AppTypography.label.copyWith(
-                            color: isDark ? AppColors.mutedForegroundDark : AppColors.mutedForegroundLight,
+                            color: isDark
+                                ? AppColors.mutedForegroundDark
+                                : AppColors.mutedForegroundLight,
                           ),
                         ),
                       ],

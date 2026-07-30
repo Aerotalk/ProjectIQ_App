@@ -17,7 +17,10 @@ class PayrollDashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payroll', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text(
+          'Payroll',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -131,21 +134,81 @@ class PayrollDashboardScreen extends ConsumerWidget {
 
     if (isHR) {
       actions = [
-        {'title': 'Payroll Runs', 'icon': LucideIcons.list, 'route': '/hrms/payroll/runs', 'color': Colors.blue},
-        {'title': 'Salary Inputs', 'icon': LucideIcons.edit3, 'route': '/hrms/payroll/inputs', 'color': Colors.indigo},
-        {'title': 'Processing', 'icon': LucideIcons.settings, 'route': '/hrms/payroll/processing', 'color': Colors.orange},
-        {'title': 'Verification', 'icon': LucideIcons.checkSquare, 'route': '/hrms/payroll/verification', 'color': Colors.teal},
-        {'title': 'Payouts', 'icon': LucideIcons.send, 'route': '/hrms/payroll/payouts', 'color': Colors.green},
-        {'title': 'Reimbursements', 'icon': LucideIcons.receipt, 'route': '/hrms/payroll/reimbursements', 'color': Colors.purple},
-        {'title': 'IT Declarations', 'icon': LucideIcons.fileText, 'route': '/hrms/payroll/it-declarations', 'color': Colors.red},
-        {'title': 'Settlements', 'icon': LucideIcons.doorOpen, 'route': '/hrms/payroll/settlements', 'color': Colors.brown},
+        {
+          'title': 'Payroll Runs',
+          'icon': LucideIcons.list,
+          'route': '/hrms/payroll/runs',
+          'color': Colors.blue,
+        },
+        {
+          'title': 'Salary Inputs',
+          'icon': LucideIcons.edit3,
+          'route': '/hrms/payroll/inputs',
+          'color': Colors.indigo,
+        },
+        {
+          'title': 'Processing',
+          'icon': LucideIcons.settings,
+          'route': '/hrms/payroll/processing',
+          'color': Colors.orange,
+        },
+        {
+          'title': 'Verification',
+          'icon': LucideIcons.checkSquare,
+          'route': '/hrms/payroll/verification',
+          'color': Colors.teal,
+        },
+        {
+          'title': 'Payouts',
+          'icon': LucideIcons.send,
+          'route': '/hrms/payroll/payouts',
+          'color': Colors.green,
+        },
+        {
+          'title': 'Reimbursements',
+          'icon': LucideIcons.receipt,
+          'route': '/hrms/payroll/reimbursements',
+          'color': Colors.purple,
+        },
+        {
+          'title': 'IT Declarations',
+          'icon': LucideIcons.fileText,
+          'route': '/hrms/payroll/it-declarations',
+          'color': Colors.red,
+        },
+        {
+          'title': 'Settlements',
+          'icon': LucideIcons.doorOpen,
+          'route': '/hrms/payroll/settlements',
+          'color': Colors.brown,
+        },
       ];
     } else {
       actions = [
-        {'title': 'My Payslips', 'icon': LucideIcons.fileDown, 'route': '/hrms/payroll/payslips', 'color': Colors.blue},
-        {'title': 'Salary Details', 'icon': LucideIcons.pieChart, 'route': '/hrms/payroll/salary-details', 'color': Colors.green},
-        {'title': 'Reimbursements', 'icon': LucideIcons.receipt, 'route': '/hrms/payroll/reimbursements', 'color': Colors.purple},
-        {'title': 'IT Declaration', 'icon': LucideIcons.fileText, 'route': '/hrms/payroll/it-declarations', 'color': Colors.red},
+        {
+          'title': 'My Payslips',
+          'icon': LucideIcons.fileDown,
+          'route': '/hrms/payroll/payslips',
+          'color': Colors.blue,
+        },
+        {
+          'title': 'Salary Details',
+          'icon': LucideIcons.pieChart,
+          'route': '/hrms/payroll/salary-details',
+          'color': Colors.green,
+        },
+        {
+          'title': 'Reimbursements',
+          'icon': LucideIcons.receipt,
+          'route': '/hrms/payroll/reimbursements',
+          'color': Colors.purple,
+        },
+        {
+          'title': 'IT Declaration',
+          'icon': LucideIcons.fileText,
+          'route': '/hrms/payroll/it-declarations',
+          'color': Colors.red,
+        },
       ];
     }
 
@@ -175,17 +238,16 @@ class PayrollDashboardScreen extends ConsumerWidget {
                     color: (action['color'] as Color).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(50),
                   ),
-                  child: Icon(
-                    action['icon'],
-                    color: action['color'],
-                    size: 24,
-                  ),
+                  child: Icon(action['icon'], color: action['color'], size: 24),
                 ),
                 const SizedBox(height: AppSpacing.s8),
                 Text(
                   action['title'],
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),

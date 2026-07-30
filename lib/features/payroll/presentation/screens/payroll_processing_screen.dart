@@ -7,7 +7,8 @@ class PayrollProcessingScreen extends StatefulWidget {
   const PayrollProcessingScreen({super.key});
 
   @override
-  State<PayrollProcessingScreen> createState() => _PayrollProcessingScreenState();
+  State<PayrollProcessingScreen> createState() =>
+      _PayrollProcessingScreenState();
 }
 
 class _PayrollProcessingScreenState extends State<PayrollProcessingScreen> {
@@ -20,7 +21,10 @@ class _PayrollProcessingScreenState extends State<PayrollProcessingScreen> {
     if (mounted) {
       setState(() => _isProcessing = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Payroll processed successfully!'), backgroundColor: Colors.green),
+        const SnackBar(
+          content: Text('Payroll processed successfully!'),
+          backgroundColor: Colors.green,
+        ),
       );
       context.pop();
     }
@@ -30,7 +34,10 @@ class _PayrollProcessingScreenState extends State<PayrollProcessingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Process Payroll', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text(
+          'Process Payroll',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => context.pop(),
@@ -61,9 +68,16 @@ class _PayrollProcessingScreenState extends State<PayrollProcessingScreen> {
                 Expanded(
                   child: FilledButton(
                     onPressed: _isProcessing ? null : details.onStepContinue,
-                    child: _isProcessing 
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : Text(isLastStep ? 'Run Payroll' : 'Continue'),
+                    child: _isProcessing
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(isLastStep ? 'Run Payroll' : 'Continue'),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.s12),
@@ -90,7 +104,10 @@ class _PayrollProcessingScreenState extends State<PayrollProcessingScreen> {
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('July 2026', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(
+                    'July 2026',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                   Icon(LucideIcons.calendar),
                 ],
               ),
@@ -108,7 +125,10 @@ class _PayrollProcessingScreenState extends State<PayrollProcessingScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(LucideIcons.alertTriangle, color: Colors.orange.shade700),
+                  Icon(
+                    LucideIcons.alertTriangle,
+                    color: Colors.orange.shade700,
+                  ),
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text('2 employees have missing attendance records.'),
@@ -120,7 +140,9 @@ class _PayrollProcessingScreenState extends State<PayrollProcessingScreen> {
           ),
           Step(
             title: const Text('Confirm Run'),
-            content: const Text('Running payroll for 150 employees. This action cannot be easily undone.'),
+            content: const Text(
+              'Running payroll for 150 employees. This action cannot be easily undone.',
+            ),
             isActive: _currentStep >= 2,
           ),
         ],

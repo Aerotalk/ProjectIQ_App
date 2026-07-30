@@ -15,7 +15,10 @@ class SalaryInputsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Salary Inputs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text(
+          'Salary Inputs',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => context.pop(),
@@ -23,7 +26,7 @@ class SalaryInputsScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Add Input form coming soon')));
+          context.push('/hrms/payroll/inputs/new');
         },
         child: const Icon(LucideIcons.plus),
       ),
@@ -37,11 +40,12 @@ class SalaryInputsScreen extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.s16),
               itemCount: inputs.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+              separatorBuilder: (_, __) =>
+                  const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
                 final input = inputs[index];
                 final isDeduction = input.amount.startsWith('-');
-                
+
                 return Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
@@ -60,11 +64,20 @@ class SalaryInputsScreen extends ConsumerWidget {
                               Container(
                                 padding: const EdgeInsets.all(AppSpacing.s8),
                                 decoration: BoxDecoration(
-                                  color: (isDeduction ? Colors.red : Colors.green).withValues(alpha: 0.1),
+                                  color:
+                                      (isDeduction ? Colors.red : Colors.green)
+                                          .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Icon(isDeduction ? LucideIcons.trendingDown : LucideIcons.trendingUp, 
-                                  color: isDeduction ? Colors.red : Colors.green, size: 20),
+                                child: Icon(
+                                  isDeduction
+                                      ? LucideIcons.trendingDown
+                                      : LucideIcons.trendingUp,
+                                  color: isDeduction
+                                      ? Colors.red
+                                      : Colors.green,
+                                  size: 20,
+                                ),
                               ),
                               const SizedBox(width: AppSpacing.s12),
                               Column(
@@ -72,12 +85,18 @@ class SalaryInputsScreen extends ConsumerWidget {
                                 children: [
                                   Text(
                                     input.employeeName,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     input.adjustmentType,
-                                    style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                                    style: TextStyle(
+                                      color: Colors.grey.shade700,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -103,7 +122,10 @@ class SalaryInputsScreen extends ConsumerWidget {
                         ),
                         child: Text(
                           'Remarks: ${input.remarks}',
-                          style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ],
@@ -116,7 +138,8 @@ class SalaryInputsScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: 3,
             separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-            itemBuilder: (_, __) => const Skeleton(height: 100, width: double.infinity),
+            itemBuilder: (_, __) =>
+                const Skeleton(height: 100, width: double.infinity),
           ),
           error: (e, _) => Center(child: Text('Error: $e')),
         ),

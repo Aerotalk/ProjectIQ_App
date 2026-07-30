@@ -18,18 +18,23 @@ class ITDeclarationScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isHR ? 'IT Declarations (HR)' : 'My IT Declaration', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: Text(
+          isHR ? 'IT Declarations (HR)' : 'My IT Declaration',
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => context.pop(),
         ),
       ),
-      floatingActionButton: !isHR ? FloatingActionButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Update Declaration coming soon')));
-        },
-        child: const Icon(LucideIcons.edit2),
-      ) : null,
+      floatingActionButton: !isHR
+          ? FloatingActionButton(
+              onPressed: () {
+                context.push('/hrms/payroll/it-declarations/new');
+              },
+              child: const Icon(LucideIcons.edit2),
+            )
+          : null,
       body: RefreshIndicator(
         onRefresh: () async => ref.refresh(itDeclarationsProvider.future),
         child: state.when(
@@ -40,7 +45,8 @@ class ITDeclarationScreen extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.s16),
               itemCount: declarations.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+              separatorBuilder: (_, __) =>
+                  const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
                 final decl = declarations[index];
                 return Container(
@@ -64,7 +70,11 @@ class ITDeclarationScreen extends ConsumerWidget {
                                   color: Colors.red.shade50,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Icon(LucideIcons.fileText, color: Colors.red, size: 20),
+                                child: const Icon(
+                                  LucideIcons.fileText,
+                                  color: Colors.red,
+                                  size: 20,
+                                ),
                               ),
                               const SizedBox(width: AppSpacing.s12),
                               Column(
@@ -72,12 +82,18 @@ class ITDeclarationScreen extends ConsumerWidget {
                                 children: [
                                   Text(
                                     isHR ? decl.employeeName : decl.regime,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     decl.submittedDate,
-                                    style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                                    style: TextStyle(
+                                      color: Colors.grey.shade700,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -92,8 +108,20 @@ class ITDeclarationScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Declared Investment', style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
-                          Text(decl.declaredAmount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          Text(
+                            'Declared Investment',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Text(
+                            decl.declaredAmount,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                         ],
                       ),
                       if (isHR && decl.status == 'Pending Review') ...[
@@ -103,7 +131,9 @@ class ITDeclarationScreen extends ConsumerWidget {
                             Expanded(
                               child: OutlinedButton(
                                 onPressed: () {},
-                                style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.red,
+                                ),
                                 child: const Text('Reject'),
                               ),
                             ),
@@ -111,7 +141,9 @@ class ITDeclarationScreen extends ConsumerWidget {
                             Expanded(
                               child: FilledButton(
                                 onPressed: () {},
-                                style: FilledButton.styleFrom(backgroundColor: Colors.green),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                ),
                                 child: const Text('Approve'),
                               ),
                             ),
@@ -128,7 +160,8 @@ class ITDeclarationScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: 3,
             separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-            itemBuilder: (_, __) => const Skeleton(height: 120, width: double.infinity),
+            itemBuilder: (_, __) =>
+                const Skeleton(height: 120, width: double.infinity),
           ),
           error: (e, _) => Center(child: Text('Error: $e')),
         ),
@@ -139,9 +172,14 @@ class ITDeclarationScreen extends ConsumerWidget {
   Widget _buildStatusBadge(String status) {
     Color color;
     switch (status.toLowerCase()) {
-      case 'approved': color = Colors.green; break;
-      case 'pending review': color = Colors.orange; break;
-      default: color = Colors.blue;
+      case 'approved':
+        color = Colors.green;
+        break;
+      case 'pending review':
+        color = Colors.orange;
+        break;
+      default:
+        color = Colors.blue;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -151,7 +189,11 @@ class ITDeclarationScreen extends ConsumerWidget {
       ),
       child: Text(
         status,
-        style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

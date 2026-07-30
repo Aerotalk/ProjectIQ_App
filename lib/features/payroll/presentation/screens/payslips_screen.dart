@@ -15,7 +15,10 @@ class PayslipsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Payslips', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text(
+          'My Payslips',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => context.pop(),
@@ -31,7 +34,8 @@ class PayslipsScreen extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.s16),
               itemCount: payslips.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+              separatorBuilder: (_, __) =>
+                  const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
                 final payslip = payslips[index];
                 return Container(
@@ -55,7 +59,11 @@ class PayslipsScreen extends ConsumerWidget {
                                   color: Colors.blue.shade50,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Icon(LucideIcons.fileText, color: Colors.blue, size: 20),
+                                child: const Icon(
+                                  LucideIcons.fileText,
+                                  color: Colors.blue,
+                                  size: 20,
+                                ),
                               ),
                               const SizedBox(width: AppSpacing.s12),
                               Column(
@@ -63,12 +71,18 @@ class PayslipsScreen extends ConsumerWidget {
                                 children: [
                                   Text(
                                     payslip.period,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Net Pay: ${payslip.netSalary}',
-                                    style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.w600),
+                                    style: TextStyle(
+                                      color: Colors.grey.shade700,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -84,11 +98,19 @@ class PayslipsScreen extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: OutlinedButton.icon(
-                              onPressed: payslip.status == 'Processed' ? () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Downloading Payslip PDF...')),
-                                );
-                              } : null,
+                              onPressed: payslip.status == 'Processed'
+                                  ? () {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Downloading Payslip PDF...',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  : null,
                               icon: const Icon(LucideIcons.download, size: 16),
                               label: const Text('Download'),
                             ),
@@ -96,7 +118,8 @@ class PayslipsScreen extends ConsumerWidget {
                           const SizedBox(width: AppSpacing.s12),
                           Expanded(
                             child: FilledButton.icon(
-                              onPressed: () => context.push('/hrms/payroll/salary-details'),
+                              onPressed: () =>
+                                  context.push('/hrms/payroll/salary-details'),
                               icon: const Icon(LucideIcons.eye, size: 16),
                               label: const Text('View Breakup'),
                             ),
@@ -113,7 +136,8 @@ class PayslipsScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: 3,
             separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-            itemBuilder: (_, __) => const Skeleton(height: 120, width: double.infinity),
+            itemBuilder: (_, __) =>
+                const Skeleton(height: 120, width: double.infinity),
           ),
           error: (e, _) => Center(child: Text('Error: $e')),
         ),
@@ -124,10 +148,17 @@ class PayslipsScreen extends ConsumerWidget {
   Widget _buildStatusBadge(String status) {
     Color color;
     switch (status.toLowerCase()) {
-      case 'processed': color = Colors.green; break;
-      case 'processing': color = Colors.orange; break;
-      case 'draft': color = Colors.grey; break;
-      default: color = Colors.blue;
+      case 'processed':
+        color = Colors.green;
+        break;
+      case 'processing':
+        color = Colors.orange;
+        break;
+      case 'draft':
+        color = Colors.grey;
+        break;
+      default:
+        color = Colors.blue;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -137,7 +168,11 @@ class PayslipsScreen extends ConsumerWidget {
       ),
       child: Text(
         status,
-        style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

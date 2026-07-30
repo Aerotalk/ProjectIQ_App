@@ -18,18 +18,23 @@ class ReimbursementListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isHR ? 'Reimbursement Claims' : 'My Reimbursements', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: Text(
+          isHR ? 'Reimbursement Claims' : 'My Reimbursements',
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => context.pop(),
         ),
       ),
-      floatingActionButton: !isHR ? FloatingActionButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('New Claim coming soon')));
-        },
-        child: const Icon(LucideIcons.plus),
-      ) : null,
+      floatingActionButton: !isHR
+          ? FloatingActionButton(
+              onPressed: () {
+                context.push('/hrms/payroll/reimbursements/new');
+              },
+              child: const Icon(LucideIcons.plus),
+            )
+          : null,
       body: RefreshIndicator(
         onRefresh: () async => ref.refresh(reimbursementsProvider.future),
         child: state.when(
@@ -40,7 +45,8 @@ class ReimbursementListScreen extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.s16),
               itemCount: claims.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+              separatorBuilder: (_, __) =>
+                  const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
                 final claim = claims[index];
                 return Container(
@@ -64,7 +70,11 @@ class ReimbursementListScreen extends ConsumerWidget {
                                   color: Colors.purple.shade50,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Icon(LucideIcons.receipt, color: Colors.purple, size: 20),
+                                child: const Icon(
+                                  LucideIcons.receipt,
+                                  color: Colors.purple,
+                                  size: 20,
+                                ),
                               ),
                               const SizedBox(width: AppSpacing.s12),
                               Column(
@@ -72,12 +82,18 @@ class ReimbursementListScreen extends ConsumerWidget {
                                 children: [
                                   Text(
                                     isHR ? claim.employeeName : claim.claimType,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     claim.submittedDate,
-                                    style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                                    style: TextStyle(
+                                      color: Colors.grey.shade700,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -92,12 +108,30 @@ class ReimbursementListScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Amount', style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
-                          Text(claim.amount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          Text(
+                            'Amount',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Text(
+                            claim.amount,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text('Remarks: ${claim.remarks}', style: TextStyle(color: Colors.grey.shade700, fontSize: 13)),
+                      Text(
+                        'Remarks: ${claim.remarks}',
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 13,
+                        ),
+                      ),
                       if (isHR && claim.status == 'Pending') ...[
                         const SizedBox(height: AppSpacing.s16),
                         Row(
@@ -105,7 +139,9 @@ class ReimbursementListScreen extends ConsumerWidget {
                             Expanded(
                               child: OutlinedButton(
                                 onPressed: () {},
-                                style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.red,
+                                ),
                                 child: const Text('Reject'),
                               ),
                             ),
@@ -113,7 +149,9 @@ class ReimbursementListScreen extends ConsumerWidget {
                             Expanded(
                               child: FilledButton(
                                 onPressed: () {},
-                                style: FilledButton.styleFrom(backgroundColor: Colors.green),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                ),
                                 child: const Text('Approve'),
                               ),
                             ),
@@ -130,7 +168,8 @@ class ReimbursementListScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: 3,
             separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-            itemBuilder: (_, __) => const Skeleton(height: 120, width: double.infinity),
+            itemBuilder: (_, __) =>
+                const Skeleton(height: 120, width: double.infinity),
           ),
           error: (e, _) => Center(child: Text('Error: $e')),
         ),
@@ -141,9 +180,14 @@ class ReimbursementListScreen extends ConsumerWidget {
   Widget _buildStatusBadge(String status) {
     Color color;
     switch (status.toLowerCase()) {
-      case 'approved': color = Colors.green; break;
-      case 'rejected': color = Colors.red; break;
-      default: color = Colors.orange;
+      case 'approved':
+        color = Colors.green;
+        break;
+      case 'rejected':
+        color = Colors.red;
+        break;
+      default:
+        color = Colors.orange;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -153,7 +197,11 @@ class ReimbursementListScreen extends ConsumerWidget {
       ),
       child: Text(
         status,
-        style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

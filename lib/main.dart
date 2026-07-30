@@ -21,7 +21,7 @@ void main() async {
   AppConfig.init(
     AppConfig(
       environment: Environment.dev,
-      apiBaseUrl: 'https://projectiqbackend-production.up.railway.app/api', 
+      apiBaseUrl: 'https://projectiqbackend-production.up.railway.app', 
     ),
   );
 

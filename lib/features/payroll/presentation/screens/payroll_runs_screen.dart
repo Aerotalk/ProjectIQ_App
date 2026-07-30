@@ -15,7 +15,10 @@ class PayrollRunsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payroll Runs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text(
+          'Payroll Runs',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => context.pop(),
@@ -31,7 +34,8 @@ class PayrollRunsScreen extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.s16),
               itemCount: runs.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+              separatorBuilder: (_, __) =>
+                  const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
                 final run = runs[index];
                 return Container(
@@ -55,7 +59,11 @@ class PayrollRunsScreen extends ConsumerWidget {
                                   color: Colors.blue.shade50,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Icon(LucideIcons.calendar, color: Colors.blue, size: 20),
+                                child: const Icon(
+                                  LucideIcons.calendar,
+                                  color: Colors.blue,
+                                  size: 20,
+                                ),
                               ),
                               const SizedBox(width: AppSpacing.s12),
                               Column(
@@ -63,12 +71,18 @@ class PayrollRunsScreen extends ConsumerWidget {
                                 children: [
                                   Text(
                                     run.period,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     '${run.employeeCount} Employees',
-                                    style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                                    style: TextStyle(
+                                      color: Colors.grey.shade700,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -86,9 +100,21 @@ class PayrollRunsScreen extends ConsumerWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Gross Pay', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                                Text(
+                                  'Gross Pay',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                    fontSize: 12,
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
-                                Text(run.grossAmount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                Text(
+                                  run.grossAmount,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -96,9 +122,21 @@ class PayrollRunsScreen extends ConsumerWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Net Pay', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                                Text(
+                                  'Net Pay',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                    fontSize: 12,
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
-                                Text(run.netAmount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                Text(
+                                  run.netAmount,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -110,7 +148,11 @@ class PayrollRunsScreen extends ConsumerWidget {
                         child: OutlinedButton(
                           onPressed: () {
                             // Route to Payroll Processing or Verification
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening run details...')));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Opening run details...'),
+                              ),
+                            );
                           },
                           child: const Text('View Details'),
                         ),
@@ -125,7 +167,8 @@ class PayrollRunsScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: 3,
             separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-            itemBuilder: (_, __) => const Skeleton(height: 150, width: double.infinity),
+            itemBuilder: (_, __) =>
+                const Skeleton(height: 150, width: double.infinity),
           ),
           error: (e, _) => Center(child: Text('Error: $e')),
         ),
@@ -136,9 +179,14 @@ class PayrollRunsScreen extends ConsumerWidget {
   Widget _buildStatusBadge(String status) {
     Color color;
     switch (status.toLowerCase()) {
-      case 'processed': color = Colors.green; break;
-      case 'processing': color = Colors.orange; break;
-      default: color = Colors.blue;
+      case 'processed':
+        color = Colors.green;
+        break;
+      case 'processing':
+        color = Colors.orange;
+        break;
+      default:
+        color = Colors.blue;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -148,7 +196,11 @@ class PayrollRunsScreen extends ConsumerWidget {
       ),
       child: Text(
         status,
-        style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

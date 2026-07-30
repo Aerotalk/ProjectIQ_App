@@ -20,24 +20,27 @@ class QuickActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppCard(
       onTap: onTap,
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.s16, horizontal: AppSpacing.s12),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.s16,
+        horizontal: AppSpacing.s12,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(AppSpacing.s12),
+            padding: const EdgeInsets.all(AppSpacing.s8),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 24),
           ),
-          const SizedBox(height: AppSpacing.s12),
+          const SizedBox(height: AppSpacing.s8),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
             textAlign: TextAlign.center,
           ),
         ],

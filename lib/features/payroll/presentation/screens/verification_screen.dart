@@ -10,7 +10,10 @@ class VerificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payroll Verification', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text(
+          'Payroll Verification',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => context.pop(),
@@ -29,7 +32,10 @@ class VerificationScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('July 2026 Batch', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const Text(
+                  'July 2026 Batch',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
                 const SizedBox(height: AppSpacing.s8),
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -43,7 +49,10 @@ class VerificationScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Net Payout:'),
-                    Text('₹ 12,50,000', style: TextStyle(fontWeight: FontWeight.w600)),
+                    Text(
+                      '₹ 12,50,000',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.s16),
@@ -52,7 +61,9 @@ class VerificationScreen extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {},
-                        style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                        ),
                         child: const Text('Reject'),
                       ),
                     ),
@@ -60,7 +71,9 @@ class VerificationScreen extends StatelessWidget {
                     Expanded(
                       child: FilledButton(
                         onPressed: () {},
-                        style: FilledButton.styleFrom(backgroundColor: Colors.green),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.green,
+                        ),
                         child: const Text('Approve'),
                       ),
                     ),
@@ -68,7 +81,7 @@ class VerificationScreen extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

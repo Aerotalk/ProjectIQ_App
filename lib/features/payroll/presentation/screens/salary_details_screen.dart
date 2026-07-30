@@ -10,7 +10,10 @@ class SalaryDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Salary Breakup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text(
+          'Salary Breakup',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => context.pop(),
@@ -70,7 +73,11 @@ class SalaryDetailsScreen extends StatelessWidget {
           const SizedBox(height: 8),
           const Text(
             '₹ 1,15,000',
-            style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 16),
           Row(
@@ -80,7 +87,7 @@ class SalaryDetailsScreen extends StatelessWidget {
               Container(width: 1, height: 30, color: Colors.white30),
               _buildSummaryItem('Deductions', '₹ 31,500'),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -89,9 +96,19 @@ class SalaryDetailsScreen extends StatelessWidget {
   Widget _buildSummaryItem(String label, String value) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
+        ),
         const SizedBox(height: 4),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ],
     );
   }
@@ -128,23 +145,44 @@ class SalaryDetailsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.s16),
             child: Column(
               children: [
-                ...items.entries.map((e) => Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.s12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(e.key, style: TextStyle(color: Colors.grey.shade700)),
-                          Text(e.value, style: const TextStyle(fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    )),
+                ...items.entries.map(
+                  (e) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.s12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          e.key,
+                          style: TextStyle(color: Colors.grey.shade700),
+                        ),
+                        Text(
+                          e.value,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 const Divider(),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Total', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    Text(total, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: color)),
+                    const Text(
+                      'Total',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      total,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: color,
+                      ),
+                    ),
                   ],
                 ),
               ],

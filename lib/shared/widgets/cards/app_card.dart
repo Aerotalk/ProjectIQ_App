@@ -36,7 +36,10 @@ class AppCard extends StatelessWidget {
         border: hasBorder ? Border.all(color: borderColor, width: 1.0) : null,
         boxShadow: hasShadow ? AppElevation.shadowSm : null,
       ),
-      child: child,
+      child: Material(
+        type: MaterialType.transparency,
+        child: child,
+      ),
     );
 
     if (onTap != null) {

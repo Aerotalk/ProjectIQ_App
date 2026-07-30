@@ -4,10 +4,11 @@ import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_animation.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 enum AppButtonVariant { primary, secondary, outline, ghost, danger }
 
-class AppButton extends StatelessWidget {
+class AppButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
   final AppButtonVariant variant;
@@ -28,6 +29,13 @@ class AppButton extends StatelessWidget {
   });
 
   @override
+  State<AppButton> createState() => _AppButtonState();
+}
+
+class _AppButtonState extends State<AppButton> {
+  bool _isPressed = false;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -36,7 +44,7 @@ class AppButton extends StatelessWidget {
     Color foregroundColor;
     Color? borderColor;
 
-    switch (variant) {
+    switch (widget.variant) {
       case AppButtonVariant.primary:
         backgroundColor = isDark ? AppColors.primaryDark : AppColors.primaryLight;
         foregroundColor = isDark ? AppColors.primaryForegroundDark : AppColors.primaryForegroundLight;
@@ -60,19 +68,19 @@ class AppButton extends StatelessWidget {
         break;
     }
 
-    final bool effectiveDisabled = isDisabled || isLoading;
+    final bool effectiveDisabled = widget.isDisabled || widget.isLoading;
     if (effectiveDisabled) {
-      if (variant != AppButtonVariant.outline && variant != AppButtonVariant.ghost) {
+      if (widget.variant != AppButtonVariant.outline && widget.variant != AppButtonVariant.ghost) {
         backgroundColor = backgroundColor.withValues(alpha: 0.5);
       }
       foregroundColor = foregroundColor.withValues(alpha: 0.5);
     }
 
     Widget content = Row(
-      mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
+      mainAxisSize: widget.isFullWidth ? MainAxisSize.max : MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (isLoading) ...[
+        if (widget.isLoading) ...[
           SizedBox(
             width: AppSpacing.s16,
             height: AppSpacing.s16,
@@ -82,21 +90,21 @@ class AppButton extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.s8),
-        ] else if (icon != null) ...[
-          Icon(icon, size: AppSpacing.s16, color: foregroundColor),
+        ] else if (widget.icon != null) ...[
+          Icon(widget.icon, size: AppSpacing.s16, color: foregroundColor),
           const SizedBox(width: AppSpacing.s8),
         ],
         Text(
-          text,
+          widget.text,
           style: AppTypography.button.copyWith(color: foregroundColor),
         ),
       ],
     );
 
-    return AnimatedContainer(
+    final buttonCore = AnimatedContainer(
       duration: AppAnimation.fast,
       curve: AppAnimation.defaultCurve,
-      width: isFullWidth ? double.infinity : null,
+      width: widget.isFullWidth ? double.infinity : null,
       height: 40.0, // standard Tailwind button h-10 (40px)
       child: Material(
         color: backgroundColor,
@@ -107,7 +115,10 @@ class AppButton extends StatelessWidget {
               : BorderSide.none,
         ),
         child: InkWell(
-          onTap: effectiveDisabled ? null : onPressed,
+          onTapDown: (_) => setState(() => _isPressed = true),
+          onTapUp: (_) => setState(() => _isPressed = false),
+          onTapCancel: () => setState(() => _isPressed = false),
+          onTap: effectiveDisabled ? null : widget.onPressed,
           borderRadius: BorderRadius.circular(AppRadius.xl),
           splashColor: foregroundColor.withValues(alpha: 0.1),
           highlightColor: foregroundColor.withValues(alpha: 0.05),
@@ -118,5 +129,7 @@ class AppButton extends StatelessWidget {
         ),
       ),
     );
+
+    return buttonCore.animate(target: _isPressed ? 1 : 0).scaleXY(end: 0.96, duration: 100.ms, curve: Curves.easeOut);
   }
 }

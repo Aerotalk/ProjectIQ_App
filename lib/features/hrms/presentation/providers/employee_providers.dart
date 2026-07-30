@@ -13,22 +13,32 @@ class EmployeeSearchQuery extends Notifier<String> {
   String build() => '';
   void updateState(String value) => state = value;
 }
-final employeeSearchQueryProvider = NotifierProvider<EmployeeSearchQuery, String>(EmployeeSearchQuery.new);
+
+final employeeSearchQueryProvider =
+    NotifierProvider<EmployeeSearchQuery, String>(EmployeeSearchQuery.new);
 
 class EmployeeDepartmentFilter extends Notifier<String?> {
   @override
   String? build() => null;
   void updateState(String? value) => state = value;
 }
-final employeeDepartmentFilterProvider = NotifierProvider<EmployeeDepartmentFilter, String?>(EmployeeDepartmentFilter.new);
+
+final employeeDepartmentFilterProvider =
+    NotifierProvider<EmployeeDepartmentFilter, String?>(
+      EmployeeDepartmentFilter.new,
+    );
 
 class EmployeeStatusFilter extends Notifier<String?> {
   @override
   String? build() => null;
   void updateState(String? value) => state = value;
 }
-final employeeStatusFilterProvider = NotifierProvider<EmployeeStatusFilter, String?>(EmployeeStatusFilter.new);
-final employeeListProvider = FutureProvider.autoDispose<List<Employee>>((ref) async {
+
+final employeeStatusFilterProvider =
+    NotifierProvider<EmployeeStatusFilter, String?>(EmployeeStatusFilter.new);
+final employeeListProvider = FutureProvider.autoDispose<List<Employee>>((
+  ref,
+) async {
   final repo = ref.watch(employeeRepositoryProvider);
   final keyword = ref.watch(employeeSearchQueryProvider);
   final departmentId = ref.watch(employeeDepartmentFilterProvider);
@@ -47,7 +57,8 @@ final employeeListProvider = FutureProvider.autoDispose<List<Employee>>((ref) as
   }
 });
 
-final employeeDetailProvider = FutureProvider.family.autoDispose<Employee, String>((ref, id) async {
-  final repo = ref.watch(employeeRepositoryProvider);
-  return repo.getEmployeeById(id);
-});
+final employeeDetailProvider = FutureProvider.family
+    .autoDispose<Employee, String>((ref, id) async {
+      final repo = ref.watch(employeeRepositoryProvider);
+      return repo.getEmployeeById(id);
+    });
