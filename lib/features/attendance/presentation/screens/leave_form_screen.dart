@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
+import '../../../../shared/widgets/inputs/app_date_picker.dart';
 import '../../data/models/leave_model.dart';
 import '../providers/leave_providers.dart';
 import 'package:uuid/uuid.dart';
@@ -67,16 +68,26 @@ class _LeaveFormScreenState extends ConsumerState<LeaveFormScreen> {
                 validator: (val) => val == null || val.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: AppSpacing.s16),
-              AppTextField(
-                label: 'Start Date (YYYY-MM-DD)',
-                controller: _startDateController,
-                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+              AppDatePicker(
+                label: 'Start Date *',
+                initialDate: DateTime.tryParse(_startDateController.text),
+                onChanged: (date) {
+                  if (date != null) {
+                    _startDateController.text = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+                  }
+                },
+                isRequired: true,
               ),
               const SizedBox(height: AppSpacing.s16),
-              AppTextField(
-                label: 'End Date (YYYY-MM-DD)',
-                controller: _endDateController,
-                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+              AppDatePicker(
+                label: 'End Date *',
+                initialDate: DateTime.tryParse(_endDateController.text),
+                onChanged: (date) {
+                  if (date != null) {
+                    _endDateController.text = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+                  }
+                },
+                isRequired: true,
               ),
               const SizedBox(height: AppSpacing.s16),
               AppTextField(

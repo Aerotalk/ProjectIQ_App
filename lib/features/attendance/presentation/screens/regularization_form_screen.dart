@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
+import '../../../../shared/widgets/inputs/app_date_picker.dart';
+import '../../../../shared/widgets/inputs/app_time_picker.dart';
 import '../../data/models/regularization_model.dart';
 import '../providers/regularization_providers.dart';
 import 'package:uuid/uuid.dart';
@@ -63,22 +65,39 @@ class _RegularizationFormScreenState extends ConsumerState<RegularizationFormScr
           key: _formKey,
           child: Column(
             children: [
-              AppTextField(
-                label: 'Date (YYYY-MM-DD)',
-                controller: _dateController,
-                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+              AppDatePicker(
+                label: 'Date *',
+                initialDate: DateTime.tryParse(_dateController.text),
+                onChanged: (date) {
+                  if (date != null) {
+                    _dateController.text = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+                  }
+                },
+                isRequired: true,
               ),
               const SizedBox(height: AppSpacing.s16),
-              AppTextField(
-                label: 'In Time (e.g. 09:00 AM)',
-                controller: _inTimeController,
-                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+              AppTimePicker(
+                label: 'In Time *',
+                onChanged: (time) {
+                  if (time != null) {
+                    final now = DateTime.now();
+                    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+                    _inTimeController.text = "${time.hourOfPeriod.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')} ${time.period == DayPeriod.am ? 'AM' : 'PM'}";
+                  }
+                },
+                isRequired: true,
               ),
               const SizedBox(height: AppSpacing.s16),
-              AppTextField(
-                label: 'Out Time (e.g. 06:00 PM)',
-                controller: _outTimeController,
-                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+              AppTimePicker(
+                label: 'Out Time *',
+                onChanged: (time) {
+                  if (time != null) {
+                    final now = DateTime.now();
+                    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+                    _outTimeController.text = "${time.hourOfPeriod.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')} ${time.period == DayPeriod.am ? 'AM' : 'PM'}";
+                  }
+                },
+                isRequired: true,
               ),
               const SizedBox(height: AppSpacing.s16),
               AppTextField(

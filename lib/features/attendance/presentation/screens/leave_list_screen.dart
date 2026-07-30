@@ -34,12 +34,116 @@ class LeaveListScreen extends ConsumerWidget {
               separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
                 final leave = leaves[index];
-                return Card(
-                  child: ListTile(
-                    title: Text(leave.leaveType, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('${leave.startDate} to ${leave.endDate}\nDuration: ${leave.durationDays} days\nReason: ${leave.reason}'),
-                    isThreeLine: true,
-                    trailing: _buildStatusBadge(leave.status),
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).primaryColor.withValues(alpha: 0.15),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.s16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(AppSpacing.s8),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    LucideIcons.calendarOff,
+                                    color: Theme.of(context).primaryColor,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.s12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      leave.leaveType,
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      leave.employeeName,
+                                      style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            _buildStatusBadge(leave.status),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.s16),
+                        const Divider(height: 1),
+                        const SizedBox(height: AppSpacing.s16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Duration',
+                                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${leave.startDate} to ${leave.endDate}',
+                                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Days',
+                                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${leave.durationDays}',
+                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.s12),
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.s8),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          width: double.infinity,
+                          child: Text(
+                            'Reason: ${leave.reason}',
+                            style: TextStyle(color: Colors.grey.shade800, fontSize: 13),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

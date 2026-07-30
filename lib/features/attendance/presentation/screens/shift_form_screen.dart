@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
+import '../../../../shared/widgets/inputs/app_time_picker.dart';
 import '../../data/models/shift_model.dart';
 import '../providers/shift_providers.dart';
 import 'package:uuid/uuid.dart';
@@ -73,16 +74,28 @@ class _ShiftFormScreenState extends ConsumerState<ShiftFormScreen> {
                 validator: (val) => val == null || val.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: AppSpacing.s16),
-              AppTextField(
-                label: 'Start Time (e.g. 09:00 AM)',
-                controller: _startTimeController,
-                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+              AppTimePicker(
+                label: 'Start Time *',
+                onChanged: (time) {
+                  if (time != null) {
+                    final now = DateTime.now();
+                    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+                    _startTimeController.text = "${time.hourOfPeriod.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')} ${time.period == DayPeriod.am ? 'AM' : 'PM'}";
+                  }
+                },
+                isRequired: true,
               ),
               const SizedBox(height: AppSpacing.s16),
-              AppTextField(
-                label: 'End Time (e.g. 06:00 PM)',
-                controller: _endTimeController,
-                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+              AppTimePicker(
+                label: 'End Time *',
+                onChanged: (time) {
+                  if (time != null) {
+                    final now = DateTime.now();
+                    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+                    _endTimeController.text = "${time.hourOfPeriod.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')} ${time.period == DayPeriod.am ? 'AM' : 'PM'}";
+                  }
+                },
+                isRequired: true,
               ),
               const SizedBox(height: AppSpacing.s16),
               AppTextField(
