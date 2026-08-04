@@ -42,8 +42,8 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> with Sing
           controller: _tabController,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          indicatorColor: AppColors.primary,
-          labelColor: AppColors.primary,
+          indicatorColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+          labelColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
           unselectedLabelColor: isDark ? Colors.grey[400] : Colors.grey[600],
           tabs: const [
             Tab(text: 'Dashboard', icon: Icon(LucideIcons.layoutDashboard, size: 20)),

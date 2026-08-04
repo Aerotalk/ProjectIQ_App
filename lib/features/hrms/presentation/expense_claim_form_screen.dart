@@ -27,7 +27,8 @@ class _ExpenseClaimFormScreenState
 
   final List<String> _templates = ['Standard', 'Travel', 'Meals'];
   final List<String> _currencies = ['USD', 'INR', 'EUR'];
-
+  @override
+  void dispose() {
     _titleController.dispose();
     super.dispose();
   }

@@ -53,7 +53,6 @@ class DesignationDetailsScreen extends ConsumerWidget {
                   title: 'Basic Information',
                   children: [
                     _buildInfoRow('Designation Code', designation.designationCode),
-                    _buildInfoRow('Hierarchy Level', designation.hierarchyLevel != null ? designation.hierarchyLevel.toString() : 'N/A'),
                     _buildInfoRow('Description', designation.description != null && designation.description!.isNotEmpty ? designation.description! : 'N/A'),
                   ],
                 ),
