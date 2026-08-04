@@ -40,7 +40,7 @@ class SalaryInputsScreen extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.s16),
               itemCount: inputs.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
                 final input = inputs[index];
@@ -137,8 +137,8 @@ class SalaryInputsScreen extends ConsumerWidget {
           loading: () => ListView.separated(
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: 3,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-            itemBuilder: (_, __) =>
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (_, _) =>
                 const Skeleton(height: 100, width: double.infinity),
           ),
           error: (e, _) => Center(child: Text('Error: $e')),

@@ -81,7 +81,7 @@ class _SalaryInputFormScreenState extends ConsumerState<SalaryInputFormScreen> {
                   Text('Employee *', style: AppTypography.label),
                   const SizedBox(height: AppSpacing.s8),
                   DropdownButtonFormField<String>(
-                    value: _employee,
+                    initialValue: _employee,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       contentPadding: EdgeInsets.symmetric(horizontal: 12),
@@ -105,7 +105,7 @@ class _SalaryInputFormScreenState extends ConsumerState<SalaryInputFormScreen> {
                             ),
                             const SizedBox(height: AppSpacing.s8),
                             DropdownButtonFormField<String>(
-                              value: _period,
+                              initialValue: _period,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 contentPadding: EdgeInsets.symmetric(
@@ -133,7 +133,7 @@ class _SalaryInputFormScreenState extends ConsumerState<SalaryInputFormScreen> {
                             Text('Pay Component *', style: AppTypography.label),
                             const SizedBox(height: AppSpacing.s8),
                             DropdownButtonFormField<String>(
-                              value: _component,
+                              initialValue: _component,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 contentPadding: EdgeInsets.symmetric(
@@ -187,8 +187,10 @@ class _SalaryInputFormScreenState extends ConsumerState<SalaryInputFormScreen> {
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                   value: t,
+                                  // ignore: deprecated_member_use
                                   groupValue: _type,
                                   contentPadding: EdgeInsets.zero,
+                                  // ignore: deprecated_member_use
                                   onChanged: (v) =>
                                       setState(() => _type = v!),
                                 ),

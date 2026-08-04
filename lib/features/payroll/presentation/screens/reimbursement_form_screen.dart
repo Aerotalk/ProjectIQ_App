@@ -47,10 +47,11 @@ class _ReimbursementFormScreenState
     );
     if (picked != null) {
       setState(() {
-        if (isBillDate)
+        if (isBillDate) {
           _billDate = picked;
-        else
+        } else {
           _claimPeriod = picked;
+        }
       });
     }
   }
@@ -111,7 +112,7 @@ class _ReimbursementFormScreenState
                   Text('Reimbursement Type *', style: AppTypography.label),
                   const SizedBox(height: AppSpacing.s8),
                   DropdownButtonFormField<String>(
-                    value: _selectedType,
+                    initialValue: _selectedType,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       contentPadding: EdgeInsets.symmetric(

@@ -47,7 +47,7 @@ class AttendanceExceptionListScreen extends ConsumerWidget {
           return ListView.separated(
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: exceptions.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
             itemBuilder: (context, index) {
               final exception = exceptions[index];
               final isHighSeverity = exception.severity == 'High';

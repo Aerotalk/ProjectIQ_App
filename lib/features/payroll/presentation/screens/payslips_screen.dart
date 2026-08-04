@@ -34,7 +34,7 @@ class PayslipsScreen extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.s16),
               itemCount: payslips.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
                 final payslip = payslips[index];
@@ -135,8 +135,8 @@ class PayslipsScreen extends ConsumerWidget {
           loading: () => ListView.separated(
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: 3,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-            itemBuilder: (_, __) =>
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (_, _) =>
                 const Skeleton(height: 120, width: double.infinity),
           ),
           error: (e, _) => Center(child: Text('Error: $e')),

@@ -5,7 +5,6 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/app_spacing.dart';
-import '../../../../../core/theme/app_colors.dart';
 import '../../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../../../shared/widgets/buttons/app_button.dart';
 import '../../../../../shared/widgets/cards/app_card.dart';
@@ -19,11 +18,9 @@ class ITDeclarationFormScreen extends ConsumerStatefulWidget {
 }
 
 class _DeclarationItem {
-  String section;
-  String amount;
-  String remarks;
-
-  _DeclarationItem({this.section = '80C', this.amount = '', this.remarks = ''});
+  String section = '80C';
+  String amount = '';
+  String remarks = '';
 }
 
 class _ITDeclarationFormScreenState
@@ -96,7 +93,7 @@ class _ITDeclarationFormScreenState
                             ),
                             const SizedBox(height: AppSpacing.s8),
                             DropdownButtonFormField<String>(
-                              value: _selectedYear,
+                              initialValue: _selectedYear,
                               isExpanded: true,
                               isDense: true,
                               decoration: const InputDecoration(
@@ -131,7 +128,7 @@ class _ITDeclarationFormScreenState
                             Text('Tax Regime *', style: AppTypography.label),
                             const SizedBox(height: AppSpacing.s8),
                             DropdownButtonFormField<String>(
-                              value: _selectedRegime,
+                              initialValue: _selectedRegime,
                               isExpanded: true,
                               isDense: true,
                               decoration: const InputDecoration(
@@ -204,7 +201,7 @@ class _ITDeclarationFormScreenState
                                 Text('Section *', style: AppTypography.label),
                                 const SizedBox(height: AppSpacing.s8),
                                 DropdownButtonFormField<String>(
-                                  value: item.section,
+                                  initialValue: item.section,
                                   isExpanded: true,
                                   isDense: true,
                                   decoration: const InputDecoration(

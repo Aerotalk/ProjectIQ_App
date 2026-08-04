@@ -15,12 +15,12 @@ class PermissionService {
   bool can(String permission) {
     if (_user == null) return false;
     if (isSuperAdmin || isCompanyAdmin) return true; // Admins have all permissions
-    return _user!.hasPermission(permission);
+    return _user.hasPermission(permission);
   }
 
   bool hasRole(String role) {
     if (_user == null) return false;
-    return _user!.hasRole(role);
+    return _user.hasRole(role);
   }
 
   bool get isSuperAdmin => hasRole('ROLE_SUPER_ADMIN');

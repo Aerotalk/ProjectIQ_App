@@ -81,7 +81,6 @@ class _RegularizationFormScreenState extends ConsumerState<RegularizationFormScr
                 onChanged: (time) {
                   if (time != null) {
                     final now = DateTime.now();
-                    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
                     _inTimeController.text = "${time.hourOfPeriod.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')} ${time.period == DayPeriod.am ? 'AM' : 'PM'}";
                   }
                 },
@@ -93,7 +92,6 @@ class _RegularizationFormScreenState extends ConsumerState<RegularizationFormScr
                 onChanged: (time) {
                   if (time != null) {
                     final now = DateTime.now();
-                    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
                     _outTimeController.text = "${time.hourOfPeriod.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')} ${time.period == DayPeriod.am ? 'AM' : 'PM'}";
                   }
                 },

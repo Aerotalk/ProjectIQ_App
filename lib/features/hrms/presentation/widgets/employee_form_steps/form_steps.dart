@@ -118,7 +118,7 @@ class BasicInfoStep extends ConsumerWidget {
           ),
           sp,
           AppDatePicker(
-            label: 'Date of Birth',
+            label: 'Date of Birth *',
             initialDate: _parseDate(d, 'dateOfBirth'),
             onChanged: (v) {
               if (v != null) n.updateField('dateOfBirth', _fmtDate(v));
@@ -145,7 +145,7 @@ class BasicInfoStep extends ConsumerWidget {
           sp,
           AppSelect<String>(
             value: d['gender'] as String?,
-            label: 'Gender',
+            label: 'Gender *',
             placeholder: 'Select Gender',
             items: [
               'Male',
@@ -157,7 +157,7 @@ class BasicInfoStep extends ConsumerWidget {
           sp,
           AppSelect<String>(
             value: d['maritalStatus'] as String?,
-            label: 'Marital Status',
+            label: 'Marital Status *',
             placeholder: 'Select',
             items: [
               'Single',
@@ -169,13 +169,13 @@ class BasicInfoStep extends ConsumerWidget {
           ),
           sp,
           AppTextField(
-            label: 'Blood Group',
+            label: 'Blood Group *',
             initialValue: d['bloodGroup']?.toString(),
             onChanged: (v) => n.updateField('bloodGroup', v),
           ),
           sp,
           AppTextField(
-            label: 'Nationality',
+            label: 'Nationality *',
             initialValue: d['nationality']?.toString(),
             onChanged: (v) => n.updateField('nationality', v),
           ),
@@ -184,7 +184,7 @@ class BasicInfoStep extends ConsumerWidget {
           _divider(),
           _sectionTitle('Employment Details'),
           AppDatePicker(
-            label: 'Date of Joining',
+            label: 'Date of Joining *',
             initialDate: _parseDate(d, 'dateOfJoining'),
             onChanged: (v) {
               if (v != null) n.updateField('dateOfJoining', _fmtDate(v));
@@ -193,7 +193,7 @@ class BasicInfoStep extends ConsumerWidget {
           sp,
           AppSelect<String>(
             value: d['employmentType'] as String?,
-            label: 'Employment Type',
+            label: 'Employment Type *',
             placeholder: 'Select',
             items: [
               'Full Time',
@@ -211,43 +211,43 @@ class BasicInfoStep extends ConsumerWidget {
           ),
           sp,
           AppTextField(
-            label: 'Department',
+            label: 'Department *',
             initialValue: d['departmentId']?.toString(),
             onChanged: (v) => n.updateField('departmentId', v),
           ),
           sp,
           AppTextField(
-            label: 'Designation',
+            label: 'Designation *',
             initialValue: d['designationId']?.toString(),
             onChanged: (v) => n.updateField('designationId', v),
           ),
           sp,
           AppTextField(
-            label: 'Location',
+            label: 'Location *',
             initialValue: d['location']?.toString(),
             onChanged: (v) => n.updateField('location', v),
           ),
           sp,
           AppTextField(
-            label: 'Grade / Band',
+            label: 'Grade / Band *',
             initialValue: d['grade']?.toString(),
             onChanged: (v) => n.updateField('grade', v),
           ),
           sp,
           AppTextField(
-            label: 'Reporting Manager',
+            label: 'Reporting Manager *',
             initialValue: d['reportingManagerId']?.toString(),
             onChanged: (v) => n.updateField('reportingManagerId', v),
           ),
           sp,
           AppTextField(
-            label: 'HR Manager',
+            label: 'HR Manager *',
             initialValue: d['hrManagerId']?.toString(),
             onChanged: (v) => n.updateField('hrManagerId', v),
           ),
           sp,
           AppTextField(
-            label: 'Weekly Off',
+            label: 'Weekly Off *',
             initialValue: d['weeklyOff']?.toString(),
             onChanged: (v) => n.updateField('weeklyOff', v),
           ),
@@ -259,7 +259,7 @@ class BasicInfoStep extends ConsumerWidget {
           ),
           sp,
           AppTextField(
-            label: 'Notice Period (Days)',
+            label: 'Notice Period (Days) *',
             initialValue: d['noticePeriodDays']?.toString(),
             keyboardType: TextInputType.number,
             onChanged: (v) => n.updateField('noticePeriodDays', v),
@@ -615,10 +615,11 @@ class EmploymentContractStep extends ConsumerWidget {
                       if (f.path != null) n.updateField('${key}_path', f.path);
                     }
                   } catch (e) {
-                    if (context.mounted)
+                    if (context.mounted) {
                       ScaffoldMessenger.of(
                         context,
                       ).showSnackBar(SnackBar(content: Text('Error: $e')));
+                    }
                   }
                 },
                 child: const Text('Choose File'),
@@ -1291,10 +1292,11 @@ class DocumentsStep extends ConsumerWidget {
         n.updateField('documents', updated);
       }
     } catch (e) {
-      if (context.mounted)
+      if (context.mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     }
   }
 
@@ -1529,8 +1531,9 @@ class PositionChangeStep extends ConsumerWidget {
             label: 'Effective Date',
             initialDate: _parseDate(d, 'positionChangeEffectiveDate'),
             onChanged: (v) {
-              if (v != null)
+              if (v != null) {
                 n.updateField('positionChangeEffectiveDate', _fmtDate(v));
+              }
             },
           ),
           sp,
@@ -1613,8 +1616,9 @@ class SalaryRevisionStep extends ConsumerWidget {
             label: 'Effective Date',
             initialDate: _parseDate(d, 'revisionEffectiveDate'),
             onChanged: (v) {
-              if (v != null)
+              if (v != null) {
                 n.updateField('revisionEffectiveDate', _fmtDate(v));
+              }
             },
           ),
           sp,

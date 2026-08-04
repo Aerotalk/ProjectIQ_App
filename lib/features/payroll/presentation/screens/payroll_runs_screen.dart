@@ -34,7 +34,7 @@ class PayrollRunsScreen extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.s16),
               itemCount: runs.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
                 final run = runs[index];
@@ -166,8 +166,8 @@ class PayrollRunsScreen extends ConsumerWidget {
           loading: () => ListView.separated(
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: 3,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-            itemBuilder: (_, __) =>
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (_, _) =>
                 const Skeleton(height: 150, width: double.infinity),
           ),
           error: (e, _) => Center(child: Text('Error: $e')),

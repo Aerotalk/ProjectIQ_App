@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 void main() {
   String hslToHex(double h, double s, double l) {
     final color = HSLColor.fromAHSL(1.0, h, s / 100, l / 100).toColor();
-    return '0xFF${color.value.toRadixString(16).substring(2).toUpperCase()}';
+    return '0xFF${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
   }
 
   final lightColors = {
@@ -74,16 +74,18 @@ void main() {
     'sidebarRing': [217.2, 91.2, 59.8]
   };
 
-  print('import \\'package:flutter/material.dart\\';\\n\\nclass AppColors {');
+  print('''import 'package:flutter/material.dart';
+
+class AppColors {
+  // LIGHT MODE''');
   
-  print('  // LIGHT MODE');
   lightColors.forEach((key, val) {
-    print('  static const \${key}Light = Color(\${hslToHex(val[0], val[1], val[2])});');
+    print('  static const ${key}Light = Color(${hslToHex(val[0], val[1], val[2])});');
   });
 
-  print('\\n  // DARK MODE');
+  print('\n  // DARK MODE');
   darkColors.forEach((key, val) {
-    print('  static const \${key}Dark = Color(\${hslToHex(val[0], val[1], val[2])});');
+    print('  static const ${key}Dark = Color(${hslToHex(val[0], val[1], val[2])});');
   });
   
   print('}');

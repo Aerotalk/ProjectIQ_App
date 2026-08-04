@@ -13,7 +13,7 @@ class ExpenseClaimsListTab extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(AppSpacing.s16),
       itemCount: 3,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
       itemBuilder: (context, index) {
         final isGST = index == 0;
         return AppCard(

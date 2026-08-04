@@ -23,14 +23,12 @@ class AttendanceClockCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final clockState = ref.watch(attendanceClockProvider);
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     final isCheckedIn = clockState.status == ClockStatus.checkedIn;
     final isCheckedOut = clockState.status == ClockStatus.checkedOut;
 
     return AppCard(
       padding: const EdgeInsets.all(AppSpacing.s24),
-      color: isDark ? AppColors.cardDark : AppColors.cardLight,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

@@ -22,7 +22,7 @@ class _PayoutsScreenState extends ConsumerState<PayoutsScreen> {
       body: ListView.separated(
         padding: const EdgeInsets.all(AppSpacing.s16),
         itemCount: 5,
-        separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+        separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
         itemBuilder: (context, index) {
           final isProcessed = index > 1;
           return AppCard(

@@ -64,7 +64,7 @@ class PermissionListScreen extends ConsumerWidget {
           return ListView.separated(
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: permissions.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
             itemBuilder: (context, index) {
               final perm = permissions[index];
               return Container(

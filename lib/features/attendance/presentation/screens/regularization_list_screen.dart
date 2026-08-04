@@ -31,7 +31,7 @@ class RegularizationListScreen extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.s16),
               itemCount: requests.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+              separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
                 final req = requests[index];
                 return Container(
@@ -162,8 +162,8 @@ class RegularizationListScreen extends ConsumerWidget {
           loading: () => ListView.separated(
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: 5,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-            itemBuilder: (_, __) => const Skeleton(height: 100, width: double.infinity),
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (_, _) => const Skeleton(height: 100, width: double.infinity),
           ),
           error: (err, _) => Center(child: Text('Error: $err')),
         ),

@@ -74,24 +74,6 @@ class DesignationCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (designation.hierarchyLevel != null) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.purple.shade50,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              'Level ${designation.hierarchyLevel}',
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.purple,
-                              ),
-                            ),
-                          ),
-                        ],
                       ],
                     ),
                   ],

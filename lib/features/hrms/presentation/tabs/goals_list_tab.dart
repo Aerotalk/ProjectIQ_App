@@ -48,7 +48,7 @@ class _GoalsListTabState extends ConsumerState<GoalsListTab> {
                 icon: const Icon(LucideIcons.plus, size: 16),
                 label: const Text('New Goal'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                   foregroundColor: Colors.white,
                 ),
               )
@@ -114,7 +114,7 @@ class _GoalCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.s16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        color: isDark ? AppColors.cardDark : AppColors.cardLight,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
       ),
@@ -138,7 +138,7 @@ class _GoalCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(goal.status).withOpacity(0.1),
+                  color: _getStatusColor(goal.status).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
@@ -153,15 +153,15 @@ class _GoalCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 16,
-                backgroundColor: AppColors.primary.withOpacity(0.2),
-                child: Text(goal.employee.name.substring(0, 1), style: AppTypography.caption.copyWith(color: AppColors.primary)),
+                backgroundColor: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.2),
+                child: Text(goal.employee.name.substring(0, 1), style: AppTypography.caption.copyWith(color: isDark ? AppColors.primaryDark : AppColors.primaryLight)),
               ),
               const SizedBox(width: AppSpacing.s8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(goal.employee.name, style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold)),
+                    Text(goal.employee.name, style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold)),
                     Text(goal.employee.department, style: AppTypography.caption.copyWith(color: Colors.grey)),
                   ],
                 ),
@@ -170,7 +170,7 @@ class _GoalCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text('Weightage', style: AppTypography.caption.copyWith(color: Colors.grey)),
-                  Text('${goal.weightage}%', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold)),
+                  Text('${goal.weightage}%', style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold)),
                 ],
               )
             ],
@@ -193,7 +193,7 @@ class _GoalCard extends StatelessWidget {
                     LinearProgressIndicator(
                       value: goal.progress / 100,
                       backgroundColor: Colors.grey.shade200,
-                      color: goal.progress >= 100 ? Colors.green : AppColors.primary,
+                      color: goal.progress >= 100 ? Colors.green : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
                     ),
                   ],
                 ),

@@ -86,7 +86,7 @@ class _ApprovalCenterScreenState extends ConsumerState<ApprovalCenterScreen> wit
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.s16),
           itemCount: pending.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
           itemBuilder: (context, index) {
             final leave = pending[index];
             return Container(
@@ -144,7 +144,7 @@ class _ApprovalCenterScreenState extends ConsumerState<ApprovalCenterScreen> wit
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.s16),
           itemCount: pending.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
           itemBuilder: (context, index) {
             final reg = pending[index];
             return Container(
@@ -202,7 +202,7 @@ class _ApprovalCenterScreenState extends ConsumerState<ApprovalCenterScreen> wit
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.s16),
           itemCount: pending.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
           itemBuilder: (context, index) {
             final perm = pending[index];
             return Container(
@@ -262,7 +262,7 @@ class _ApprovalCenterScreenState extends ConsumerState<ApprovalCenterScreen> wit
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.s16),
           itemCount: pending.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
           itemBuilder: (context, index) {
             final exc = pending[index];
             return Container(

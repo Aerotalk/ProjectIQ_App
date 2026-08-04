@@ -3,7 +3,6 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
-import 'package:intl_phone_field/phone_number.dart';
 
 class AppPhoneField extends StatelessWidget {
   final String label;
@@ -29,9 +28,9 @@ class AppPhoneField extends StatelessWidget {
         if (label.isNotEmpty) ...[
           Text(
             label,
-            style: AppTypography.bodySmall.copyWith(
+            style: AppTypography.caption.copyWith(
               fontWeight: FontWeight.w500,
-              color: isDark ? Colors.white70 : AppColors.textLight,
+              color: isDark ? Colors.white70 : AppColors.foregroundLight,
             ),
           ),
           const SizedBox(height: AppSpacing.s8),
@@ -44,7 +43,7 @@ class AppPhoneField extends StatelessWidget {
               color: isDark ? Colors.white30 : Colors.black38,
             ),
             filled: true,
-            fillColor: isDark ? AppColors.surfaceDark : Colors.white,
+            fillColor: isDark ? AppColors.inputDark : Colors.white,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.s16,
               vertical: AppSpacing.s12,
@@ -63,8 +62,8 @@ class AppPhoneField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(
-                color: AppColors.primary,
+              borderSide: BorderSide(
+                color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                 width: 2,
               ),
             ),

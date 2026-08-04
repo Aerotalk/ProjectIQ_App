@@ -35,10 +35,11 @@ class _SettlementFormScreenState extends ConsumerState<SettlementFormScreen> {
     );
     if (picked != null) {
       setState(() {
-        if (isLastWorking)
+        if (isLastWorking) {
           _lastWorkingDate = picked;
-        else
+        } else {
           _settlementDate = picked;
+        }
       });
     }
   }
@@ -77,7 +78,7 @@ class _SettlementFormScreenState extends ConsumerState<SettlementFormScreen> {
                   Text('Employee *', style: AppTypography.label),
                   const SizedBox(height: AppSpacing.s8),
                   DropdownButtonFormField<String>(
-                    value: _employee,
+                    initialValue: _employee,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       contentPadding: EdgeInsets.symmetric(horizontal: 12),

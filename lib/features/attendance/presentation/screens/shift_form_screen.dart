@@ -79,7 +79,6 @@ class _ShiftFormScreenState extends ConsumerState<ShiftFormScreen> {
                 onChanged: (time) {
                   if (time != null) {
                     final now = DateTime.now();
-                    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
                     _startTimeController.text = "${time.hourOfPeriod.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')} ${time.period == DayPeriod.am ? 'AM' : 'PM'}";
                   }
                 },
@@ -91,7 +90,6 @@ class _ShiftFormScreenState extends ConsumerState<ShiftFormScreen> {
                 onChanged: (time) {
                   if (time != null) {
                     final now = DateTime.now();
-                    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
                     _endTimeController.text = "${time.hourOfPeriod.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')} ${time.period == DayPeriod.am ? 'AM' : 'PM'}";
                   }
                 },

@@ -31,7 +31,7 @@ class ShiftListScreen extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.s16),
               itemCount: shifts.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+              separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
                 final shift = shifts[index];
                 return Container(
@@ -127,8 +127,8 @@ class ShiftListScreen extends ConsumerWidget {
           loading: () => ListView.separated(
             padding: const EdgeInsets.all(AppSpacing.s16),
             itemCount: 5,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-            itemBuilder: (_, __) => const Skeleton(height: 100, width: double.infinity),
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (_, _) => const Skeleton(height: 100, width: double.infinity),
           ),
           error: (err, _) => Center(child: Text('Error: $err')),
         ),

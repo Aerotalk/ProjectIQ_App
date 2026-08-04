@@ -38,7 +38,7 @@ class ProfileAvatar extends ConsumerWidget {
                     return Image.memory(
                       bytes,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _buildInitials(initials),
+                      errorBuilder: (_, _, _) => _buildInitials(initials),
                     );
                   }
                   return _buildInitials(initials);
@@ -50,7 +50,7 @@ class ProfileAvatar extends ConsumerWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
                 ),
-                error: (_, __) => _buildInitials(initials),
+                error: (_, _) => _buildInitials(initials),
               )
           : _buildInitials(initials),
     );

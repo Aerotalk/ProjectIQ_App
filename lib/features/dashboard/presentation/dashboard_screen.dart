@@ -9,10 +9,8 @@ import '../../../../core/router/module_registry.dart';
 import '../../../../core/permissions/permission_service.dart';
 import '../../../shared/widgets/avatars/profile_avatar.dart';
 import 'widgets/dashboard_section.dart';
-import 'widgets/module_card.dart';
 import 'widgets/attendance_clock_card.dart';
 import '../../../../shared/widgets/loaders/skeleton.dart';
-import '../../../../shared/widgets/search/global_search_delegate.dart';
 import '../../../../core/theme/theme_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -38,7 +36,6 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authControllerProvider);
-    final moduleRegistry = ref.watch(moduleRegistryProvider);
     final permissionService = ref.watch(permissionServiceProvider);
     
     final user = authState.user;
@@ -348,8 +345,8 @@ class DashboardScreen extends ConsumerWidget {
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
         itemCount: 3,
-        separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-        itemBuilder: (_, __) => const Skeleton(height: 70, borderRadius: 12),
+        separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
+        itemBuilder: (_, _) => const Skeleton(height: 70, borderRadius: 12),
       );
     }
     
@@ -360,7 +357,7 @@ class DashboardScreen extends ConsumerWidget {
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       itemCount: 3,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
       itemBuilder: (context, index) {
         return Container(
           padding: const EdgeInsets.all(AppSpacing.s16),

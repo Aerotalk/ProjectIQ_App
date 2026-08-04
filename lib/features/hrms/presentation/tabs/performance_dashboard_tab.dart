@@ -26,11 +26,11 @@ class PerformanceDashboardTab extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Performance Dashboard', style: AppTypography.h3),
+                    Text('Performance Dashboard', style: AppTypography.title),
                     const SizedBox(height: 4),
                     Text(
                       'Overview of organization performance metrics and active cycles.',
-                      style: AppTypography.bodySmall.copyWith(color: Colors.grey),
+                      style: AppTypography.caption.copyWith(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -40,7 +40,7 @@ class PerformanceDashboardTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.s24),
           _buildStatCards(context, isDark),
           const SizedBox(height: AppSpacing.s24),
-          Text('Goal Completion Tracking', style: AppTypography.h4),
+          Text('Goal Completion Tracking', style: AppTypography.subtitle),
           const SizedBox(height: AppSpacing.s12),
           FutureBuilder(
             future: performanceRepo.getGoals(),
@@ -58,7 +58,7 @@ class PerformanceDashboardTab extends ConsumerWidget {
                     margin: const EdgeInsets.only(bottom: AppSpacing.s12),
                     padding: const EdgeInsets.all(AppSpacing.s16),
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                      color: isDark ? AppColors.cardDark : AppColors.cardLight,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
                     ),
@@ -69,7 +69,7 @@ class PerformanceDashboardTab extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(child: Text(goal.title, style: AppTypography.subtitle)),
-                            Text('${goal.progress.toInt()}%', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold)),
+                            Text('${goal.progress.toInt()}%', style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold)),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.s8),
@@ -94,7 +94,7 @@ class PerformanceDashboardTab extends ConsumerWidget {
             },
           ),
           const SizedBox(height: AppSpacing.s24),
-          Text('Active Cycles', style: AppTypography.h4),
+          Text('Active Cycles', style: AppTypography.subtitle),
           const SizedBox(height: AppSpacing.s12),
           FutureBuilder(
             future: performanceRepo.getActiveCycles(),
@@ -111,7 +111,7 @@ class PerformanceDashboardTab extends ConsumerWidget {
                     margin: const EdgeInsets.only(bottom: AppSpacing.s12),
                     padding: const EdgeInsets.all(AppSpacing.s16),
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                      color: isDark ? AppColors.cardDark : AppColors.cardLight,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
                     ),
@@ -124,14 +124,14 @@ class PerformanceDashboardTab extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('${cycle.completionPercentage}% Completed', style: AppTypography.caption),
-                            Text(cycle.status, style: AppTypography.caption.copyWith(color: AppColors.primary)),
+                            Text(cycle.status, style: AppTypography.caption.copyWith(color: isDark ? AppColors.primaryDark : AppColors.primaryLight)),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.s8),
                         LinearProgressIndicator(
                           value: cycle.completionPercentage / 100,
                           backgroundColor: Colors.grey.shade200,
-                          color: AppColors.primary,
+                          color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                         ),
                       ],
                     ),
@@ -183,7 +183,7 @@ class _StatCard extends StatelessWidget {
       margin: const EdgeInsets.only(right: AppSpacing.s12),
       padding: const EdgeInsets.all(AppSpacing.s16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        color: isDark ? AppColors.cardDark : AppColors.cardLight,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
       ),
@@ -193,7 +193,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 20),
@@ -201,7 +201,7 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.s12),
           Text(title, style: AppTypography.caption.copyWith(color: Colors.grey)),
           const SizedBox(height: 4),
-          Text(value, style: AppTypography.h3),
+          Text(value, style: AppTypography.title),
         ],
       ),
     );

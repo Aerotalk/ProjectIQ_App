@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/theme/app_typography.dart';
 import '../../../core/router/module_registry.dart';
 import '../../authentication/presentation/auth_controller.dart';
-import '../../../shared/widgets/avatars/profile_avatar.dart'; // We will create this
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+// We will create this
 
 class HomeShell extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -28,8 +26,6 @@ class HomeShell extends ConsumerWidget {
     // We get the authenticated user
     final authState = ref.watch(authControllerProvider);
     final user = authState.user;
-    
-    final orgName = user?.companyName ?? user?.organizationName ?? 'My Organization';
     
     return Scaffold(
       body: navigationShell,

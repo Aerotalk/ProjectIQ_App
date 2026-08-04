@@ -27,8 +27,8 @@ class _AddEmployeeScreenState extends ConsumerState<AddEmployeeScreen> {
     'Statutory', // 3  statutory
     'Bank Details', // 4  bank
     'Documents', // 5  documents
-    'Position', // 6  position
-    'Separation', // 7  separation
+    // 'Position', // 6  position
+    // 'Separation', // 7  separation
     'Salary', // 8  salary
     'Education', // 9  education
     'Family', // 10 family
@@ -53,18 +53,34 @@ class _AddEmployeeScreenState extends ConsumerState<AddEmployeeScreen> {
     final state = ref.read(employeeFormProvider);
     final data = state.formData;
 
-    // Basic validation
-    if (data['workEmail'] == null || data['workEmail'].toString().isEmpty) {
-      ref
-          .read(employeeFormProvider.notifier)
-          .setError('Work Email is required (Basic Info)');
-      return;
-    }
-    if (data['phone'] == null || data['phone'].toString().isEmpty) {
-      ref
-          .read(employeeFormProvider.notifier)
-          .setError('Phone is required (Basic Info)');
-      return;
+    final requiredKeys = {
+      'firstName': 'First Name',
+      'lastName': 'Last Name',
+      'dateOfBirth': 'Date of Birth',
+      'workEmail': 'Work Email',
+      'phone': 'Phone',
+      'gender': 'Gender',
+      'maritalStatus': 'Marital Status',
+      'bloodGroup': 'Blood Group',
+      'nationality': 'Nationality',
+      'dateOfJoining': 'Date of Joining',
+      'employmentType': 'Employment Type',
+      'companyId': 'Company / Legal Entity',
+      'departmentId': 'Department',
+      'designationId': 'Designation',
+      'location': 'Location',
+      'grade': 'Grade / Band',
+      'reportingManagerId': 'Reporting Manager',
+      'hrManagerId': 'HR Manager',
+      'weeklyOff': 'Weekly Off',
+      'noticePeriodDays': 'Notice Period (Days)'
+    };
+
+    for (final entry in requiredKeys.entries) {
+      if (data[entry.key] == null || data[entry.key].toString().trim().isEmpty) {
+        ref.read(employeeFormProvider.notifier).setError('${entry.value} is required (Basic Info)');
+        return;
+      }
     }
 
     ref.read(employeeFormProvider.notifier).setLoading(true);
@@ -245,8 +261,8 @@ class _AddEmployeeScreenState extends ConsumerState<AddEmployeeScreen> {
                 StatutoryDetailsStep(), // 3  statutory
                 BankDetailsStep(), // 4  bank
                 DocumentsStep(), // 5  documents
-                PositionChangeStep(), // 6  position
-                SeparationExitStep(), // 7  separation
+                // PositionChangeStep(), // 6  position
+                // SeparationExitStep(), // 7  separation
                 SalaryRevisionStep(), // 8  salary
                 EducationStep(), // 9  education
                 FamilyNomineeStep(), // 10 family

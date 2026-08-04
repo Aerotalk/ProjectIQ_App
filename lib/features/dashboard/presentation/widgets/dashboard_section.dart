@@ -28,7 +28,7 @@ class DashboardSection extends StatelessWidget {
                 title,
                 style: AppTypography.title.copyWith(fontWeight: FontWeight.w700),
               ),
-              if (action != null) action!,
+              ?action,
             ],
           ),
         ),

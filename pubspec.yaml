@@ -53,6 +53,7 @@ dependencies:
   flutter_animate: ^4.5.2
   cookie_jar: ^4.0.9
   intl_phone_field: ^3.2.0
+  uuid: ^4.3.3
 
 dev_dependencies:
   flutter_test:
