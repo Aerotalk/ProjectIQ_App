@@ -2,7 +2,8 @@ class DesignationModel {
   final String id;
   final String designationCode;
   final String designationName;
-  final int? hierarchyLevel;
+  final String? roleId;
+  final Map<String, dynamic>? role;
   final String? description;
   final String? companyId;
   final String? createdAt;
@@ -12,7 +13,8 @@ class DesignationModel {
     required this.id,
     required this.designationCode,
     required this.designationName,
-    this.hierarchyLevel,
+    this.roleId,
+    this.role,
     this.description,
     this.companyId,
     this.createdAt,
@@ -24,7 +26,8 @@ class DesignationModel {
       id: json['id'] as String? ?? '',
       designationCode: json['designationCode'] as String? ?? '',
       designationName: json['designationName'] as String? ?? '',
-      hierarchyLevel: json['hierarchyLevel'] as int?,
+      roleId: json['roleId'] as String?,
+      role: json['role'] as Map<String, dynamic>?,
       description: json['description'] as String?,
       companyId: json['companyId'] as String?,
       createdAt: json['createdAt'] as String?,
@@ -37,7 +40,8 @@ class DesignationModel {
       'id': id,
       'designationCode': designationCode,
       'designationName': designationName,
-      'hierarchyLevel': hierarchyLevel,
+      'roleId': roleId,
+      'role': role,
       'description': description,
       'companyId': companyId,
       'createdAt': createdAt,
@@ -49,7 +53,8 @@ class DesignationModel {
     String? id,
     String? designationCode,
     String? designationName,
-    int? hierarchyLevel,
+    String? roleId,
+    Map<String, dynamic>? role,
     String? description,
     String? companyId,
     String? createdAt,
@@ -59,7 +64,8 @@ class DesignationModel {
       id: id ?? this.id,
       designationCode: designationCode ?? this.designationCode,
       designationName: designationName ?? this.designationName,
-      hierarchyLevel: hierarchyLevel ?? this.hierarchyLevel,
+      roleId: roleId ?? this.roleId,
+      role: role ?? this.role,
       description: description ?? this.description,
       companyId: companyId ?? this.companyId,
       createdAt: createdAt ?? this.createdAt,

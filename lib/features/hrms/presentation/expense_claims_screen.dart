@@ -3,135 +3,75 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/widgets/cards/app_card.dart';
+import 'tabs/expense_claims_dashboard_tab.dart';
+import 'tabs/expense_claims_list_tab.dart';
+import 'tabs/expense_advances_tab.dart';
+import 'tabs/expense_configuration_tab.dart';
+import 'tabs/expense_approvals_tab.dart';
+import 'tabs/expense_batch_processing_tab.dart';
 
 class ExpenseClaimsScreen extends ConsumerStatefulWidget {
   const ExpenseClaimsScreen({super.key});
 
   @override
-  ConsumerState<ExpenseClaimsScreen> createState() =>
-      _ExpenseClaimsScreenState();
+  ConsumerState<ExpenseClaimsScreen> createState() => _ExpenseClaimsScreenState();
 }
 
-class _ExpenseClaimsScreenState extends ConsumerState<ExpenseClaimsScreen> {
+class _ExpenseClaimsScreenState extends ConsumerState<ExpenseClaimsScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 6, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Expenses')),
+      appBar: AppBar(
+        title: const Text('Expense Claims'),
+        bottom: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          labelColor: AppColors.primaryLight,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: AppColors.primaryLight,
+          tabAlignment: TabAlignment.start,
+          tabs: const [
+            Tab(text: 'Dashboard'),
+            Tab(text: 'Claims'),
+            Tab(text: 'Advances'),
+            Tab(text: 'Configuration'),
+            Tab(text: 'Approvals'),
+            Tab(text: 'Batch Processing'),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+          ExpenseClaimsDashboardTab(),
+          ExpenseClaimsListTab(),
+          ExpenseAdvancesTab(),
+          ExpenseConfigurationTab(),
+          ExpenseApprovalsTab(),
+          ExpenseBatchProcessingTab(),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.push('/hrms/expense-claims/new');
         },
         child: const Icon(LucideIcons.plus),
-      ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(AppSpacing.s16),
-        itemCount: 3,
-        separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
-        itemBuilder: (context, index) {
-          final isGST = index == 0;
-          return AppCard(
-            padding: const EdgeInsets.all(AppSpacing.s16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: AppColors.primaryLight.withValues(
-                            alpha: 0.1,
-                          ),
-                          child: const Icon(
-                            LucideIcons.receipt,
-                            color: AppColors.primaryLight,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.s12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'EXP-00${index + 1}',
-                              style: AppTypography.subtitle.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              'Office Supplies',
-                              style: AppTypography.caption,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '₹ ${isGST ? '12,500.00' : '4,200.00'}',
-                          style: AppTypography.subtitle.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Text('12 Aug 2026', style: AppTypography.caption),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.s12),
-                const Divider(height: 1),
-                const SizedBox(height: AppSpacing.s12),
-                Text(
-                  'Purchased new monitors and keyboards for the dev team.',
-                  style: AppTypography.body,
-                ),
-                if (isGST) ...[
-                  const SizedBox(height: AppSpacing.s12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: Colors.blue.withValues(alpha: 0.1),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'GST Included',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.blue.shade700,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          '₹ 2,250.00',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.blue.shade700,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          );
-        },
       ),
     );
   }

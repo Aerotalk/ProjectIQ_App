@@ -37,7 +37,7 @@ class ModuleCard extends StatelessWidget {
     
     return AppCard(
       onTap: () {
-        context.go(module.route);
+        context.push(module.route);
       },
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.s16),
@@ -58,10 +58,14 @@ class ModuleCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.s12),
-            Text(
-              module.title,
-              style: AppTypography.button.copyWith(fontWeight: FontWeight.w600),
-              textAlign: TextAlign.center,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                module.title,
+                style: AppTypography.button.copyWith(fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+              ),
             ),
           ],
         ),

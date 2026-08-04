@@ -32,6 +32,8 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   bool _isLoadingPersonal = false;
   bool _isLoadingPassword = false;
 
+  String? _photoId;
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +43,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
       if (user != null) {
         _usernameController.text = user.username;
         _emailController.text = user.email;
+        setState(() {
+          _photoId = user.profilePhotoId;
+        });
       }
     });
   }
@@ -100,7 +105,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                     children: [
                       ProfileAvatar(
                         name: user?.username ?? 'User',
-                        photoId: user?.profilePhotoId,
+                        photoId: _photoId,
                         size: 80,
                       ),
                       const SizedBox(width: AppSpacing.s16),
@@ -115,10 +120,14 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                               style: AppTypography.caption.copyWith(color: Colors.grey),
                             ),
                             const SizedBox(height: AppSpacing.s12),
-                            Row(
+                            Wrap(
+                              spacing: AppSpacing.s16,
+                              runSpacing: AppSpacing.s8,
                               children: [
                                 ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Photo upload coming soon')));
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: isDark ? Colors.grey[800] : Colors.grey[200],
                                     foregroundColor: isDark ? Colors.white : Colors.black,
@@ -126,9 +135,11 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                                   ),
                                   child: const Text('Change Photo'),
                                 ),
-                                const SizedBox(width: AppSpacing.s16),
                                 TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    setState(() => _photoId = null);
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Photo removed. Click Save Changes to apply.')));
+                                  },
                                   style: TextButton.styleFrom(
                                     foregroundColor: AppColors.destructiveLight,
                                   ),
@@ -183,7 +194,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                         try {
                           await ref.read(profileSettingsRepositoryProvider).updatePersonalInformation(
                                 _usernameController.text,
-                                null, // Pass photoId if changed
+                                _photoId ?? '', // Pass empty string to clear if null
                               );
                           messenger.showSnackBar(const SnackBar(content: Text('Profile updated successfully')));
                         } catch (e) {
@@ -242,6 +253,12 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _isLoadingPassword ? null : () async {
+                        if (_currentPasswordController.text.isEmpty || 
+                            _newPasswordController.text.isEmpty || 
+                            _confirmPasswordController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill all password fields')));
+                          return;
+                        }
                         if (_newPasswordController.text != _confirmPasswordController.text) {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
                           return;
@@ -267,7 +284,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isDark ? AppColors.primaryDark : const Color(0xFF1F2937), // Dark navy
-                        foregroundColor: Colors.white,
+                        foregroundColor: isDark ? AppColors.primaryForegroundDark : Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       child: _isLoadingPassword
@@ -321,6 +338,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 100), // Padding to prevent overlap with floating navigation
           ],
         ),
       ),

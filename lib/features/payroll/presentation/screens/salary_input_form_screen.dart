@@ -20,11 +20,12 @@ class _SalaryInputFormScreenState extends ConsumerState<SalaryInputFormScreen> {
   String _employee = 'John Doe (EMP001)';
   String _period = 'July 2026';
   String _component = 'Bonus';
-  String _type = 'Earning';
+  String _type = 'Addition';
   bool _recurring = false;
   DateTime? _recurringUntil;
 
   final _amountController = TextEditingController();
+  final _reasonController = TextEditingController();
 
   final List<String> _employees = ['John Doe (EMP001)', 'Jane Smith (EMP002)'];
   final List<String> _periods = ['June 2026', 'July 2026', 'August 2026'];
@@ -34,7 +35,7 @@ class _SalaryInputFormScreenState extends ConsumerState<SalaryInputFormScreen> {
     'Deduction',
     'Other',
   ];
-  final List<String> _types = ['Earning', 'Deduction'];
+  final List<String> _types = ['Addition', 'Override', 'Deduction'];
 
   void _submit() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -167,37 +168,44 @@ class _SalaryInputFormScreenState extends ConsumerState<SalaryInputFormScreen> {
                           keyboardType: TextInputType.number,
                         ),
                       ),
-                      const SizedBox(width: AppSpacing.s16),
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Type *', style: AppTypography.label),
-                            const SizedBox(height: AppSpacing.s8),
-                            Row(
-                              children: _types
-                                  .map(
-                                    (t) => Expanded(
-                                      child: RadioListTile<String>(
-                                        title: Text(
-                                          t,
-                                          style: const TextStyle(fontSize: 12),
-                                        ),
-                                        value: t,
-                                        groupValue: _type,
-                                        contentPadding: EdgeInsets.zero,
-                                        onChanged: (v) =>
-                                            setState(() => _type = v!),
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
-                          ],
-                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.s16),
+
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Input Type *', style: AppTypography.label),
+                      const SizedBox(height: AppSpacing.s8),
+                      Row(
+                        children: _types
+                            .map(
+                              (t) => Expanded(
+                                child: RadioListTile<String>(
+                                  title: Text(
+                                    t,
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                  value: t,
+                                  groupValue: _type,
+                                  contentPadding: EdgeInsets.zero,
+                                  onChanged: (v) =>
+                                      setState(() => _type = v!),
+                                ),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ],
+                  ),
+                  
+                  const SizedBox(height: AppSpacing.s16),
+
+                  AppTextField(
+                    label: 'Reason (Optional)',
+                    placeholder: 'Reason for salary input',
+                    controller: _reasonController,
+                    maxLines: 2,
                   ),
 
                   const SizedBox(height: AppSpacing.s16),

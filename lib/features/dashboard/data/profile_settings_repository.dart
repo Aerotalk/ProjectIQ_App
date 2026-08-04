@@ -20,7 +20,7 @@ class ProfileSettingsRepository {
         '/auth/profile',
         data: {
           'username': username,
-          if (photoId != null) 'profilePhotoId': photoId,
+          if (photoId != null) 'profilePhotoId': photoId.isEmpty ? null : photoId,
         },
       );
       // Refresh user session data after updating profile

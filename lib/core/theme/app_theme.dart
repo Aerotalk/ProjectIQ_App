@@ -115,6 +115,13 @@ class AppTheme {
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         elevation: 0,
       ),
+      snackBarTheme: const SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(bottom: 90, left: 16, right: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+        ),
+      ),
       scrollbarTheme: const ScrollbarThemeData(
         // Sometimes scrollbars trigger shader compilation on fade out
       ),
@@ -233,6 +240,13 @@ class AppTheme {
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         elevation: 0,
+      ),
+      snackBarTheme: const SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(bottom: 90, left: 16, right: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+        ),
       ),
       extensions: const [
         AppThemeExtension(

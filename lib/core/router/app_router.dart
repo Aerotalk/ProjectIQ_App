@@ -12,6 +12,7 @@ import '../../features/dashboard/presentation/notifications_screen.dart';
 import '../../features/hrms/presentation/employee_directory_screen.dart';
 import '../../features/hrms/presentation/employee_profile_screen.dart';
 import '../../features/hrms/presentation/add_employee_screen.dart';
+import '../../features/hrms/presentation/performance_screen.dart';
 import '../../features/departments/presentation/screens/department_list_screen.dart';
 import '../../features/departments/presentation/screens/department_details_screen.dart';
 import '../../features/departments/presentation/screens/department_form_screen.dart';
@@ -268,6 +269,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/hrms/expense-claims/new',
         builder: (context, state) => const ExpenseClaimFormScreen(),
+      ),
+      GoRoute(
+        path: '/hrms/performance',
+        builder: (context, state) => const PerformanceScreen(),
       ),
         ],
       ),

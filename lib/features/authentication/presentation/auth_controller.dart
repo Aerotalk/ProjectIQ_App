@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
 import '../domain/user.dart';
 import '../data/auth_repository.dart';
+import 'package:cookie_jar/cookie_jar.dart';
 
 // State wrapper for auth
 class AuthState {
@@ -32,6 +33,8 @@ class AuthController extends Notifier<AuthState> {
   AuthRepository get _repository => ref.read(authRepositoryProvider);
   FlutterSecureStorage get _storage => ref.read(secureStorageProvider);
 
+  CookieJar get _cookieJar => ref.read(cookieJarProvider);
+
   @override
   AuthState build() {
     Future.microtask(_init);
@@ -51,6 +54,7 @@ class AuthController extends Notifier<AuthState> {
       // Typically on 401 we clear token.
       if (e.response?.statusCode == 401) {
         await _storage.delete(key: 'has_session');
+        await _cookieJar.deleteAll(); // Clear expired cookies
       }
       state = AuthState(isLoading: false, error: 'Session expired or offline');
     } catch (e) {
@@ -86,6 +90,7 @@ class AuthController extends Notifier<AuthState> {
     state = state.copyWith(isLoading: true);
     await _repository.logout();
     await _storage.delete(key: 'has_session');
+    await _cookieJar.deleteAll(); // Clear persistent cookies
     state = const AuthState(isLoading: false);
   }
 

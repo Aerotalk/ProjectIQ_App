@@ -14,6 +14,7 @@ class PermissionService {
 
   bool can(String permission) {
     if (_user == null) return false;
+    if (isSuperAdmin || isCompanyAdmin) return true; // Admins have all permissions
     return _user!.hasPermission(permission);
   }
 

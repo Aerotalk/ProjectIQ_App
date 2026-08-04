@@ -21,61 +21,15 @@ class ExpenseClaimFormScreen extends ConsumerStatefulWidget {
 
 class _ExpenseClaimFormScreenState
     extends ConsumerState<ExpenseClaimFormScreen> {
-  final _amountController = TextEditingController();
-  final _gstAmountController = TextEditingController();
-  final _descController = TextEditingController();
+  final _titleController = TextEditingController();
+  String _selectedTemplate = 'Standard';
+  String _selectedCurrency = 'USD';
 
-  String _selectedCategory = 'Travel';
-  DateTime? _expenseDate;
-  String? _attachmentName;
+  final List<String> _templates = ['Standard', 'Travel', 'Meals'];
+  final List<String> _currencies = ['USD', 'INR', 'EUR'];
 
-  bool _isGstApplicable = false;
-  bool _isInputCreditClaimable = false;
-
-  final List<String> _categories = [
-    'Travel',
-    'Meals',
-    'Office Supplies',
-    'Marketing',
-    'Software',
-    'Hardware',
-    'Other',
-  ];
-
-  void _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        _expenseDate = picked;
-      });
-    }
-  }
-
-  void _pickAttachment() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: [
-        'jpg',
-        'jpeg',
-        'png',
-        'pdf',
-        'xlsx',
-        'xls',
-        'doc',
-        'docx',
-      ],
-    );
-
-    if (result != null) {
-      setState(() {
-        _attachmentName = result.files.single.name;
-      });
-    }
+    _titleController.dispose();
+    super.dispose();
   }
 
   void _submit() {
@@ -107,158 +61,42 @@ class _ExpenseClaimFormScreenState
                   ),
                   const SizedBox(height: AppSpacing.s16),
 
-                  Text('Category *', style: AppTypography.label),
+                  Text('Template *', style: AppTypography.label),
                   const SizedBox(height: AppSpacing.s8),
                   DropdownButtonFormField<String>(
-                    value: _selectedCategory,
+                    value: _selectedTemplate,
                     isExpanded: true,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       contentPadding: EdgeInsets.symmetric(horizontal: 12),
                     ),
-                    items: _categories
+                    items: _templates
                         .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                         .toList(),
-                    onChanged: (v) => setState(() => _selectedCategory = v!),
-                  ),
-                  const SizedBox(height: AppSpacing.s16),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: InkWell(
-                          onTap: _pickDate,
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Expense Date *',
-                              border: OutlineInputBorder(),
-                            ),
-                            child: Text(
-                              _expenseDate?.toString().split(' ')[0] ??
-                                  'Select Date',
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.s16),
-                      Expanded(
-                        child: AppTextField(
-                          label: 'Amount (Total) *',
-                          placeholder: '0.00',
-                          controller: _amountController,
-                          keyboardType: TextInputType.number,
-                        ),
-                      ),
-                    ],
+                    onChanged: (v) => setState(() => _selectedTemplate = v!),
                   ),
                   const SizedBox(height: AppSpacing.s16),
 
                   AppTextField(
-                    label: 'Description',
-                    placeholder: 'What was this expense for?',
-                    controller: _descController,
-                    maxLines: 2,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.s16),
-
-            AppCard(
-              padding: const EdgeInsets.all(AppSpacing.s16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Tax & Compliance',
-                    style: AppTypography.subtitle.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    label: 'Title / Purpose *',
+                    placeholder: 'e.g., April Client Visit',
+                    controller: _titleController,
                   ),
                   const SizedBox(height: AppSpacing.s16),
 
-                  SwitchListTile(
-                    title: const Text('GST Applicable?'),
-                    value: _isGstApplicable,
-                    onChanged: (v) => setState(() => _isGstApplicable = v),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-
-                  if (_isGstApplicable) ...[
-                    const SizedBox(height: AppSpacing.s8),
-                    AppTextField(
-                      label: 'GST Amount',
-                      placeholder: '0.00',
-                      controller: _gstAmountController,
-                      keyboardType: TextInputType.number,
+                  Text('Currency *', style: AppTypography.label),
+                  const SizedBox(height: AppSpacing.s8),
+                  DropdownButtonFormField<String>(
+                    value: _selectedCurrency,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
                     ),
-                    const SizedBox(height: AppSpacing.s8),
-                    SwitchListTile(
-                      title: const Text('Input Credit Claimable?'),
-                      value: _isInputCreditClaimable,
-                      onChanged: (v) =>
-                          setState(() => _isInputCreditClaimable = v),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.s16),
-
-            AppCard(
-              padding: const EdgeInsets.all(AppSpacing.s16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Receipt Attachment',
-                    style: AppTypography.subtitle.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.s16),
-
-                  InkWell(
-                    onTap: _pickAttachment,
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      padding: const EdgeInsets.all(AppSpacing.s24),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColors.primaryLight.withValues(alpha: 0.3),
-                          style: BorderStyle.solid,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                        color: AppColors.primaryLight.withValues(alpha: 0.05),
-                      ),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Icon(
-                              LucideIcons.uploadCloud,
-                              size: 32,
-                              color: AppColors.primaryLight,
-                            ),
-                            const SizedBox(height: AppSpacing.s8),
-                            Text(
-                              _attachmentName ?? 'Tap to upload receipt',
-                              style: AppTypography.body.copyWith(
-                                color: _attachmentName != null
-                                    ? AppColors.primaryLight
-                                    : AppColors.mutedForegroundLight,
-                                fontWeight: _attachmentName != null
-                                    ? FontWeight.w600
-                                    : FontWeight.normal,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    items: _currencies
+                        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                        .toList(),
+                    onChanged: (v) => setState(() => _selectedCurrency = v!),
                   ),
                 ],
               ),

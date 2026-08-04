@@ -65,7 +65,7 @@ const List<AppModule> _coreModules = [
   ),
   AppModule(
     id: 'notifications',
-    title: 'Notifications',
+    title: 'Alerts',
     icon: LucideIcons.bell,
     route: '/notifications',
   ),
@@ -120,7 +120,7 @@ const List<AppModule> _hrmsModules = [
   ),
   AppModule(
     id: 'expense',
-    title: 'Expenses',
+    title: 'Expense Claims',
     icon: LucideIcons.receipt,
     route: '/hrms/expense-claims',
     permission: 'expense.view',

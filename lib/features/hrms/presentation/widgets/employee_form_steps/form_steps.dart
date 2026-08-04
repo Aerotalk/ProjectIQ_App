@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:projectiq_app/shared/widgets/inputs/app_text_field.dart';
+import 'package:projectiq_app/shared/widgets/inputs/app_phone_field.dart';
 import 'package:projectiq_app/shared/widgets/inputs/app_select.dart';
 import 'package:projectiq_app/shared/widgets/inputs/app_date_picker.dart';
 import 'package:projectiq_app/core/theme/app_spacing.dart';
@@ -130,17 +131,15 @@ class BasicInfoStep extends ConsumerWidget {
             onChanged: (v) => n.updateField('workEmail', v),
           ),
           sp,
-          AppTextField(
+          AppPhoneField(
             label: 'Phone *',
             initialValue: d['phone']?.toString(),
-            keyboardType: TextInputType.phone,
             onChanged: (v) => n.updateField('phone', v),
           ),
           sp,
-          AppTextField(
+          AppPhoneField(
             label: 'Alternate Phone',
             initialValue: d['alternatePhone']?.toString(),
-            keyboardType: TextInputType.phone,
             onChanged: (v) => n.updateField('alternatePhone', v),
           ),
           sp,
@@ -330,10 +329,9 @@ class ContactInfoStep extends ConsumerWidget {
             onChanged: (v) => n.updateField('presentCountry', v),
           ),
           sp,
-          AppTextField(
+          AppPhoneField(
             label: 'Phone',
             initialValue: d['presentPhone']?.toString(),
-            keyboardType: TextInputType.phone,
             onChanged: (v) => n.updateField('presentPhone', v),
           ),
 
@@ -401,10 +399,9 @@ class ContactInfoStep extends ConsumerWidget {
             onChanged: (v) => n.updateField('permanentCountry', v),
           ),
           sp,
-          AppTextField(
+          AppPhoneField(
             label: 'Phone',
             initialValue: d['permanentPhone']?.toString(),
-            keyboardType: TextInputType.phone,
             onChanged: (v) => n.updateField('permanentPhone', v),
           ),
           const SizedBox(height: AppSpacing.s24),
@@ -444,17 +441,15 @@ class EmergencyContactStep extends ConsumerWidget {
             onChanged: (v) => n.updateField('emergencyRelationship', v),
           ),
           sp,
-          AppTextField(
+          AppPhoneField(
             label: 'Phone',
             initialValue: d['emergencyPhone']?.toString(),
-            keyboardType: TextInputType.phone,
             onChanged: (v) => n.updateField('emergencyPhone', v),
           ),
           sp,
-          AppTextField(
+          AppPhoneField(
             label: 'Alternate Phone',
             initialValue: d['emergencyAlternatePhone']?.toString(),
-            keyboardType: TextInputType.phone,
             onChanged: (v) => n.updateField('emergencyAlternatePhone', v),
           ),
           sp,

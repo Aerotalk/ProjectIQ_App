@@ -10,6 +10,7 @@ import '../../../../core/permissions/permission_service.dart';
 import '../../../shared/widgets/avatars/profile_avatar.dart';
 import 'widgets/dashboard_section.dart';
 import 'widgets/module_card.dart';
+import 'widgets/attendance_clock_card.dart';
 import '../../../../shared/widgets/loaders/skeleton.dart';
 import '../../../../shared/widgets/search/global_search_delegate.dart';
 import '../../../../core/theme/theme_provider.dart';
@@ -50,8 +51,14 @@ class DashboardScreen extends ConsumerWidget {
           SliverToBoxAdapter(
             child: _buildWelcomeHeader(context, user, isLoading),
           ),
+          const SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.s16, vertical: AppSpacing.s16),
+            sliver: SliverToBoxAdapter(
+              child: AttendanceClockCard(),
+            ),
+          ),
           SliverPadding(
-            padding: const EdgeInsets.only(top: AppSpacing.s24),
+            padding: const EdgeInsets.only(top: AppSpacing.s8),
             sliver: SliverToBoxAdapter(
               child: DashboardSection(
                 title: 'Today\'s Summary',
@@ -145,7 +152,7 @@ class DashboardScreen extends ConsumerWidget {
             child: Icon(LucideIcons.bell, size: 20),
           ),
           onPressed: () {
-            context.go('/notifications');
+            context.push('/notifications');
           },
         ),
         Padding(
@@ -296,7 +303,7 @@ class DashboardScreen extends ConsumerWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => context.go('/approvals'),
+          onTap: () => context.push('/approvals'),
           borderRadius: BorderRadius.circular(12),
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.s16),

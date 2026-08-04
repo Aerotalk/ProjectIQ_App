@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
+import '../../../../shared/widgets/inputs/app_select.dart';
 import '../../data/models/designation_model.dart';
 import '../providers/designation_providers.dart';
 
@@ -20,7 +21,7 @@ class _DesignationFormScreenState extends ConsumerState<DesignationFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _codeController;
   late TextEditingController _nameController;
-  late TextEditingController _levelController;
+  String? _roleId;
   late TextEditingController _descController;
 
   @override
@@ -28,9 +29,7 @@ class _DesignationFormScreenState extends ConsumerState<DesignationFormScreen> {
     super.initState();
     _codeController = TextEditingController(text: widget.designation?.designationCode ?? '');
     _nameController = TextEditingController(text: widget.designation?.designationName ?? '');
-    _levelController = TextEditingController(
-      text: widget.designation?.hierarchyLevel != null ? widget.designation!.hierarchyLevel.toString() : '',
-    );
+    _roleId = widget.designation?.roleId ?? widget.designation?.role?['id'];
     _descController = TextEditingController(text: widget.designation?.description ?? '');
   }
 
@@ -38,7 +37,6 @@ class _DesignationFormScreenState extends ConsumerState<DesignationFormScreen> {
   void dispose() {
     _codeController.dispose();
     _nameController.dispose();
-    _levelController.dispose();
     _descController.dispose();
     super.dispose();
   }
@@ -47,13 +45,12 @@ class _DesignationFormScreenState extends ConsumerState<DesignationFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final actionNotifier = ref.read(designationActionProvider.notifier);
-    final hierarchyLevel = int.tryParse(_levelController.text);
 
     if (widget.designation == null) {
       await actionNotifier.createDesignation(
         designationCode: _codeController.text,
         designationName: _nameController.text,
-        hierarchyLevel: hierarchyLevel,
+        roleId: _roleId,
         description: _descController.text,
       );
     } else {
@@ -61,7 +58,7 @@ class _DesignationFormScreenState extends ConsumerState<DesignationFormScreen> {
         id: widget.designation!.id,
         designationCode: _codeController.text,
         designationName: _nameController.text,
-        hierarchyLevel: hierarchyLevel,
+        roleId: _roleId,
         description: _descController.text,
       );
     }
@@ -82,6 +79,7 @@ class _DesignationFormScreenState extends ConsumerState<DesignationFormScreen> {
   @override
   Widget build(BuildContext context) {
     final actionState = ref.watch(designationActionProvider);
+    final rolesAsync = ref.watch(availableRolesProvider);
     final isEdit = widget.designation != null;
 
     return Scaffold(
@@ -119,20 +117,27 @@ class _DesignationFormScreenState extends ConsumerState<DesignationFormScreen> {
                 },
               ),
               const SizedBox(height: AppSpacing.s16),
-              AppTextField(
-                label: 'Hierarchy Level *',
-                controller: _levelController,
-                keyboardType: TextInputType.number,
-                placeholder: '1 (Highest), 2, 3...',
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) {
-                    return 'Hierarchy level is required';
-                  }
-                  if (int.tryParse(val) == null) {
-                    return 'Must be a valid number';
-                  }
-                  return null;
+              rolesAsync.when(
+                data: (roles) {
+                  final items = roles
+                      .where((r) => !['ROLE_SUPER_ADMIN', 'ROLE_COMPANY_ADMIN', 'ROLE_ORG_ADMIN'].contains(r['roleName']))
+                      .map((r) {
+                    final label = r['roleName'].toString().replaceAll('ROLE_', '').replaceAll('_', ' ');
+                    return DropdownMenuItem<String>(
+                      value: r['id'].toString(),
+                      child: Text(label),
+                    );
+                  }).toList();
+                  return AppSelect<String>(
+                    label: 'Role',
+                    value: _roleId,
+                    placeholder: 'Select a Role',
+                    items: items,
+                    onChanged: (val) => setState(() => _roleId = val),
+                  );
                 },
+                loading: () => const CircularProgressIndicator(),
+                error: (err, st) => Text('Error loading roles: $err'),
               ),
               const SizedBox(height: AppSpacing.s16),
               AppTextField(

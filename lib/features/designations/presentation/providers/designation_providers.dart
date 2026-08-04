@@ -2,6 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/designation_model.dart';
 import '../../data/repositories/designation_repository.dart';
 import '../../../authentication/presentation/auth_controller.dart';
+import '../../../../core/network/api_client.dart';
+
+final availableRolesProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final dio = ref.read(dioProvider);
+  final response = await dio.get('/admin/roles/available');
+  final data = response.data as List;
+  return data.map((e) => e as Map<String, dynamic>).toList();
+});
 
 final designationListProvider = AsyncNotifierProvider<DesignationListNotifier, List<DesignationModel>>(
   DesignationListNotifier.new,
@@ -71,7 +79,7 @@ class DesignationActionNotifier extends Notifier<DesignationActionState> {
   Future<void> createDesignation({
     required String designationCode,
     required String designationName,
-    int? hierarchyLevel,
+    String? roleId,
     String? description,
   }) async {
     state = DesignationActionState(isLoading: true);
@@ -82,7 +90,7 @@ class DesignationActionNotifier extends Notifier<DesignationActionState> {
       final newDesig = await repo.createDesignation(
         designationCode: designationCode,
         designationName: designationName,
-        hierarchyLevel: hierarchyLevel,
+        roleId: roleId,
         description: description,
         companyId: user?.companyId,
       );
@@ -98,7 +106,7 @@ class DesignationActionNotifier extends Notifier<DesignationActionState> {
     required String id,
     required String designationCode,
     required String designationName,
-    int? hierarchyLevel,
+    String? roleId,
     String? description,
   }) async {
     state = DesignationActionState(isLoading: true);
@@ -109,7 +117,7 @@ class DesignationActionNotifier extends Notifier<DesignationActionState> {
         id,
         designationCode: designationCode,
         designationName: designationName,
-        hierarchyLevel: hierarchyLevel,
+        roleId: roleId,
         description: description,
       );
 

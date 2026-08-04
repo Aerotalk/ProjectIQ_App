@@ -52,6 +52,7 @@ dependencies:
   file_picker: ^8.1.4
   flutter_animate: ^4.5.2
   cookie_jar: ^4.0.9
+  intl_phone_field: ^3.2.0
 
 dev_dependencies:
   flutter_test:

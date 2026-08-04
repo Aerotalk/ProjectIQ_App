@@ -34,7 +34,7 @@ class DesignationRepository extends BaseRepository {
   Future<DesignationModel> createDesignation({
     required String designationCode,
     required String designationName,
-    int? hierarchyLevel,
+    String? roleId,
     String? description,
     String? companyId,
   }) async {
@@ -42,7 +42,7 @@ class DesignationRepository extends BaseRepository {
       final response = await _dio.post('/admin/designations', data: {
         'designationCode': designationCode,
         'designationName': designationName,
-        if (hierarchyLevel != null) 'hierarchyLevel': hierarchyLevel,
+        if (roleId != null) 'roleId': roleId,
         if (description != null) 'description': description,
         if (companyId != null) 'companyId': companyId,
       });
@@ -54,14 +54,14 @@ class DesignationRepository extends BaseRepository {
     String id, {
     required String designationCode,
     required String designationName,
-    int? hierarchyLevel,
+    String? roleId,
     String? description,
   }) async {
     return apiCall(() async {
       final response = await _dio.put('/admin/designations/$id', data: {
         'designationCode': designationCode,
         'designationName': designationName,
-        if (hierarchyLevel != null) 'hierarchyLevel': hierarchyLevel,
+        if (roleId != null) 'roleId': roleId,
         if (description != null) 'description': description,
       });
       return DesignationModel.fromJson(response.data);

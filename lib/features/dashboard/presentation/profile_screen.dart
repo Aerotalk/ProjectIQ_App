@@ -75,7 +75,16 @@ class ProfileScreen extends ConsumerWidget {
                     if (profile == null) {
                       return Column(
                         children: [
-                          _buildProfileDetailRow(context, 'Role', user?.roles.join(', ') ?? 'Admin'),
+                          _buildProfileDetailRow(
+                            context, 
+                            'Role', 
+                            user?.roles.map((r) {
+                              if (r.startsWith('ROLE_')) {
+                                return r.substring(5).split('_').map((w) => w.isNotEmpty ? '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}' : '').join(' ');
+                              }
+                              return r;
+                            }).join(', ') ?? 'Admin'
+                          ),
                           if (user?.organizationName != null) 
                             _buildProfileDetailRow(context, 'Organization', user!.organizationName!),
                           if (user?.companyName != null)
@@ -137,12 +146,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.s8),
           
-          _buildSettingsTile(
-            context: context,
-            icon: LucideIcons.lock,
-            title: 'Change Password',
-            trailing: const Icon(LucideIcons.chevronRight, size: 20),
-          ),
+
           _buildSettingsTile(
             context: context,
             icon: LucideIcons.logOut,
