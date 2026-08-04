@@ -3,31 +3,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../data/expense_repository.dart';
+import '../../data/performance_repository.dart';
 
-class ExpenseAdvancesTab extends ConsumerWidget {
-  const ExpenseAdvancesTab({super.key});
+class ManagerReviewsTab extends ConsumerWidget {
+  const ManagerReviewsTab({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final repo = ref.watch(expenseRepositoryProvider);
+    final repo = ref.watch(performanceRepositoryProvider);
 
     return FutureBuilder(
-      future: repo.getAdvances(),
+      future: repo.getManagerReviews(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
-        final advances = snapshot.data ?? [];
-        if (advances.isEmpty) return const Center(child: Text('No advances found.'));
+        final reviews = snapshot.data ?? [];
+        if (reviews.isEmpty) return const Center(child: Text('No manager reviews pending.'));
 
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.s16),
-          itemCount: advances.length,
+          itemCount: reviews.length,
           separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
           itemBuilder: (context, index) {
-            final advance = advances[index];
+            final review = reviews[index];
             return Container(
               padding: const EdgeInsets.all(AppSpacing.s16),
               decoration: BoxDecoration(
@@ -35,34 +35,30 @@ class ExpenseAdvancesTab extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(advance['reason'], style: AppTypography.subtitle),
-                      Text(advance['advanceNo'], style: AppTypography.caption.copyWith(color: Colors.grey)),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text('\$${advance['amount']}', style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
+                      Text(review['employee'], style: AppTypography.subtitle),
                       Container(
-                        margin: const EdgeInsets.only(top: 4),
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.orange.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
-                          advance['status'],
+                          review['status'],
                           style: AppTypography.caption.copyWith(color: Colors.orange, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: AppSpacing.s8),
+                  Text('Cycle: ${review['cycle']}', style: AppTypography.body),
+                  const SizedBox(height: AppSpacing.s4),
+                  Text('Overall Rating: ${review['overallRating']}', style: AppTypography.caption.copyWith(color: Colors.grey)),
                 ],
               ),
             );

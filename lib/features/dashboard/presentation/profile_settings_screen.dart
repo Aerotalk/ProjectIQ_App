@@ -126,7 +126,33 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                               children: [
                                 ElevatedButton(
                                   onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Photo upload coming soon')));
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return SafeArea(
+                                          child: Wrap(
+                                            children: <Widget>[
+                                              ListTile(
+                                                leading: const Icon(LucideIcons.camera),
+                                                title: const Text('Take Photo'),
+                                                onTap: () {
+                                                  Navigator.of(context).pop();
+                                                  setState(() => _photoId = 'new_photo_id');
+                                                },
+                                              ),
+                                              ListTile(
+                                                leading: const Icon(LucideIcons.image),
+                                                title: const Text('Choose from Gallery'),
+                                                onTap: () {
+                                                  Navigator.of(context).pop();
+                                                  setState(() => _photoId = 'new_photo_id');
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: isDark ? Colors.grey[800] : Colors.grey[200],

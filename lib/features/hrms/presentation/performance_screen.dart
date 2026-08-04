@@ -5,6 +5,12 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'tabs/performance_dashboard_tab.dart';
 import 'tabs/goals_list_tab.dart';
+import 'tabs/appraisal_cycles_tab.dart';
+import 'tabs/employee_reviews_tab.dart';
+import 'tabs/manager_reviews_tab.dart';
+import 'tabs/calibration_tab.dart';
+import 'tabs/performance_templates_tab.dart';
+import 'tabs/performance_reports_tab.dart';
 
 class PerformanceScreen extends ConsumerStatefulWidget {
   const PerformanceScreen({super.key});
@@ -19,7 +25,7 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> with Sing
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 8, vsync: this);
   }
 
   @override
@@ -47,7 +53,13 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> with Sing
           unselectedLabelColor: isDark ? Colors.grey[400] : Colors.grey[600],
           tabs: const [
             Tab(text: 'Dashboard', icon: Icon(LucideIcons.layoutDashboard, size: 20)),
+            Tab(text: 'Appraisal Cycles', icon: Icon(LucideIcons.refreshCw, size: 20)),
             Tab(text: 'Goals & KRAs', icon: Icon(LucideIcons.target, size: 20)),
+            Tab(text: 'Employee Reviews', icon: Icon(LucideIcons.userCheck, size: 20)),
+            Tab(text: 'Manager Reviews', icon: Icon(LucideIcons.users, size: 20)),
+            Tab(text: 'Calibration', icon: Icon(LucideIcons.scale, size: 20)),
+            Tab(text: 'Templates', icon: Icon(LucideIcons.fileText, size: 20)),
+            Tab(text: 'Reports', icon: Icon(LucideIcons.barChart2, size: 20)),
           ],
         ),
       ),
@@ -55,7 +67,13 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> with Sing
         controller: _tabController,
         children: const [
           PerformanceDashboardTab(),
+          AppraisalCyclesTab(),
           GoalsListTab(),
+          EmployeeReviewsTab(),
+          ManagerReviewsTab(),
+          CalibrationTab(),
+          PerformanceTemplatesTab(),
+          PerformanceReportsTab(),
         ],
       ),
     );

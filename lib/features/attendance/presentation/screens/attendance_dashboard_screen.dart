@@ -84,6 +84,7 @@ class AttendanceDashboardScreen extends ConsumerWidget {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: AppSpacing.s12,
       crossAxisSpacing: AppSpacing.s12,
+      childAspectRatio: 0.85,
       children: [
         QuickActionButton(
           icon: LucideIcons.calendar,
@@ -138,7 +139,7 @@ class AttendanceDashboardScreen extends ConsumerWidget {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: AppSpacing.s12,
       crossAxisSpacing: AppSpacing.s12,
-      childAspectRatio: 1.8,
+      childAspectRatio: 1.5,
       children: [
         AttendanceKpiCard(
           label: 'Present Today',
@@ -183,7 +184,7 @@ class AttendanceDashboardScreen extends ConsumerWidget {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: AppSpacing.s12,
       crossAxisSpacing: AppSpacing.s12,
-      childAspectRatio: 1.8,
+      childAspectRatio: 1.5,
       children: List.generate(4, (index) => const Skeleton(width: double.infinity, height: double.infinity)),
     );
   }

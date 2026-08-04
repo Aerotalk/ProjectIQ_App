@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../data/performance_repository.dart';
 import '../../data/models/performance_models.dart';
+import '../goal_form_screen.dart';
 
 class GoalsListTab extends ConsumerStatefulWidget {
   const GoalsListTab({super.key});
@@ -44,7 +45,12 @@ class _GoalsListTabState extends ConsumerState<GoalsListTab> {
               ),
               const SizedBox(width: AppSpacing.s12),
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const GoalFormScreen()),
+                  );
+                },
                 icon: const Icon(LucideIcons.plus, size: 16),
                 label: const Text('New Goal'),
                 style: ElevatedButton.styleFrom(

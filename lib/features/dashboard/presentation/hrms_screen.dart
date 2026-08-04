@@ -30,7 +30,7 @@ class HRMSScreen extends ConsumerWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: AppSpacing.s16,
                 mainAxisSpacing: AppSpacing.s16,
-                childAspectRatio: 1.1,
+                childAspectRatio: 1.0,
               ),
               itemCount: modules.length,
               itemBuilder: (context, index) {

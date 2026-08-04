@@ -19,69 +19,64 @@ class PremiumNavigationWrapper extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     
-    return Stack(
-      children: [
-        child,
-        Positioned(
-          bottom: AppSpacing.s24,
-          left: 0,
-          right: 0,
-          child: SafeArea(
-            child: Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(30),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.black.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(
-                        color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
-                        width: 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (context.canPop()) ...[
-                          _NavButton(
-                            icon: LucideIcons.arrowLeft,
-                            label: 'Back',
-                            onTap: () => context.pop(),
-                            isDark: isDark,
-                          ),
-                          Container(
-                            width: 1,
-                            height: 24,
-                            margin: const EdgeInsets.symmetric(horizontal: 16),
-                            color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.1),
-                          ),
-                        ],
-                        _NavButton(
-                          icon: LucideIcons.home,
-                          label: 'Home',
-                          onTap: () => context.go('/dashboard'),
-                          isDark: isDark,
-                          isPrimary: true,
-                        ),
-                      ],
-                    ),
+    return Scaffold(
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      body: child,
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          color: Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.cardDark : AppColors.cardLight,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
+                    width: 1,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (context.canPop()) ...[
+                      _NavButton(
+                        icon: LucideIcons.arrowLeft,
+                        label: 'Back',
+                        onTap: () => context.pop(),
+                        isDark: isDark,
+                      ),
+                      Container(
+                        width: 1,
+                        height: 24,
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.1),
+                      ),
+                    ],
+                    _NavButton(
+                      icon: LucideIcons.home,
+                      label: 'Home',
+                      onTap: () => context.go('/dashboard'),
+                      isDark: isDark,
+                      isPrimary: true,
+                    ),
+                  ],
                 ),
               ),
-            ).animate().slideY(begin: 2, end: 0, duration: 600.ms, curve: Curves.easeOutBack).fade(),
+            ],
           ),
         ),
-      ],
+      ).animate().slideY(begin: 1, end: 0, duration: 400.ms, curve: Curves.easeOutQuad),
     );
   }
 }

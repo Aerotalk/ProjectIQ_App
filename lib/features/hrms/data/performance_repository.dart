@@ -126,4 +126,50 @@ class PerformanceRepository {
       ),
     ];
   }
+
+  Future<List<dynamic>> getSelfReviews() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return [
+      {
+        'id': 'SR-101',
+        'cycle': 'Mid-Year Review 2026',
+        'overallRating': 4.2,
+        'status': 'Submitted',
+        'submittedOn': '2026-07-10',
+      }
+    ];
+  }
+
+  Future<List<dynamic>> getManagerReviews() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return [
+      {
+        'id': 'MR-101',
+        'employee': 'John Doe',
+        'cycle': 'Mid-Year Review 2026',
+        'overallRating': 4.0,
+        'status': 'Pending',
+      }
+    ];
+  }
+
+  Future<List<dynamic>> getCalibrationRecords() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return [
+      {
+        'id': 'CAL-01',
+        'employee': 'John Doe',
+        'currentRating': 4.0,
+        'proposedRating': 3.8,
+        'status': 'Pending',
+      },
+      {
+        'id': 'CAL-02',
+        'employee': 'Jane Smith',
+        'currentRating': 4.8,
+        'proposedRating': 4.8,
+        'status': 'Finalized',
+      }
+    ];
+  }
 }

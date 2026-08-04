@@ -15,6 +15,7 @@ import '../../../../core/theme/theme_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../../attendance/presentation/providers/clock_provider.dart';
 
 class QuickActionItem {
   final String label;
@@ -59,7 +60,7 @@ class DashboardScreen extends ConsumerWidget {
             sliver: SliverToBoxAdapter(
               child: DashboardSection(
                 title: 'Today\'s Summary',
-                child: _buildSummaryCards(context, isLoading),
+                child: _buildSummaryCards(context, ref, isLoading),
               ),
             ),
           ),
@@ -77,7 +78,7 @@ class DashboardScreen extends ConsumerWidget {
             sliver: SliverToBoxAdapter(
               child: DashboardSection(
                 title: 'Recent Activity',
-                child: _buildRecentActivity(context, isLoading),
+                child: _buildRecentActivity(context, ref, isLoading),
               ),
             ),
           ),
@@ -120,20 +121,29 @@ class DashboardScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              user?.hasRole('ROLE_SUPER_ADMIN') == true ? 'HR' : 'EMP',
+              'EMP',
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                color: (user?.hasRole('ROLE_SUPER_ADMIN') == true) ? Colors.grey : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
               ),
             ),
             Transform.scale(
               scale: 0.6,
               child: Switch(
                 value: user?.hasRole('ROLE_SUPER_ADMIN') == true,
+                activeColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                 onChanged: (_) {
                   ref.read(authControllerProvider.notifier).toggleDeveloperRole();
                 },
+              ),
+            ),
+            Text(
+              'HR',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: (user?.hasRole('ROLE_SUPER_ADMIN') == true) ? (isDark ? AppColors.primaryDark : AppColors.primaryLight) : Colors.grey,
               ),
             ),
           ],
@@ -216,7 +226,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryCards(BuildContext context, bool isLoading) {
+  Widget _buildSummaryCards(BuildContext context, WidgetRef ref, bool isLoading) {
     if (isLoading) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
@@ -231,17 +241,29 @@ class DashboardScreen extends ConsumerWidget {
     }
     
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final clockState = ref.watch(attendanceClockProvider);
+    
+    String hoursLogged = '0h 0m';
+    String attendanceStatus = 'Absent';
+    IconData attendanceIcon = LucideIcons.xCircle;
+    
+    if (clockState.status == ClockStatus.checkedIn || clockState.status == ClockStatus.checkedOut) {
+      final duration = clockState.elapsed;
+      hoursLogged = '\${duration.inHours}h \${duration.inMinutes.remainder(60)}m';
+      attendanceStatus = clockState.status == ClockStatus.checkedIn ? 'Present' : 'Checked Out';
+      attendanceIcon = LucideIcons.checkCircle;
+    }
     
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       child: Row(
         children: [
           Expanded(
-            child: _buildSummaryCard(context, 'Hours Logged', '8h 30m', LucideIcons.clock, isDark),
+            child: _buildSummaryCard(context, 'Hours Logged', hoursLogged, LucideIcons.clock, isDark),
           ),
           const SizedBox(width: AppSpacing.s16),
           Expanded(
-            child: _buildSummaryCard(context, 'Attendance', 'Present', LucideIcons.checkCircle, isDark),
+            child: _buildSummaryCard(context, 'Attendance', attendanceStatus, attendanceIcon, isDark),
           ),
         ],
       ).animate().fade(duration: 400.ms).slideY(begin: 0.2, curve: Curves.easeOutQuad),
@@ -338,7 +360,7 @@ class DashboardScreen extends ConsumerWidget {
     ).animate().fade(duration: 400.ms, delay: 100.ms).slideY(begin: 0.2, curve: Curves.easeOutQuad);
   }
 
-  Widget _buildRecentActivity(BuildContext context, bool isLoading) {
+  Widget _buildRecentActivity(BuildContext context, WidgetRef ref, bool isLoading) {
     if (isLoading) {
       return ListView.separated(
         shrinkWrap: true,
@@ -351,14 +373,43 @@ class DashboardScreen extends ConsumerWidget {
     }
     
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final clockState = ref.watch(attendanceClockProvider);
+    
+    List<Map<String, dynamic>> activities = [];
+    if (clockState.checkInTime != null) {
+      activities.add({
+        'title': 'Checked In',
+        'subtitle': '\${DateFormat('hh:mm a').format(clockState.checkInTime!)} - HQ Office',
+        'icon': LucideIcons.checkCircle,
+        'color': Colors.green,
+      });
+    }
+    if (clockState.status == ClockStatus.checkedOut && clockState.checkOutTime != null) {
+      activities.insert(0, {
+        'title': 'Checked Out',
+        'subtitle': '\${DateFormat('hh:mm a').format(clockState.checkOutTime!)} - HQ Office',
+        'icon': LucideIcons.logOut,
+        'color': Colors.orange,
+      });
+    }
+    
+    if (activities.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(AppSpacing.s16),
+        child: Center(
+          child: Text('No recent activity', style: AppTypography.caption),
+        ),
+      );
+    }
 
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
-      itemCount: 3,
+      itemCount: activities.length,
       separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
       itemBuilder: (context, index) {
+        final activity = activities[index];
         return Container(
           padding: const EdgeInsets.all(AppSpacing.s16),
           decoration: BoxDecoration(
@@ -368,14 +419,14 @@ class DashboardScreen extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              Icon(LucideIcons.checkCircle, color: Colors.green, size: 20),
+              Icon(activity['icon'], color: activity['color'], size: 20),
               const SizedBox(width: AppSpacing.s16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Checked In', style: AppTypography.body.copyWith(fontWeight: FontWeight.w500)),
-                    Text('09:00 AM - HQ Office', style: AppTypography.caption),
+                    Text(activity['title'], style: AppTypography.body.copyWith(fontWeight: FontWeight.w500)),
+                    Text(activity['subtitle'], style: AppTypography.caption),
                   ],
                 ),
               ),
