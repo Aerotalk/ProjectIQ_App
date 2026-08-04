@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'core/environment/app_config.dart';
 import 'core/environment/environment.dart';
 import 'core/router/app_router.dart';
+import 'core/network/api_client.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
@@ -16,6 +19,17 @@ void main() async {
 
   // Initialize SharedPreferences
   final prefs = await SharedPreferences.getInstance();
+
+  // Initialize CookieJar for persistence
+  CookieJar cookieJar = CookieJar();
+  if (!kIsWeb) {
+    final appDocDir = await getApplicationDocumentsDirectory();
+    final String appDocPath = appDocDir.path;
+    cookieJar = PersistCookieJar(
+      ignoreExpires: true,
+      storage: FileStorage("$appDocPath/.cookies/"),
+    );
+  }
 
   // Initialize AppConfig (Development by default for now)
   AppConfig.init(
@@ -29,6 +43,7 @@ void main() async {
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
+        cookieJarProvider.overrideWithValue(cookieJar),
       ],
       child: const HRMSApp(),
     ),

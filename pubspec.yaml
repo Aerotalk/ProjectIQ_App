@@ -51,6 +51,7 @@ dependencies:
   path_provider: ^2.1.6
   file_picker: ^8.1.4
   flutter_animate: ^4.5.2
+  cookie_jar: ^4.0.9
 
 dev_dependencies:
   flutter_test:
