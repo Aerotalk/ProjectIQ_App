@@ -15,7 +15,7 @@ import '../../../../core/theme/theme_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../attendance/presentation/providers/clock_provider.dart';
+import '../../attendance/presentation/providers/clock_provider.dart';
 
 class QuickActionItem {
   final String label;
@@ -249,7 +249,7 @@ class DashboardScreen extends ConsumerWidget {
     
     if (clockState.status == ClockStatus.checkedIn || clockState.status == ClockStatus.checkedOut) {
       final duration = clockState.elapsed;
-      hoursLogged = '\${duration.inHours}h \${duration.inMinutes.remainder(60)}m';
+      hoursLogged = "${duration.inHours}h ${duration.inMinutes.remainder(60)}m";
       attendanceStatus = clockState.status == ClockStatus.checkedIn ? 'Present' : 'Checked Out';
       attendanceIcon = LucideIcons.checkCircle;
     }
@@ -379,7 +379,7 @@ class DashboardScreen extends ConsumerWidget {
     if (clockState.checkInTime != null) {
       activities.add({
         'title': 'Checked In',
-        'subtitle': '\${DateFormat('hh:mm a').format(clockState.checkInTime!)} - HQ Office',
+        'subtitle': "${DateFormat('hh:mm a').format(clockState.checkInTime!)} - HQ Office",
         'icon': LucideIcons.checkCircle,
         'color': Colors.green,
       });
@@ -387,7 +387,7 @@ class DashboardScreen extends ConsumerWidget {
     if (clockState.status == ClockStatus.checkedOut && clockState.checkOutTime != null) {
       activities.insert(0, {
         'title': 'Checked Out',
-        'subtitle': '\${DateFormat('hh:mm a').format(clockState.checkOutTime!)} - HQ Office',
+        'subtitle': "${DateFormat('hh:mm a').format(clockState.checkOutTime!)} - HQ Office",
         'icon': LucideIcons.logOut,
         'color': Colors.orange,
       });

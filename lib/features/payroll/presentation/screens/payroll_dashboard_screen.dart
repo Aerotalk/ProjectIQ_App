@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/cards/app_card.dart';
 import '../../../../shared/widgets/loaders/skeleton.dart';
-import '../../../authentication/presentation/auth_controller.dart';
 import '../providers/payroll_providers.dart';
 
 class PayrollDashboardScreen extends ConsumerWidget {
@@ -12,8 +14,8 @@ class PayrollDashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authControllerProvider).user;
-    final isHR = user?.hasRole('ROLE_SUPER_ADMIN') ?? false;
+    final isHR = ref.watch(payrollRoleProvider).isHR;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -35,17 +37,21 @@ class PayrollDashboardScreen extends ConsumerWidget {
               if (isHR) ...[
                 _buildKPIs(context, ref),
                 const SizedBox(height: AppSpacing.s24),
+              ] else ...[
+                _buildEmployeeSummary(context, isDark),
+                const SizedBox(height: AppSpacing.s24),
               ],
               Text(
                 'Quick Actions',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
-                ),
+                style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: AppSpacing.s16),
               _buildQuickActions(context, isHR),
+              const SizedBox(height: AppSpacing.s24),
+              if (isHR)
+                _buildRecentRuns(context, ref, isDark)
+              else
+                _buildRecentPayslips(context, ref, isDark),
             ],
           ),
         ),
@@ -254,6 +260,157 @@ class PayrollDashboardScreen extends ConsumerWidget {
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildEmployeeSummary(BuildContext context, bool isDark) {
+    return AppCard(
+      padding: const EdgeInsets.all(AppSpacing.s24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Next Payout', style: AppTypography.caption.copyWith(color: Colors.grey)),
+              const SizedBox(height: 8),
+              Text('₹ 1,15,000', style: AppTypography.title),
+              const SizedBox(height: 4),
+              Text('Expected by 31 Jul 2026', style: AppTypography.caption.copyWith(color: Colors.green)),
+            ],
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.blue.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(LucideIcons.banknote, color: Colors.blue, size: 32),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecentRuns(BuildContext context, WidgetRef ref, bool isDark) {
+    final runsState = ref.watch(payrollRunsProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Recent Payroll Runs', style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
+            TextButton(
+              onPressed: () => context.push('/hrms/payroll/runs'),
+              child: const Text('View All'),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.s8),
+        runsState.when(
+          data: (runs) {
+            if (runs.isEmpty) return const Text('No recent runs.');
+            return Column(
+              children: runs.take(2).map<Widget>((run) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.s12),
+                  child: AppCard(
+                    padding: const EdgeInsets.all(AppSpacing.s16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(run.period, style: AppTypography.body.copyWith(fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 4),
+                            Text('${run.employeeCount} Employees', style: AppTypography.caption.copyWith(color: Colors.grey)),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(run.netAmount, style: AppTypography.body.copyWith(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 4),
+                            Text(run.status, style: AppTypography.caption.copyWith(color: run.status == 'Processed' ? Colors.green : Colors.orange)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
+          },
+          loading: () => const Skeleton(height: 100, width: double.infinity),
+          error: (e, _) => Text('Error loading runs: $e'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecentPayslips(BuildContext context, WidgetRef ref, bool isDark) {
+    final payslipsState = ref.watch(payslipsProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Recent Payslips', style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
+            TextButton(
+              onPressed: () => context.push('/hrms/payroll/payslips'),
+              child: const Text('View All'),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.s8),
+        payslipsState.when(
+          data: (payslips) {
+            if (payslips.isEmpty) return const Text('No recent payslips.');
+            return Column(
+              children: payslips.take(2).map<Widget>((payslip) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.s12),
+                  child: AppCard(
+                    padding: const EdgeInsets.all(AppSpacing.s16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+                              child: Icon(LucideIcons.fileText, size: 20, color: isDark ? AppColors.primaryDark : AppColors.primaryLight),
+                            ),
+                            const SizedBox(width: AppSpacing.s12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(payslip.period, style: AppTypography.body.copyWith(fontWeight: FontWeight.w600)),
+                                const SizedBox(height: 4),
+                                Text('Net: ${payslip.netSalary}', style: AppTypography.caption.copyWith(color: Colors.grey)),
+                              ],
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          icon: const Icon(LucideIcons.download, size: 18),
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
+          },
+          loading: () => const Skeleton(height: 80, width: double.infinity),
+          error: (e, _) => Text('Error: $e'),
+        ),
+      ],
     );
   }
 }

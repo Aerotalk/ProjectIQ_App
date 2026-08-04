@@ -84,7 +84,7 @@ class AttendanceDashboardScreen extends ConsumerWidget {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: AppSpacing.s12,
       crossAxisSpacing: AppSpacing.s12,
-      childAspectRatio: 0.85,
+      childAspectRatio: 0.7,
       children: [
         QuickActionButton(
           icon: LucideIcons.calendar,
