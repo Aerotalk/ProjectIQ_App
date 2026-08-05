@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../../shared/widgets/inputs/app_select.dart';
+import '../../../../shared/widgets/buttons/app_button.dart';
 import '../../data/models/designation_model.dart';
 import '../providers/designation_providers.dart';
 
@@ -149,15 +150,10 @@ class _DesignationFormScreenState extends ConsumerState<DesignationFormScreen> {
               const SizedBox(height: AppSpacing.s32),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: actionState.isLoading ? null : _submit,
-                  child: actionState.isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(isEdit ? 'Update Designation' : 'Save Designation'),
+                  isLoading: actionState.isLoading,
+                  text: isEdit ? 'Update Designation' : 'Save Designation',
                 ),
               ),
             ],

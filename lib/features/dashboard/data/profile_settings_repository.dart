@@ -31,10 +31,39 @@ class ProfileSettingsRepository {
   }
 
   Future<void> updatePassword(String currentPassword, String newPassword) async {
-    // Note: Backend endpoint for updating logged-in user's password is not yet available.
-    // Mocking success delay for now.
-    await Future.delayed(const Duration(seconds: 1));
-    // throw Exception('Not implemented in backend');
+    try {
+      await _dio.put(
+        '/auth/password',
+        data: {
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        },
+      );
+    } catch (e) {
+      if (e is DioException && e.response?.data != null) {
+        throw Exception(e.response?.data['message'] ?? e.response?.data ?? 'Failed to update password');
+      }
+      rethrow;
+    }
+  }
+
+  Future<String> uploadProfilePhoto(String filePath) async {
+    try {
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(filePath),
+        'module': 'profile_pictures',
+      });
+      final response = await _dio.post(
+        '/admin/files/upload',
+        data: formData,
+      );
+      return response.data['id'];
+    } catch (e) {
+      if (e is DioException && e.response?.data != null) {
+        throw Exception(e.response?.data['message'] ?? 'Failed to upload photo');
+      }
+      rethrow;
+    }
   }
 
   Future<void> updateNotificationPreferences(Map<String, bool> preferences) async {

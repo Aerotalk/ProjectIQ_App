@@ -75,15 +75,38 @@ class ProfileScreen extends ConsumerWidget {
                     if (profile == null) {
                       return Column(
                         children: [
-                          _buildProfileDetailRow(
+                          _buildProfileWidgetRow(
                             context, 
                             'Role', 
-                            user?.roles.map((r) {
-                              if (r.startsWith('ROLE_')) {
-                                return r.substring(5).split('_').map((w) => w.isNotEmpty ? '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}' : '').join(' ');
-                              }
-                              return r;
-                            }).join(', ') ?? 'Admin'
+                            Wrap(
+                              alignment: WrapAlignment.end,
+                              spacing: 4,
+                              runSpacing: 4,
+                              children: (user?.roles ?? ['ROLE_ADMIN']).map((r) {
+                                String displayRole = r;
+                                if (r.startsWith('ROLE_')) {
+                                  displayRole = r.substring(5).split('_').map((w) => w.isNotEmpty ? '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}' : '').join(' ');
+                                }
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.2),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    displayRole,
+                                    style: AppTypography.caption.copyWith(
+                                      fontSize: 11,
+                                      color: isDark ? AppColors.primaryForegroundDark : AppColors.primaryLight,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
                           ),
                           if (user?.organizationName != null) 
                             _buildProfileDetailRow(context, 'Organization', user!.organizationName!),
@@ -181,6 +204,32 @@ class ProfileScreen extends ConsumerWidget {
               value,
               style: AppTypography.body.copyWith(fontWeight: FontWeight.w500),
               textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileWidgetRow(BuildContext context, String label, Widget valueWidget) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.s8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: AppTypography.label.copyWith(
+              color: isDark ? AppColors.mutedForegroundDark : AppColors.mutedForegroundLight,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.s16),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: valueWidget,
             ),
           ),
         ],

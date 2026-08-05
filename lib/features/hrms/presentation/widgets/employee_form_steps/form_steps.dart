@@ -168,9 +168,20 @@ class BasicInfoStep extends ConsumerWidget {
             onChanged: (v) => n.updateField('maritalStatus', v),
           ),
           sp,
-          AppTextField(
+          AppSelect<String>(
+            value: d['bloodGroup'] as String?,
             label: 'Blood Group *',
-            initialValue: d['bloodGroup']?.toString(),
+            placeholder: 'Select',
+            items: [
+              'A+',
+              'A-',
+              'B+',
+              'B-',
+              'AB+',
+              'AB-',
+              'O+',
+              'O-',
+            ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
             onChanged: (v) => n.updateField('bloodGroup', v),
           ),
           sp,

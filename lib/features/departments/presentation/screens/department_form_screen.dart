@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
+import '../../../../shared/widgets/buttons/app_button.dart';
 import '../../data/models/department_model.dart';
 import '../providers/department_providers.dart';
 
@@ -117,15 +118,10 @@ class _DepartmentFormScreenState extends ConsumerState<DepartmentFormScreen> {
               const SizedBox(height: AppSpacing.s32),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: actionState.isLoading ? null : _submit,
-                  child: actionState.isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(isEdit ? 'Update Department' : 'Save Department'),
+                  isLoading: actionState.isLoading,
+                  text: isEdit ? 'Update Department' : 'Save Department',
                 ),
               ),
             ],

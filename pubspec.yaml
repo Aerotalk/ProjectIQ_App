@@ -54,6 +54,7 @@ dependencies:
   cookie_jar: ^4.0.9
   intl_phone_field: ^3.2.0
   uuid: ^4.3.3
+  image_picker: ^1.2.3
 
 dev_dependencies:
   flutter_test:

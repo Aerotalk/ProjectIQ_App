@@ -124,7 +124,7 @@ class AuthController extends Notifier<AuthState> {
     if (state.user == null) return;
     
     final currentUser = state.user!;
-    final isCurrentlyHR = currentUser.roles.contains('ROLE_SUPER_ADMIN') || currentUser.roles.contains('ROLE_HR');
+    final isCurrentlyHR = currentUser.roles.contains('ROLE_SUPER_ADMIN') || currentUser.roles.contains('ROLE_HR') || currentUser.roles.contains('ROLE_COMPANY_ADMIN');
     
     final newUser = currentUser.copyWith(
       roles: isCurrentlyHR ? ['ROLE_EMPLOYEE'] : ['ROLE_SUPER_ADMIN'],

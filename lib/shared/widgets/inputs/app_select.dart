@@ -111,7 +111,8 @@ class AppSelect<T> extends StatelessWidget {
             focusedErrorBorder: focusedErrorBorder,
           ),
           dropdownColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
-          elevation: 0,
+          elevation: 8,
+          isExpanded: true,
           borderRadius: borderRadius,
         ),
         if (errorText != null || helperText != null) ...[

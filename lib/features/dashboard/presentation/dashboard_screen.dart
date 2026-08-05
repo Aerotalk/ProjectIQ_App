@@ -125,13 +125,13 @@ class DashboardScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: (user?.hasRole('ROLE_SUPER_ADMIN') == true) ? Colors.grey : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
+                color: (user?.hasRole('ROLE_SUPER_ADMIN') == true || user?.hasRole('ROLE_HR') == true || user?.hasRole('ROLE_COMPANY_ADMIN') == true) ? Colors.grey : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
               ),
             ),
             Transform.scale(
               scale: 0.6,
               child: Switch(
-                value: user?.hasRole('ROLE_SUPER_ADMIN') == true,
+                value: user?.hasRole('ROLE_SUPER_ADMIN') == true || user?.hasRole('ROLE_HR') == true || user?.hasRole('ROLE_COMPANY_ADMIN') == true,
                 activeColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                 onChanged: (_) {
                   ref.read(authControllerProvider.notifier).toggleDeveloperRole();
@@ -143,7 +143,7 @@ class DashboardScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: (user?.hasRole('ROLE_SUPER_ADMIN') == true) ? (isDark ? AppColors.primaryDark : AppColors.primaryLight) : Colors.grey,
+                color: (user?.hasRole('ROLE_SUPER_ADMIN') == true || user?.hasRole('ROLE_HR') == true || user?.hasRole('ROLE_COMPANY_ADMIN') == true) ? (isDark ? AppColors.primaryDark : AppColors.primaryLight) : Colors.grey,
               ),
             ),
           ],

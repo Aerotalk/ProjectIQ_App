@@ -9,6 +9,7 @@ import '../../../../shared/widgets/avatars/profile_avatar.dart';
 import '../../authentication/presentation/auth_controller.dart';
 import '../data/profile_settings_repository.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileSettingsScreen extends ConsumerStatefulWidget {
   const ProfileSettingsScreen({super.key});
@@ -60,6 +61,30 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     super.dispose();
   }
 
+  bool _isUploadingPhoto = false;
+
+  Future<void> _pickAndUploadPhoto(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source, imageQuality: 70);
+    
+    if (pickedFile != null) {
+      setState(() => _isUploadingPhoto = true);
+      try {
+        final uploadedId = await ref.read(profileSettingsRepositoryProvider).uploadProfilePhoto(pickedFile.path);
+        setState(() => _photoId = uploadedId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Photo uploaded successfully! Save changes to apply.')));
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to upload photo: $e')));
+        }
+      } finally {
+        if (mounted) setState(() => _isUploadingPhoto = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -103,10 +128,27 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ProfileAvatar(
-                        name: user?.username ?? 'User',
-                        photoId: _photoId,
-                        size: 80,
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          ProfileAvatar(
+                            name: user?.username ?? 'User',
+                            photoId: _photoId,
+                            size: 80,
+                          ),
+                          if (_isUploadingPhoto)
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: const BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(color: Colors.white),
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(width: AppSpacing.s16),
                       Expanded(
@@ -137,7 +179,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                                                 title: const Text('Take Photo'),
                                                 onTap: () {
                                                   Navigator.of(context).pop();
-                                                  setState(() => _photoId = 'new_photo_id');
+                                                  _pickAndUploadPhoto(ImageSource.camera);
                                                 },
                                               ),
                                               ListTile(
@@ -145,7 +187,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                                                 title: const Text('Choose from Gallery'),
                                                 onTap: () {
                                                   Navigator.of(context).pop();
-                                                  setState(() => _photoId = 'new_photo_id');
+                                                  _pickAndUploadPhoto(ImageSource.gallery);
                                                 },
                                               ),
                                             ],
@@ -279,9 +321,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _isLoadingPassword ? null : () async {
-                        if (_currentPasswordController.text.isEmpty || 
-                            _newPasswordController.text.isEmpty || 
-                            _confirmPasswordController.text.isEmpty) {
+                        if (_currentPasswordController.text.trim().isEmpty || 
+                            _newPasswordController.text.trim().isEmpty || 
+                            _confirmPasswordController.text.trim().isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill all password fields')));
                           return;
                         }
