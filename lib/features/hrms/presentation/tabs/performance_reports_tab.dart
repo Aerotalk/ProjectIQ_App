@@ -156,12 +156,14 @@ class _PerformanceReportsTabState extends ConsumerState<PerformanceReportsTab> {
         rows.add(['No promotion data']);
       }
 
-      String csv = const ListToCsvConverter().convert(rows);
+      String csvData = Csv().encode(rows);
       final dir = await getApplicationDocumentsDirectory();
       final file = File('${dir.path}/performance_report_$_activeReport.csv');
-      await file.writeAsString(csv);
+      await file.writeAsString(csvData);
       
-      await Share.shareXFiles([XFile(file.path)], text: 'Performance Report - $_activeReport');
+      if (mounted) {
+        await Share.shareXFiles([XFile(file.path)], text: 'Performance Report - $_activeReport');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Export failed: $e'), backgroundColor: Colors.red),
