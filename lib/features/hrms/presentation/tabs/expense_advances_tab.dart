@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/app_formatters.dart';
 import '../../data/expense_repository.dart';
 
 class ExpenseAdvancesTab extends ConsumerWidget {
@@ -48,7 +49,7 @@ class ExpenseAdvancesTab extends ConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('\$${advance['amount']}', style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
+                      Text(AppFormatters.formatCurrency(advance['amount']), style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
                       Container(
                         margin: const EdgeInsets.only(top: 4),
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

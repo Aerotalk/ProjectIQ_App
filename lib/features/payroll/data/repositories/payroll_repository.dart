@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/payroll_models.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/utils/app_formatters.dart';
 
 final payrollRepositoryProvider = Provider<PayrollRepository>((ref) {
   final dio = ref.read(dioProvider);
@@ -44,10 +45,10 @@ class PayrollRepository {
           period: r['payrollPeriod'] ?? '',
           status: r['status'] ?? 'Draft',
           employeeCount: r['employeeCount'] ?? 0,
-          grossAmount: '₹ ${(r['totalGross'] ?? 0).toStringAsFixed(2)}',
-          netAmount: '₹ ${(r['totalNet'] ?? 0).toStringAsFixed(2)}',
-          createdDate: r['createdAt']?.toString().split('T')[0] ?? '',
-          processedDate: r['processedAt']?.toString().split('T')[0],
+          grossAmount: AppFormatters.formatCurrency(r['totalGross']),
+          netAmount: AppFormatters.formatCurrency(r['totalNet']),
+          createdDate: AppFormatters.formatDate(r['createdAt']),
+          processedDate: AppFormatters.formatDate(r['processedAt']),
         )).toList();
       }
       return [];
@@ -74,8 +75,8 @@ class PayrollRepository {
                   employeeCode: emp['employeeCode'] ?? '',
                   department: emp['department']?['departmentName'] ?? '',
                   period: run['payrollPeriod'] ?? '',
-                  netSalary: '₹ ${(d['net'] ?? 0).toStringAsFixed(2)}',
-                  grossSalary: '₹ ${(d['gross'] ?? 0).toStringAsFixed(2)}',
+                  netSalary: AppFormatters.formatCurrency(d['net']),
+                  grossSalary: AppFormatters.formatCurrency(d['gross']),
                   status: run['status'] ?? 'Draft',
                   payoutStatus: run['payoutStatus'] ?? 'Unpaid',
                 );
@@ -100,9 +101,9 @@ class PayrollRepository {
           id: r['id'] ?? '',
           employeeName: '${r['employee']?['firstName'] ?? ''} ${r['employee']?['lastName'] ?? ''}'.trim(),
           claimType: r['expenseType'] ?? '',
-          amount: '₹ ${(r['claimedAmount'] ?? 0).toStringAsFixed(2)}',
+          amount: AppFormatters.formatCurrency(r['claimedAmount']),
           status: r['status'] ?? 'Pending',
-          submittedDate: r['createdAt']?.toString().split('T')[0] ?? '',
+          submittedDate: AppFormatters.formatDate(r['createdAt']),
           remarks: r['remarks'] ?? '',
         )).toList();
       }
@@ -126,7 +127,7 @@ class PayrollRepository {
           employeeCode: s['employee']?['employeeCode'] ?? '',
           period: s['month'] != null ? '${s['month']}/${s['year']}' : '',
           adjustmentType: s['componentType'] ?? '',
-          amount: '₹ ${(s['amount'] ?? 0).toStringAsFixed(2)}',
+          amount: AppFormatters.formatCurrency(s['amount']),
           remarks: s['remarks'] ?? '',
         )).toList();
       }

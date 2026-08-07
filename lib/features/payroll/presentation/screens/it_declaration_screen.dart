@@ -130,7 +130,9 @@ class ITDeclarationScreen extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: OutlinedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Declaration Verified!')));
+                                },
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: Colors.red,
                                 ),
@@ -140,7 +142,9 @@ class ITDeclarationScreen extends ConsumerWidget {
                             const SizedBox(width: AppSpacing.s12),
                             Expanded(
                               child: FilledButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Declaration Rejected!')));
+                                },
                                 style: FilledButton.styleFrom(
                                   backgroundColor: Colors.green,
                                 ),

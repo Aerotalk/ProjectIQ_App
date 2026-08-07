@@ -60,7 +60,9 @@ class VerificationScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Verified successfully.')));
+                        },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.red,
                         ),
@@ -70,7 +72,9 @@ class VerificationScreen extends StatelessWidget {
                     const SizedBox(width: AppSpacing.s12),
                     Expanded(
                       child: FilledButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Marked for re-check.')));
+                        },
                         style: FilledButton.styleFrom(
                           backgroundColor: Colors.green,
                         ),

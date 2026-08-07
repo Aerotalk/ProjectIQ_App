@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/app_formatters.dart';
 import '../../data/expense_repository.dart';
 
 class ExpenseBatchProcessingTab extends ConsumerWidget {
@@ -48,7 +49,7 @@ class ExpenseBatchProcessingTab extends ConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('\$${batch['totalAmount']}', style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
+                      Text(AppFormatters.formatCurrency(batch['totalAmount']), style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
                       Text(batch['status'], style: AppTypography.caption.copyWith(color: Colors.green)),
                     ],
                   ),

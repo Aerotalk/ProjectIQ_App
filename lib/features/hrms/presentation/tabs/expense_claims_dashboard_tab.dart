@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/app_formatters.dart';
 import '../../data/expense_repository.dart';
 
 class ExpenseClaimsDashboardTab extends ConsumerWidget {
@@ -43,15 +44,15 @@ class ExpenseClaimsDashboardTab extends ConsumerWidget {
                 children: [
                   Expanded(child: _buildStatCard(context, 'Total Claims', totalClaims.toString(), LucideIcons.fileText, Colors.blue, isDark)),
                   const SizedBox(width: AppSpacing.s12),
-                  Expanded(child: _buildStatCard(context, 'Pending Approval', pendingClaims.toString(), LucideIcons.clock, Colors.orange, isDark)),
+                  Expanded(child: _buildStatCard(context, 'Approved', approvedClaims.toString(), LucideIcons.checkCircle, Colors.green, isDark)),
                 ],
               ),
               const SizedBox(height: AppSpacing.s12),
               Row(
                 children: [
-                  Expanded(child: _buildStatCard(context, 'Approved', approvedClaims.toString(), LucideIcons.checkCircle, Colors.green, isDark)),
-                  const SizedBox(width: AppSpacing.s12),
-                  Expanded(child: _buildStatCard(context, 'Total Amount', '\$${totalAmount.toStringAsFixed(2)}', LucideIcons.dollarSign, Colors.purple, isDark)),
+                  Expanded(child: _buildStatCard(context, 'Pending Approval', claims.where((c) => c['status'] == 'Pending').length.toString(), LucideIcons.clock, Colors.orange, isDark)),
+                  const SizedBox(width: AppSpacing.s16),
+                  Expanded(child: _buildStatCard(context, 'Total Amount', AppFormatters.formatCurrency(totalAmount), LucideIcons.dollarSign, Colors.purple, isDark)),
                 ],
               ),
               const SizedBox(height: AppSpacing.s24),
@@ -81,7 +82,7 @@ class ExpenseClaimsDashboardTab extends ConsumerWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text('\$${claim['totalClaimed']}', style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
+                            Text(AppFormatters.formatCurrency(claim['totalClaimed']), style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
                             Text(claim['status'], style: AppTypography.caption.copyWith(color: Colors.blue)),
                           ],
                         ),

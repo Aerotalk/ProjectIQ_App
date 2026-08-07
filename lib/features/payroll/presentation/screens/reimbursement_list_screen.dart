@@ -138,7 +138,9 @@ class ReimbursementListScreen extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: OutlinedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reimbursement Approved!')));
+                                },
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: Colors.red,
                                 ),
@@ -148,7 +150,9 @@ class ReimbursementListScreen extends ConsumerWidget {
                             const SizedBox(width: AppSpacing.s12),
                             Expanded(
                               child: FilledButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reimbursement Rejected!')));
+                                },
                                 style: FilledButton.styleFrom(
                                   backgroundColor: Colors.green,
                                 ),

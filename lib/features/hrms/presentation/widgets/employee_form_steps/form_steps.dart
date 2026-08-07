@@ -4,6 +4,7 @@ import 'package:projectiq_app/shared/widgets/inputs/app_text_field.dart';
 import 'package:projectiq_app/shared/widgets/inputs/app_phone_field.dart';
 import 'package:projectiq_app/shared/widgets/inputs/app_select.dart';
 import 'package:projectiq_app/shared/widgets/inputs/app_date_picker.dart';
+import 'package:projectiq_app/shared/widgets/inputs/app_country_state_picker.dart';
 import 'package:projectiq_app/core/theme/app_spacing.dart';
 import 'package:projectiq_app/features/hrms/presentation/providers/employee_form_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -322,22 +323,18 @@ class ContactInfoStep extends ConsumerWidget {
           ),
           sp,
           AppTextField(
-            label: 'State',
-            initialValue: d['presentState']?.toString(),
-            onChanged: (v) => n.updateField('presentState', v),
-          ),
-          sp,
-          AppTextField(
             label: 'Pin Code',
             initialValue: d['presentPinCode']?.toString(),
             keyboardType: TextInputType.number,
             onChanged: (v) => n.updateField('presentPinCode', v),
           ),
           sp,
-          AppTextField(
-            label: 'Country',
-            initialValue: d['presentCountry']?.toString(),
-            onChanged: (v) => n.updateField('presentCountry', v),
+          AppCountryStatePicker(
+            label: 'Country & State',
+            initialCountry: d['presentCountry']?.toString(),
+            initialState: d['presentState']?.toString(),
+            onCountryChanged: (v) => n.updateField('presentCountry', v),
+            onStateChanged: (v) => n.updateField('presentState', v),
           ),
           sp,
           AppPhoneField(
@@ -392,22 +389,18 @@ class ContactInfoStep extends ConsumerWidget {
           ),
           sp,
           AppTextField(
-            label: 'State',
-            initialValue: d['permanentState']?.toString(),
-            onChanged: (v) => n.updateField('permanentState', v),
-          ),
-          sp,
-          AppTextField(
             label: 'Pin Code',
             initialValue: d['permanentPinCode']?.toString(),
             keyboardType: TextInputType.number,
             onChanged: (v) => n.updateField('permanentPinCode', v),
           ),
           sp,
-          AppTextField(
-            label: 'Country',
-            initialValue: d['permanentCountry']?.toString(),
-            onChanged: (v) => n.updateField('permanentCountry', v),
+          AppCountryStatePicker(
+            label: 'Country & State',
+            initialCountry: d['permanentCountry']?.toString(),
+            initialState: d['permanentState']?.toString(),
+            onCountryChanged: (v) => n.updateField('permanentCountry', v),
+            onStateChanged: (v) => n.updateField('permanentState', v),
           ),
           sp,
           AppPhoneField(

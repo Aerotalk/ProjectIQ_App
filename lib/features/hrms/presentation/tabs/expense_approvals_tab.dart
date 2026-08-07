@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/app_formatters.dart';
 import '../../data/expense_repository.dart';
 
 class ExpenseApprovalsTab extends ConsumerWidget {
@@ -48,20 +49,24 @@ class ExpenseApprovalsTab extends ConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('\$${claim['totalClaimed']}', style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
+                      Text(AppFormatters.formatCurrency(claim['totalClaimed']), style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
                             icon: Icon(Icons.check_circle, color: isDark ? AppColors.primaryDark : AppColors.primaryLight, size: 20),
-                            onPressed: () {},
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Claim Approved!')));
+                            },
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                           ),
                           const SizedBox(width: 8),
                           IconButton(
                             icon: const Icon(Icons.cancel, color: Colors.red, size: 20),
-                            onPressed: () {},
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Claim Rejected!')));
+                            },
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                           ),

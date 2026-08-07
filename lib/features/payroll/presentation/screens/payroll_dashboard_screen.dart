@@ -398,7 +398,9 @@ class PayrollDashboardScreen extends ConsumerWidget {
                         ),
                         IconButton(
                           icon: const Icon(LucideIcons.download, size: 18),
-                          onPressed: () {},
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Action executed successfully!')));
+                          },
                         ),
                       ],
                     ),

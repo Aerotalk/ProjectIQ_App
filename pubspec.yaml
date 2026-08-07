@@ -55,6 +55,9 @@ dependencies:
   intl_phone_field: ^3.2.0
   uuid: ^4.3.3
   image_picker: ^1.2.3
+  csc_picker: ^0.2.7
+  csv: ^8.0.0
+  share_plus: ^12.0.2
 
 dev_dependencies:
   flutter_test:

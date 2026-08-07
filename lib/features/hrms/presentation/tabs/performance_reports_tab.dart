@@ -7,6 +7,10 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/buttons/app_button.dart';
 import '../../../../shared/widgets/cards/app_card.dart';
 import '../../data/performance_repository.dart';
+import 'package:csv/csv.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'dart:io';
 
 class PerformanceReportsTab extends ConsumerStatefulWidget {
   const PerformanceReportsTab({super.key});
@@ -116,14 +120,53 @@ class _PerformanceReportsTabState extends ConsumerState<PerformanceReportsTab> {
     }
   }
 
-  void _showExportSuccess(String format) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Report exported as $format successfully.'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.green,
-      ),
-    );
+  Future<void> _handleExport(String format) async {
+    final hasData = _activeReport == 'department' ? _departmentData.isNotEmpty : (_activeReport == 'goals' ? _goalData.isNotEmpty : _promotionData.isNotEmpty);
+    if (!hasData) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No data available to export for ${_activeReport.replaceAll('-', ' ')}.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (format == 'PDF') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('PDF export not supported on mobile yet. Try Excel.'), backgroundColor: Colors.orange),
+      );
+      return;
+    }
+
+    try {
+      List<List<dynamic>> rows = [];
+      if (_activeReport == 'department') {
+        rows.add(['Department', 'Avg Rating', 'Top Performers', 'Needs Improvement', 'Total Employees']);
+        for (var d in _departmentData) {
+          rows.add([d['department'], d['avgRating'], d['topPerformers'], d['needsImprovement'], d['totalEmployees']]);
+        }
+      } else if (_activeReport == 'goals') {
+        rows.add(['Title', 'Completion %', 'On Track', 'At Risk', 'Completed']);
+        for (var g in _goalData) {
+          rows.add([g['title'], g['completion'], g['onTrack'], g['atRisk'], g['completed']]);
+        }
+      } else {
+        rows.add(['Data']);
+        rows.add(['No promotion data']);
+      }
+
+      String csv = const ListToCsvConverter().convert(rows);
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File('${dir.path}/performance_report_$_activeReport.csv');
+      await file.writeAsString(csv);
+      
+      await Share.shareXFiles([XFile(file.path)], text: 'Performance Report - $_activeReport');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export failed: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override
@@ -191,7 +234,9 @@ class _PerformanceReportsTabState extends ConsumerState<PerformanceReportsTab> {
                       child: AppButton(
                         text: 'PDF',
                         icon: LucideIcons.fileText,
-                        onPressed: () => _showExportSuccess('PDF'),
+                        onPressed: (_activeReport == 'department' && _departmentData.isEmpty) || 
+                                   (_activeReport == 'goals' && _goalData.isEmpty) || 
+                                   (_activeReport == 'promotions') ? null : () => _handleExport('PDF'),
                         variant: AppButtonVariant.outline,
                       ),
                     ),
@@ -201,7 +246,9 @@ class _PerformanceReportsTabState extends ConsumerState<PerformanceReportsTab> {
                       child: AppButton(
                         text: 'Excel',
                         icon: LucideIcons.download,
-                        onPressed: () => _showExportSuccess('Excel'),
+                        onPressed: (_activeReport == 'department' && _departmentData.isEmpty) || 
+                                   (_activeReport == 'goals' && _goalData.isEmpty) || 
+                                   (_activeReport == 'promotions') ? null : () => _handleExport('Excel'),
                         variant: AppButtonVariant.outline,
                       ),
                     ),
