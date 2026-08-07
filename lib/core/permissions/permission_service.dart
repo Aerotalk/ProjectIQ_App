@@ -1,26 +1,39 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/authentication/presentation/auth_controller.dart';
-import '../../features/authentication/domain/user.dart';
 
 final permissionServiceProvider = Provider<PermissionService>((ref) {
-  final authState = ref.watch(authControllerProvider);
-  return PermissionService(authState.user);
+  // Watch stringified roles and permissions to only rebuild when they change
+  final rolesStr = ref.watch(authControllerProvider.select((s) => s.user?.roles.join(',') ?? ''));
+  final permsStr = ref.watch(authControllerProvider.select((s) => s.user?.effectivePermissions.join(',') ?? ''));
+  final isAuthenticated = ref.watch(authControllerProvider.select((s) => s.isAuthenticated));
+
+  return PermissionService(
+    roles: rolesStr.isNotEmpty ? rolesStr.split(',') : [],
+    permissions: permsStr.isNotEmpty ? permsStr.split(',') : [],
+    isAuthenticated: isAuthenticated,
+  );
 });
 
 class PermissionService {
-  final User? _user;
+  final List<String> roles;
+  final List<String> permissions;
+  final bool isAuthenticated;
 
-  PermissionService(this._user);
+  PermissionService({
+    required this.roles,
+    required this.permissions,
+    required this.isAuthenticated,
+  });
 
   bool can(String permission) {
-    if (_user == null) return false;
+    if (!isAuthenticated) return false;
     if (isSuperAdmin || isCompanyAdmin) return true; // Admins have all permissions
-    return _user.hasPermission(permission);
+    return permissions.contains(permission);
   }
 
   bool hasRole(String role) {
-    if (_user == null) return false;
-    return _user.hasRole(role);
+    if (!isAuthenticated) return false;
+    return roles.contains(role);
   }
 
   bool get isSuperAdmin => hasRole('ROLE_SUPER_ADMIN');

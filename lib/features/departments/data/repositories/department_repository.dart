@@ -42,7 +42,7 @@ class DepartmentRepository extends BaseRepository {
         'departmentCode': departmentCode,
         'departmentName': departmentName,
         'description': description,
-        'companyId': ?companyId,
+        'companyId': companyId,
       });
       return DepartmentModel.fromJson(response.data);
     });

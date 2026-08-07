@@ -51,6 +51,8 @@ import '../../features/hrms/presentation/expense_claim_form_screen.dart';
 import '../../shared/widgets/navigation/premium_navigation_wrapper.dart';
 import 'module_registry.dart';
 
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   // Only rebuild the router if authentication status or loading status changes
   final isLoading = ref.watch(authControllerProvider.select((state) => state.isLoading));
@@ -59,6 +61,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final moduleRegistry = ref.watch(moduleRegistryProvider);
 
   return GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: '/splash',
     redirect: (context, state) {
       final authState = ref.read(authControllerProvider);
@@ -91,6 +94,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         GoRoute(
           path: '/profile-settings',
           builder: (context, state) => const ProfileSettingsScreen(),
+        ),
+        GoRoute(
+          path: '/notifications-modal',
+          builder: (context, state) => const NotificationsScreen(),
         ),
         GoRoute(
           path: '/hrms/employees',
@@ -275,6 +282,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         (route) => GoRoute(
           path: route.path,
           name: route.name,
+          parentNavigatorKey: _rootNavigatorKey,
           builder: (context, state) =>
               PremiumNavigationWrapper(child: route.builder!(context, state)),
         ),

@@ -1,56 +1,86 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/network/api_client.dart';
 
 final expenseRepositoryProvider = Provider<ExpenseRepository>((ref) {
-  return ExpenseRepository();
+  final dio = ref.read(dioProvider);
+  return ExpenseRepository(dio);
 });
 
 class ExpenseRepository {
+  final Dio _dio;
+
+  ExpenseRepository(this._dio);
+
   Future<List<dynamic>> getCategories() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return [
-      {'id': 'cat1', 'category': 'Travel', 'glCode': 'GL-TRV-100', 'active': true},
-      {'id': 'cat2', 'category': 'Meals', 'glCode': 'GL-MEA-200', 'active': true},
-      {'id': 'cat3', 'category': 'Office Supplies', 'glCode': 'GL-OFF-300', 'active': true},
-    ];
+    try {
+      final response = await _dio.get('/hrms/expense-claims/categories');
+      if (response.data is List) {
+        return (response.data as List).map((c) => {
+          'id': c['id'] ?? '',
+          'category': c['name'] ?? '',
+          'glCode': c['glCode'] ?? '',
+          'active': c['active'] ?? true,
+        }).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<List<dynamic>> getClaims() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return [
-      {
-        'id': 'clm1',
-        'claimNo': 'CLM-1001',
-        'title': 'April Client Visit',
-        'totalClaimed': 250.50,
-        'status': 'Submitted',
-        'submittedOn': DateTime.now().toIso8601String(),
+    try {
+      final response = await _dio.get('/hrms/expense-claims/claims');
+      if (response.data is List) {
+        return (response.data as List).map((c) => {
+          'id': c['id'] ?? '',
+          'claimNo': c['claimNo'] ?? '',
+          'title': c['title'] ?? '',
+          'totalClaimed': (c['totalClaimed'] ?? 0).toDouble(),
+          'status': c['status'] ?? 'Draft',
+          'submittedOn': c['submittedOn']?.toString() ?? c['createdAt']?.toString() ?? '',
+        }).toList();
       }
-    ];
+      return [];
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<List<dynamic>> getBatches() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return [
-      {
-        'id': 'bat1',
-        'batchNo': 'BAT-9901',
-        'totalAmount': 1500.00,
-        'status': 'Processed',
-        'createdAt': DateTime.now().toIso8601String(),
+    try {
+      final response = await _dio.get('/hrms/expense-claims/batches');
+      if (response.data is List) {
+        return (response.data as List).map((b) => {
+          'id': b['id'] ?? '',
+          'batchNo': b['batchNo'] ?? '',
+          'totalAmount': (b['totalAmount'] ?? 0).toDouble(),
+          'status': b['status'] ?? 'Draft',
+          'createdAt': b['createdAt']?.toString() ?? '',
+        }).toList();
       }
-    ];
+      return [];
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<List<dynamic>> getAdvances() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return [
-      {
-        'id': 'adv1',
-        'advanceNo': 'ADV-5001',
-        'amount': 500.00,
-        'reason': 'Upcoming conference',
-        'status': 'Pending',
+    try {
+      final response = await _dio.get('/hrms/expense-claims/advances');
+      if (response.data is List) {
+        return (response.data as List).map((a) => {
+          'id': a['id'] ?? '',
+          'advanceNo': a['advanceNo'] ?? '',
+          'amount': (a['amount'] ?? 0).toDouble(),
+          'reason': a['reason'] ?? '',
+          'status': a['status'] ?? 'Pending',
+        }).toList();
       }
-    ];
+      return [];
+    } catch (e) {
+      return [];
+    }
   }
 }

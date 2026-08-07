@@ -88,32 +88,53 @@ class AppSelect<T> extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.s8),
         ],
-        DropdownButtonFormField<T>(
-          initialValue: items.any((item) => item.value == value) ? value : null,
-          items: items,
-          onChanged: onChanged,
-          style: AppTypography.body.copyWith(color: textColor),
-          icon: Icon(LucideIcons.chevronDown, color: placeholderColor, size: AppSpacing.s20),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: backgroundColor,
-            hintText: placeholder,
-            hintStyle: AppTypography.body.copyWith(color: placeholderColor),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.s16,
-              vertical: AppSpacing.s12,
-            ),
-            prefixIcon: prefixIcon,
-            border: border,
-            enabledBorder: border,
-            focusedBorder: focusedBorder,
-            errorBorder: errorBorder,
-            focusedErrorBorder: focusedErrorBorder,
-          ),
-          dropdownColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
-          elevation: 8,
-          isExpanded: true,
-          borderRadius: borderRadius,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return DropdownMenu<T>(
+              key: ValueKey(value),
+              initialSelection: items.any((item) => item.value == value) ? value : null,
+              width: constraints.maxWidth,
+              hintText: placeholder,
+              onSelected: onChanged,
+              textStyle: AppTypography.body.copyWith(color: textColor),
+              trailingIcon: Icon(LucideIcons.chevronDown, color: placeholderColor, size: AppSpacing.s20),
+              selectedTrailingIcon: Icon(LucideIcons.chevronUp, color: placeholderColor, size: AppSpacing.s20),
+              leadingIcon: prefixIcon,
+              menuStyle: MenuStyle(
+                backgroundColor: WidgetStatePropertyAll(isDark ? AppColors.backgroundDark : AppColors.backgroundLight),
+                elevation: const WidgetStatePropertyAll(8),
+                shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: borderRadius)),
+              ),
+              inputDecorationTheme: InputDecorationTheme(
+                filled: true,
+                fillColor: backgroundColor,
+                hintStyle: AppTypography.body.copyWith(color: placeholderColor),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.s16,
+                  vertical: AppSpacing.s12,
+                ),
+                border: border,
+                enabledBorder: border,
+                focusedBorder: focusedBorder,
+                errorBorder: errorBorder,
+                focusedErrorBorder: focusedErrorBorder,
+              ),
+              dropdownMenuEntries: items.map((item) {
+                String itemLabel = item.value.toString();
+                if (item.child is Text) {
+                  itemLabel = (item.child as Text).data ?? itemLabel;
+                }
+                return DropdownMenuEntry<T>(
+                  value: item.value as T,
+                  label: itemLabel,
+                  style: MenuItemButton.styleFrom(
+                    foregroundColor: textColor,
+                    textStyle: AppTypography.body,
+                  ),
+                );
+              }).toList(),
+            );
+          },
         ),
         if (errorText != null || helperText != null) ...[
           const SizedBox(height: AppSpacing.s4),

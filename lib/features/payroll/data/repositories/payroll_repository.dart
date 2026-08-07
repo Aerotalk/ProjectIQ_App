@@ -1,153 +1,138 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/payroll_models.dart';
+import '../../../../core/network/api_client.dart';
 
 final payrollRepositoryProvider = Provider<PayrollRepository>((ref) {
-  return PayrollRepository();
+  final dio = ref.read(dioProvider);
+  return PayrollRepository(dio);
 });
 
 class PayrollRepository {
+  final Dio _dio;
+
+  PayrollRepository(this._dio);
+
   Future<PayrollDashboardKPIs> getDashboardKPIs() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return const PayrollDashboardKPIs(
-      currentPeriod: 'July 2026',
-      pendingPayrollCount: 8,
-      processedCount: 145,
-      pendingVerificationCount: 2,
-      pendingPayoutCount: 1,
-    );
+    try {
+      final response = await _dio.get('/hrms/payroll/dashboard');
+      final data = response.data;
+      return PayrollDashboardKPIs(
+        currentPeriod: data['currentPeriod'] ?? 'Current',
+        pendingPayrollCount: data['pendingPayrollCount'] ?? 0,
+        processedCount: data['processedCount'] ?? 0,
+        pendingVerificationCount: data['pendingVerificationCount'] ?? 0,
+        pendingPayoutCount: data['pendingPayoutCount'] ?? 0,
+      );
+    } catch (e) {
+      return const PayrollDashboardKPIs(
+        currentPeriod: 'Current',
+        pendingPayrollCount: 0,
+        processedCount: 0,
+        pendingVerificationCount: 0,
+        pendingPayoutCount: 0,
+      );
+    }
   }
 
   Future<List<PayrollRunModel>> getPayrollRuns() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return const [
-      PayrollRunModel(
-        id: 'PR-2026-07',
-        period: 'July 2026',
-        status: 'Processing',
-        employeeCount: 150,
-        grossAmount: '₹ 15,20,000',
-        netAmount: '₹ 12,50,000',
-        createdDate: '2026-07-28',
-      ),
-      PayrollRunModel(
-        id: 'PR-2026-06',
-        period: 'June 2026',
-        status: 'Processed',
-        employeeCount: 148,
-        grossAmount: '₹ 14,80,000',
-        netAmount: '₹ 11,90,000',
-        createdDate: '2026-06-28',
-        processedDate: '2026-06-30',
-      ),
-    ];
+    try {
+      final response = await _dio.get('/hrms/payroll/runs');
+      if (response.data is List) {
+        return (response.data as List).map((r) => PayrollRunModel(
+          id: r['id'] ?? '',
+          period: r['payrollPeriod'] ?? '',
+          status: r['status'] ?? 'Draft',
+          employeeCount: r['employeeCount'] ?? 0,
+          grossAmount: '₹ ${(r['totalGross'] ?? 0).toStringAsFixed(2)}',
+          netAmount: '₹ ${(r['totalNet'] ?? 0).toStringAsFixed(2)}',
+          createdDate: r['createdAt']?.toString().split('T')[0] ?? '',
+          processedDate: r['processedAt']?.toString().split('T')[0],
+        )).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<List<PayslipModel>> getPayslips() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return const [
-      PayslipModel(
-        id: '1',
-        employeeName: 'John Doe',
-        employeeCode: 'EMP001',
-        department: 'Engineering',
-        period: 'July 2026',
-        grossSalary: '₹ 1,50,000',
-        netSalary: '₹ 1,15,000',
-        status: 'Processed',
-        payoutStatus: 'Paid',
-      ),
-      PayslipModel(
-        id: '2',
-        employeeName: 'Jane Smith',
-        employeeCode: 'EMP002',
-        department: 'Marketing',
-        period: 'July 2026',
-        grossSalary: '₹ 1,20,000',
-        netSalary: '₹ 95,000',
-        status: 'Processing',
-        payoutStatus: 'Pending',
-      ),
-      PayslipModel(
-        id: '3',
-        employeeName: 'John Doe',
-        employeeCode: 'EMP001',
-        department: 'Engineering',
-        period: 'June 2026',
-        grossSalary: '₹ 1,50,000',
-        netSalary: '₹ 1,15,000',
-        status: 'Processed',
-        payoutStatus: 'Paid',
-      ),
-    ];
+    try {
+      final runsResponse = await _dio.get('/hrms/payroll/runs');
+      List<PayslipModel> payslips = [];
+      
+      if (runsResponse.data is List) {
+        for (var run in runsResponse.data) {
+          try {
+            final detailResp = await _dio.get('/hrms/payroll/runs/${run['id']}/details');
+            if (detailResp.data is List) {
+              payslips.addAll((detailResp.data as List).map((d) {
+                final emp = d['employee'] ?? {};
+                return PayslipModel(
+                  id: d['id'] ?? '',
+                  employeeName: '${emp['firstName'] ?? ''} ${emp['lastName'] ?? ''}'.trim(),
+                  employeeCode: emp['employeeCode'] ?? '',
+                  department: emp['department']?['departmentName'] ?? '',
+                  period: run['payrollPeriod'] ?? '',
+                  netSalary: '₹ ${(d['net'] ?? 0).toStringAsFixed(2)}',
+                  grossSalary: '₹ ${(d['gross'] ?? 0).toStringAsFixed(2)}',
+                  status: run['status'] ?? 'Draft',
+                  payoutStatus: run['payoutStatus'] ?? 'Unpaid',
+                );
+              }));
+            }
+          } catch (_) {
+            // ignore
+          }
+        }
+      }
+      return payslips;
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<List<ReimbursementModel>> getReimbursements() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return const [
-      ReimbursementModel(
-        id: 'RMB-001',
-        employeeName: 'Jane Smith',
-        claimType: 'Travel',
-        amount: '₹ 5,000',
-        status: 'Pending',
-        submittedDate: '2026-07-15',
-        remarks: 'Client visit to Mumbai',
-      ),
-      ReimbursementModel(
-        id: 'RMB-002',
-        employeeName: 'John Doe',
-        claimType: 'Internet',
-        amount: '₹ 1,500',
-        status: 'Approved',
-        submittedDate: '2026-06-10',
-        remarks: 'Monthly broadband',
-      ),
-    ];
+    try {
+      final response = await _dio.get('/hrms/payroll/reimbursements');
+      if (response.data is List) {
+        return (response.data as List).map((r) => ReimbursementModel(
+          id: r['id'] ?? '',
+          employeeName: '${r['employee']?['firstName'] ?? ''} ${r['employee']?['lastName'] ?? ''}'.trim(),
+          claimType: r['expenseType'] ?? '',
+          amount: '₹ ${(r['claimedAmount'] ?? 0).toStringAsFixed(2)}',
+          status: r['status'] ?? 'Pending',
+          submittedDate: r['createdAt']?.toString().split('T')[0] ?? '',
+          remarks: r['remarks'] ?? '',
+        )).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<List<ITDeclarationModel>> getITDeclarations() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return const [
-      ITDeclarationModel(
-        id: 'ITD-001',
-        employeeName: 'John Doe',
-        regime: 'New Regime',
-        declaredAmount: '₹ 1,50,000',
-        status: 'Approved',
-        submittedDate: '2026-04-05',
-      ),
-      ITDeclarationModel(
-        id: 'ITD-002',
-        employeeName: 'Jane Smith',
-        regime: 'Old Regime',
-        declaredAmount: '₹ 2,00,000',
-        status: 'Pending Review',
-        submittedDate: '2026-07-20',
-      ),
-    ];
+    return []; // Backend not implemented for this
   }
 
   Future<List<SalaryInputModel>> getSalaryInputs() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return const [
-      SalaryInputModel(
-        id: 'SI-001',
-        employeeName: 'Alice Johnson',
-        employeeCode: 'EMP003',
-        period: 'July 2026',
-        adjustmentType: 'Performance Bonus',
-        amount: '₹ 25,000',
-        remarks: 'Q2 Targets Achieved',
-      ),
-      SalaryInputModel(
-        id: 'SI-002',
-        employeeName: 'Bob Brown',
-        employeeCode: 'EMP004',
-        period: 'July 2026',
-        adjustmentType: 'Leave Deduction',
-        amount: '-₹ 3,500',
-        remarks: 'Unpaid Leave (1 Day)',
-      ),
-    ];
+    try {
+      final response = await _dio.get('/hrms/payroll/salary-inputs');
+      if (response.data is List) {
+        return (response.data as List).map((s) => SalaryInputModel(
+          id: s['id'] ?? '',
+          employeeName: '${s['employee']?['firstName'] ?? ''} ${s['employee']?['lastName'] ?? ''}'.trim(),
+          employeeCode: s['employee']?['employeeCode'] ?? '',
+          period: s['month'] != null ? '${s['month']}/${s['year']}' : '',
+          adjustmentType: s['componentType'] ?? '',
+          amount: '₹ ${(s['amount'] ?? 0).toStringAsFixed(2)}',
+          remarks: s['remarks'] ?? '',
+        )).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
   }
 }

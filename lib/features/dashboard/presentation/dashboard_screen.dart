@@ -159,7 +159,7 @@ class DashboardScreen extends ConsumerWidget {
             child: Icon(LucideIcons.bell, size: 20),
           ),
           onPressed: () {
-            context.push('/notifications');
+            context.push('/notifications-modal');
           },
         ),
         Padding(

@@ -32,16 +32,25 @@ class ProfileSettingsRepository {
 
   Future<void> updatePassword(String currentPassword, String newPassword) async {
     try {
-      await _dio.put(
+      final response = await _dio.put(
         '/auth/password',
         data: {
           'currentPassword': currentPassword,
           'newPassword': newPassword,
         },
       );
+      // If the backend returns 200 OK but includes an error message
+      if (response.data != null && response.data is Map && response.data['error'] != null) {
+        throw Exception(response.data['error']);
+      }
     } catch (e) {
       if (e is DioException && e.response?.data != null) {
-        throw Exception(e.response?.data['message'] ?? e.response?.data ?? 'Failed to update password');
+        final data = e.response!.data;
+        if (data is Map) {
+          throw Exception(data['message'] ?? data['error'] ?? 'Failed to update password');
+        } else {
+          throw Exception(data.toString());
+        }
       }
       rethrow;
     }

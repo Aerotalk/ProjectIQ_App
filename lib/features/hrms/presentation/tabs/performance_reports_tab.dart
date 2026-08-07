@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/buttons/app_button.dart';
 import '../../../../shared/widgets/cards/app_card.dart';
+import '../../data/performance_repository.dart';
 
-class PerformanceReportsTab extends StatefulWidget {
+class PerformanceReportsTab extends ConsumerStatefulWidget {
   const PerformanceReportsTab({super.key});
 
   @override
-  State<PerformanceReportsTab> createState() => _PerformanceReportsTabState();
+  ConsumerState<PerformanceReportsTab> createState() => _PerformanceReportsTabState();
 }
 
-class _PerformanceReportsTabState extends State<PerformanceReportsTab> {
+class _PerformanceReportsTabState extends ConsumerState<PerformanceReportsTab> {
   String _activeReport = 'department';
   String _selectedCycle = 'H1 2024';
 
@@ -23,22 +25,96 @@ class _PerformanceReportsTabState extends State<PerformanceReportsTab> {
     {'id': 'promotions', 'title': 'Promotion Recs.', 'icon': LucideIcons.trendingUp},
   ];
 
-  final List<Map<String, dynamic>> _departmentData = [
-    {'department': 'Engineering', 'avgRating': 4.2, 'topPerformers': 12, 'needsImprovement': 2, 'totalEmployees': 45},
-    {'department': 'Sales', 'avgRating': 3.9, 'topPerformers': 8, 'needsImprovement': 5, 'totalEmployees': 32},
-    {'department': 'Marketing', 'avgRating': 4.1, 'topPerformers': 5, 'needsImprovement': 1, 'totalEmployees': 18},
-    {'department': 'HR', 'avgRating': 4.0, 'topPerformers': 2, 'needsImprovement': 0, 'totalEmployees': 8},
-  ];
+  List<Map<String, dynamic>> _departmentData = [];
+  List<Map<String, dynamic>> _goalData = [];
+  List<Map<String, dynamic>> _promotionData = [];
 
-  final List<Map<String, dynamic>> _goalData = [
-    {'title': 'Q1 OKRs', 'completion': 85, 'onTrack': 10, 'atRisk': 2, 'completed': 25},
-    {'title': 'Annual KPIs', 'completion': 45, 'onTrack': 30, 'atRisk': 5, 'completed': 5},
-  ];
+  bool _isLoading = true;
 
-  final List<Map<String, dynamic>> _promotionData = [
-    {'employee': 'Alice Chen', 'department': 'Engineering', 'currentRole': 'SDE II', 'proposedRole': 'Senior SDE', 'rating': 4.8},
-    {'employee': 'Bob Smith', 'department': 'Sales', 'currentRole': 'Account Exec', 'proposedRole': 'Senior AE', 'rating': 4.5},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    setState(() => _isLoading = true);
+    try {
+      final repo = ref.read(performanceRepositoryProvider);
+      final goals = await repo.getGoals();
+
+      // Department Map
+      final Map<String, Map<String, dynamic>> deptMap = {};
+      
+      int totalCompleted = 0;
+      int totalNeedsImp = 0;
+
+      for (var g in goals) {
+        final dept = g.employee.department.isNotEmpty ? g.employee.department : 'Unknown';
+        final empId = g.employee.id;
+
+        if (!deptMap.containsKey(dept)) {
+          deptMap[dept] = {
+            'totalEmployeesSet': <String>{},
+            'completed': 0,
+            'needsImprovement': 0,
+            'totalRating': 0.0,
+          };
+        }
+
+        final data = deptMap[dept]!;
+        (data['totalEmployeesSet'] as Set<String>).add(empId);
+        
+        if (g.status == 'Completed' || g.progress >= 100) {
+          data['completed'] = (data['completed'] as int) + 1;
+          data['totalRating'] = (data['totalRating'] as double) + 5.0;
+          totalCompleted++;
+        } else if (g.progress < 50 && g.status != 'Draft') {
+          data['needsImprovement'] = (data['needsImprovement'] as int) + 1;
+          data['totalRating'] = (data['totalRating'] as double) + 2.0;
+          totalNeedsImp++;
+        } else {
+          data['totalRating'] = (data['totalRating'] as double) + 3.5;
+        }
+      }
+
+      final newDeptData = deptMap.entries.map((e) {
+        final data = e.value;
+        final count = (data['totalEmployeesSet'] as Set).length;
+        final completed = data['completed'] as int;
+        final needsImp = data['needsImprovement'] as int;
+        double avg = (data['totalRating'] as double) / (count + completed + needsImp > 0 ? (count + completed + needsImp) : 1);
+        
+        return {
+          'department': e.key,
+          'avgRating': double.parse(avg.toStringAsFixed(1)),
+          'topPerformers': completed,
+          'needsImprovement': needsImp,
+          'totalEmployees': count,
+        };
+      }).toList();
+
+      final newGoalData = [
+        {
+          'title': 'Overall Goals',
+          'completion': goals.isEmpty ? 0 : ((totalCompleted / goals.length) * 100).toInt(),
+          'onTrack': goals.length - totalCompleted - totalNeedsImp,
+          'atRisk': totalNeedsImp,
+          'completed': totalCompleted,
+        }
+      ];
+
+      setState(() {
+        _departmentData = newDeptData;
+        _goalData = newGoalData;
+        _promotionData = []; // waiting on actual promotion APIs
+        _isLoading = false;
+      });
+
+    } catch (e) {
+      setState(() => _isLoading = false);
+    }
+  }
 
   void _showExportSuccess(String format) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -172,7 +248,9 @@ class _PerformanceReportsTabState extends State<PerformanceReportsTab> {
         ),
         const Divider(height: 1),
         Expanded(
-          child: _activeReport == 'department'
+          child: _isLoading 
+            ? const Center(child: CircularProgressIndicator())
+            : _activeReport == 'department'
               ? _buildDepartmentReport(isDark)
               : _activeReport == 'goals'
                   ? _buildGoalReport(isDark)

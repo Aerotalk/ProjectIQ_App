@@ -14,41 +14,51 @@ class ExpenseClaimsDashboardTab extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final repo = ref.watch(expenseRepositoryProvider);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.s16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Expense Overview', style: AppTypography.title),
-          const SizedBox(height: AppSpacing.s16),
-          Row(
-            children: [
-              Expanded(child: _buildStatCard(context, 'Total Claims', '1', LucideIcons.fileText, Colors.blue, isDark)),
-              const SizedBox(width: AppSpacing.s12),
-              Expanded(child: _buildStatCard(context, 'Pending Approval', '1', LucideIcons.clock, Colors.orange, isDark)),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.s12),
-          Row(
-            children: [
-              Expanded(child: _buildStatCard(context, 'Approved', '0', LucideIcons.checkCircle, Colors.green, isDark)),
-              const SizedBox(width: AppSpacing.s12),
-              Expanded(child: _buildStatCard(context, 'Total Amount', '\$250.50', LucideIcons.dollarSign, Colors.purple, isDark)),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.s24),
-          Text('Recent Claims', style: AppTypography.subtitle),
-          const SizedBox(height: AppSpacing.s16),
-          FutureBuilder(
-            future: repo.getClaims(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final claims = snapshot.data ?? [];
-              if (claims.isEmpty) return const Text('No recent claims.');
+    return FutureBuilder(
+      future: repo.getClaims(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        final claims = snapshot.data ?? [];
+        final int totalClaims = claims.length;
+        final int pendingClaims = claims.where((c) => c['status'] == 'Pending' || c['status'] == 'Draft').length;
+        final int approvedClaims = claims.where((c) => c['status'] == 'Approved').length;
+        final double totalAmount = claims.where((c) => c['status'] == 'Approved' || c['status'] == 'Pending').fold(0.0, (sum, c) {
+          double amount = 0.0;
+          if (c['totalClaimed'] is num) amount = (c['totalClaimed'] as num).toDouble();
+          else if (c['totalClaimed'] is String) amount = double.tryParse(c['totalClaimed']) ?? 0.0;
+          return sum + amount;
+        });
 
-              return Column(
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.s16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Expense Overview', style: AppTypography.title),
+              const SizedBox(height: AppSpacing.s16),
+              Row(
+                children: [
+                  Expanded(child: _buildStatCard(context, 'Total Claims', totalClaims.toString(), LucideIcons.fileText, Colors.blue, isDark)),
+                  const SizedBox(width: AppSpacing.s12),
+                  Expanded(child: _buildStatCard(context, 'Pending Approval', pendingClaims.toString(), LucideIcons.clock, Colors.orange, isDark)),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.s12),
+              Row(
+                children: [
+                  Expanded(child: _buildStatCard(context, 'Approved', approvedClaims.toString(), LucideIcons.checkCircle, Colors.green, isDark)),
+                  const SizedBox(width: AppSpacing.s12),
+                  Expanded(child: _buildStatCard(context, 'Total Amount', '\$${totalAmount.toStringAsFixed(2)}', LucideIcons.dollarSign, Colors.purple, isDark)),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.s24),
+              Text('Recent Claims', style: AppTypography.subtitle),
+              const SizedBox(height: AppSpacing.s16),
+              if (claims.isEmpty) const Text('No recent claims.') else 
+              Column(
                 children: claims.map((claim) {
                   return Container(
                     margin: const EdgeInsets.only(bottom: AppSpacing.s12),
@@ -79,11 +89,11 @@ class ExpenseClaimsDashboardTab extends ConsumerWidget {
                     ),
                   );
                 }).toList(),
-              );
-            },
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

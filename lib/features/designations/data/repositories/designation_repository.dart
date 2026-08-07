@@ -42,9 +42,9 @@ class DesignationRepository extends BaseRepository {
       final response = await _dio.post('/admin/designations', data: {
         'designationCode': designationCode,
         'designationName': designationName,
-        'roleId': ?roleId,
-        'description': ?description,
-        'companyId': ?companyId,
+        'roleId': roleId,
+        'description': description,
+        'companyId': companyId,
       });
       return DesignationModel.fromJson(response.data);
     });
@@ -61,8 +61,8 @@ class DesignationRepository extends BaseRepository {
       final response = await _dio.put('/admin/designations/$id', data: {
         'designationCode': designationCode,
         'designationName': designationName,
-        'roleId': ?roleId,
-        'description': ?description,
+        'roleId': roleId,
+        'description': description,
       });
       return DesignationModel.fromJson(response.data);
     });
