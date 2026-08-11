@@ -1640,12 +1640,8 @@ class SalaryRevisionStep extends ConsumerWidget {
             onChanged: (v) => n.updateField('revisionIncrementPercentage', v),
           ),
           sp,
-          AppTextField(
-            label: 'Salary Components',
-            initialValue: d['revisionSalaryComponents']?.toString(),
-            maxLines: 3,
-            onChanged: (v) => n.updateField('revisionSalaryComponents', v),
-          ),
+          _sectionTitle('Pay Components'),
+          _buildSalaryComponentsList(context, ref),
           sp,
           AppTextField(
             label: 'Reason',
@@ -1655,6 +1651,98 @@ class SalaryRevisionStep extends ConsumerWidget {
           const SizedBox(height: AppSpacing.s24),
         ],
       ),
+    );
+  }
+
+  Widget _buildSalaryComponentsList(BuildContext context, WidgetRef ref) {
+    final n = ref.read(employeeFormProvider.notifier);
+    final d = ref.watch(employeeFormProvider).formData;
+    
+    // Initialize list if null
+    List<dynamic> components = [];
+    if (d['revisionSalaryComponents'] is List) {
+      components = List.from(d['revisionSalaryComponents']);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (components.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Text('No components added.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+          ),
+        ...List.generate(components.length, (index) {
+          final comp = components[index] as Map<String, dynamic>;
+          return _itemCard(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Component ${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
+                        components.removeAt(index);
+                        n.updateField('revisionSalaryComponents', components);
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                AppTextField(
+                  label: 'Component Name (e.g. Basic, HRA)',
+                  initialValue: comp['componentName']?.toString(),
+                  onChanged: (v) {
+                    components[index]['componentName'] = v;
+                    n.updateField('revisionSalaryComponents', components);
+                  },
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppTextField(
+                        label: 'Percentage (%)',
+                        initialValue: comp['percentage']?.toString(),
+                        keyboardType: TextInputType.number,
+                        onChanged: (v) {
+                          components[index]['percentage'] = v;
+                          n.updateField('revisionSalaryComponents', components);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: AppTextField(
+                        label: 'Amount (Fixed)',
+                        initialValue: comp['amount']?.toString(),
+                        keyboardType: TextInputType.number,
+                        onChanged: (v) {
+                          components[index]['amount'] = v;
+                          n.updateField('revisionSalaryComponents', components);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: () {
+            components.add({'componentName': '', 'percentage': '', 'amount': ''});
+            n.updateField('revisionSalaryComponents', components);
+          },
+          icon: const Icon(Icons.add, size: 16),
+          label: const Text('Add Component'),
+        ),
+      ],
     );
   }
 }

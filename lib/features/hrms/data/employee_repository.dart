@@ -44,4 +44,36 @@ class EmployeeRepository {
     final response = await _dio.post('/admin/users', data: data);
     return response.data as Map<String, dynamic>;
   }
+
+  Future<void> saveAddress(String employeeId, Map<String, dynamic> data) async {
+    await _dio.post('/admin/employees/$employeeId/address', data: data);
+  }
+
+  Future<void> saveEmergencyContact(String employeeId, Map<String, dynamic> data) async {
+    await _dio.post('/admin/employees/$employeeId/emergency-contact', data: data);
+  }
+
+  Future<void> saveStatutory(String employeeId, Map<String, dynamic> data) async {
+    await _dio.post('/admin/employees/$employeeId/statutory', data: data);
+  }
+
+  Future<void> saveBankAccount(String employeeId, Map<String, dynamic> data) async {
+    await _dio.post('/admin/employees/$employeeId/bank-account', data: data);
+  }
+
+  Future<void> saveSalaryRevision(String employeeId, Map<String, dynamic> data) async {
+    await _dio.post('/admin/employees/$employeeId/salary-revision', data: data);
+  }
+
+  Future<void> saveEducation(String employeeId, Map<String, dynamic> data) async {
+    await _dio.post('/admin/employees/$employeeId/educations', data: data);
+  }
+
+  Future<void> saveFamily(String employeeId, Map<String, dynamic> data) async {
+    await _dio.post('/admin/employees/$employeeId/families', data: data);
+  }
+
+  Future<void> saveContract(String employeeId, Map<String, dynamic> data) async {
+    await _dio.post('/admin/employees/$employeeId/contract', data: data);
+  }
 }

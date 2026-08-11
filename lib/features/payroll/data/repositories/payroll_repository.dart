@@ -136,4 +136,27 @@ class PayrollRepository {
       return [];
     }
   }
+
+  Future<List<dynamic>> getPayrollEligibilityCheck(String batchMonth) async {
+    try {
+      final response = await _dio.get(
+        '/hrms/payroll/eligibility-check',
+        queryParameters: {'batchMonth': batchMonth},
+      );
+      if (response.data is List) {
+        return response.data as List;
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Failed to check eligibility: $e');
+    }
+  }
+
+  Future<void> runPayroll(Map<String, dynamic> data) async {
+    try {
+      await _dio.post('/hrms/payroll/runs', data: data);
+    } catch (e) {
+      throw Exception('Failed to run payroll: $e');
+    }
+  }
 }

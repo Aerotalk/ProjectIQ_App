@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import 'dart:convert';
 import 'providers/employee_form_provider.dart';
 import 'providers/employee_providers.dart';
 import 'widgets/employee_form_steps/form_steps.dart';
@@ -102,7 +103,83 @@ class _AddEmployeeScreenState extends ConsumerState<AddEmployeeScreen> {
 
       // 2. Create Employee Profile
       final empPayload = {'userId': userRes['id'], ...data};
-      await repo.createEmployee(empPayload);
+      final empRes = await repo.createEmployee(empPayload);
+      final employeeId = empRes.id;
+
+      // 3. Save Sub-Resources (in parallel as much as possible)
+      
+      // Salary needs special serialization for dynamic components
+      dynamic rawComponents = data['revisionSalaryComponents'];
+      String salaryComponentsStr = '';
+      if (rawComponents is List) {
+        salaryComponentsStr = jsonEncode(rawComponents);
+      } else if (rawComponents != null) {
+        salaryComponentsStr = rawComponents.toString();
+      }
+
+      await Future.wait([
+        repo.saveAddress(employeeId, {
+          'presentAddressLine1': data['presentAddressLine1'],
+          'presentAddressLine2': data['presentAddressLine2'],
+          'presentCity': data['presentCity'],
+          'presentState': data['presentState'],
+          'presentPinCode': data['presentPinCode'],
+          'presentCountry': data['presentCountry'],
+          'presentPhone': data['presentPhone'],
+          'permanentAddressLine1': data['permanentAddressLine1'],
+          'permanentAddressLine2': data['permanentAddressLine2'],
+          'permanentCity': data['permanentCity'],
+          'permanentState': data['permanentState'],
+          'permanentPinCode': data['permanentPinCode'],
+          'permanentCountry': data['permanentCountry'],
+          'permanentPhone': data['permanentPhone'],
+        }),
+        repo.saveEmergencyContact(employeeId, {
+          'name': data['emergencyContactName'],
+          'relationship': data['emergencyRelationship'],
+          'phone': data['emergencyPhone'],
+          'alternatePhone': data['emergencyAlternatePhone'],
+          'email': data['emergencyEmail'],
+          'address': data['emergencyAddress'],
+          'isPrimary': data['emergencyPrimaryContact'],
+        }),
+        repo.saveStatutory(employeeId, {
+          'panNumber': data['panNumber'],
+          'aadhaarNumber': data['aadhaarNumber'],
+          'uan': data['uan'],
+          'pfNumber': data['pfNumber'],
+          'esiNumber': data['esiNumber'],
+          'taxRegime': data['taxRegime'],
+          'passportNumber': data['passportNumber'],
+          'passportExpiry': data['passportExpiry'],
+        }),
+        repo.saveBankAccount(employeeId, {
+          'bankName': data['bankName'],
+          'branchName': data['branchName'],
+          'accountNumber': data['accountNumber'],
+          'ifscCode': data['ifscCode'],
+          'accountType': data['accountType'],
+          'accountHolderName': data['accountHolderName'],
+          'paymentMode': data['paymentMode'],
+          'isPrimary': data['primaryAccount'],
+        }),
+        repo.saveSalaryRevision(employeeId, {
+          'revisionType': data['revisionType'],
+          'effectiveDate': data['revisionEffectiveDate'],
+          'annualCTC': data['revisionAnnualCTC'],
+          'incrementPercentage': data['revisionIncrementPercentage'],
+          'salaryComponents': salaryComponentsStr,
+          'reason': data['revisionReason'],
+        }),
+        repo.saveContract(employeeId, {
+          'contractType': data['contractType'],
+          'startDate': data['contractStartDate'],
+          'endDate': data['contractEndDate'],
+          'annualCTC': data['contractAnnualCTC'],
+          'noticePeriodDays': data['contractNoticePeriod'],
+          'terms': data['contractTerms'],
+        }),
+      ]);
 
       ref.invalidate(employeeListProvider);
       if (mounted) {
