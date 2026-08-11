@@ -7,6 +7,7 @@ import '../../../../shared/widgets/inputs/app_date_picker.dart';
 import '../../data/models/leave_model.dart';
 import '../providers/leave_providers.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../features/authentication/presentation/auth_controller.dart';
 
 class LeaveFormScreen extends ConsumerStatefulWidget {
   const LeaveFormScreen({super.key});
@@ -34,13 +35,24 @@ class _LeaveFormScreenState extends ConsumerState<LeaveFormScreen> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
 
+    final user = ref.read(authControllerProvider).user;
+    final userName = user?.username ?? 'Unknown Employee';
+    
+    int duration = 1;
+    final start = DateTime.tryParse(_startDateController.text);
+    final end = DateTime.tryParse(_endDateController.text);
+    if (start != null && end != null) {
+      duration = end.difference(start).inDays + 1;
+      if (duration < 1) duration = 1;
+    }
+
     final newReq = LeaveModel(
       id: const Uuid().v4(),
       leaveType: _leaveTypeController.text,
-      employeeName: 'Current User', // Mocked
+      employeeName: userName,
       startDate: _startDateController.text,
       endDate: _endDateController.text,
-      durationDays: 1, // Mocked for now
+      durationDays: duration.toDouble(),
       reason: _reasonController.text,
       status: 'Pending',
     );

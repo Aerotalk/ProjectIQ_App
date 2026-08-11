@@ -1,44 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../../shared/widgets/buttons/app_button.dart';
+import '../../data/performance_repository.dart';
 
-class PerformanceTemplatesTab extends StatefulWidget {
+class PerformanceTemplatesTab extends ConsumerStatefulWidget {
   const PerformanceTemplatesTab({super.key});
 
   @override
-  State<PerformanceTemplatesTab> createState() => _PerformanceTemplatesTabState();
+  ConsumerState<PerformanceTemplatesTab> createState() => _PerformanceTemplatesTabState();
 }
 
-class _PerformanceTemplatesTabState extends State<PerformanceTemplatesTab> {
+class _PerformanceTemplatesTabState extends ConsumerState<PerformanceTemplatesTab> {
   int _activeTabIndex = 1; // Default to Competencies Library
   final List<String> _tabs = ['Review Templates', 'Competencies Library', 'Rating Scales'];
 
-  final List<Map<String, dynamic>> _mockCompetencies = [
-    {'name': 'Communication', 'category': 'Core', 'weightage': 15, 'active': true},
-    {'name': 'Leadership', 'category': 'Leadership', 'weightage': 20, 'active': true},
-    {'name': 'Technical Skills', 'category': 'Technical', 'weightage': 25, 'active': true},
-    {'name': 'Problem Solving', 'category': 'Core', 'weightage': 15, 'active': false},
-  ];
+  List<dynamic> _templates = [];
+  List<dynamic> _competencies = [];
+  List<dynamic> _scales = [];
+  bool _isLoading = true;
 
-  final List<Map<String, dynamic>> _mockTemplates = [
-    {'name': 'Annual Performance Review 2024', 'type': 'Annual', 'status': 'Active'},
-    {'name': 'Q3 Check-in', 'type': 'Quarterly', 'status': 'Draft'},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
 
-  final List<Map<String, dynamic>> _mockScales = [
-    {'name': 'Standard 5-Point', 'levels': 5, 'active': true},
-    {'name': '3-Point Simple', 'levels': 3, 'active': true},
-  ];
+  Future<void> _fetchData() async {
+    setState(() => _isLoading = true);
+    final repo = ref.read(performanceRepositoryProvider);
+    try {
+      final results = await Future.wait([
+        repo.getTemplates(),
+        repo.getCompetencies(),
+        repo.getScales(),
+      ]);
+      if (mounted) {
+        setState(() {
+          _templates = results[0];
+          _competencies = results[1];
+          _scales = results[2];
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   void _deleteItem(int index) {
     setState(() {
-      if (_activeTabIndex == 0) _mockTemplates.removeAt(index);
-      else if (_activeTabIndex == 1) _mockCompetencies.removeAt(index);
-      else _mockScales.removeAt(index);
+      if (_activeTabIndex == 0) _templates.removeAt(index);
+      else if (_activeTabIndex == 1) _competencies.removeAt(index);
+      else _scales.removeAt(index);
     });
   }
 
@@ -79,11 +99,11 @@ class _PerformanceTemplatesTabState extends State<PerformanceTemplatesTab> {
                   onPressed: () {
                     setState(() {
                       if (_activeTabIndex == 0) {
-                        _mockTemplates.add({'name': 'New Template', 'type': 'Custom', 'status': 'Draft'});
+                        _templates.add({'name': 'New Template', 'type': 'Custom', 'status': 'Draft'});
                       } else if (_activeTabIndex == 1) {
-                        _mockCompetencies.add({'name': 'New Competency', 'category': 'Custom', 'weightage': 10, 'active': true});
+                        _competencies.add({'name': 'New Competency', 'category': 'Custom', 'weightage': 10, 'active': true});
                       } else {
-                        _mockScales.add({'name': 'New Scale', 'levels': 4, 'active': true});
+                        _scales.add({'name': 'New Scale', 'levels': 4, 'active': true});
                       }
                     });
                     Navigator.pop(context);
@@ -174,14 +194,16 @@ class _PerformanceTemplatesTabState extends State<PerformanceTemplatesTab> {
 
         // Content Area
         Expanded(
-          child: _buildList(isDark),
+          child: _isLoading 
+            ? const Center(child: CircularProgressIndicator()) 
+            : _buildList(isDark),
         ),
       ],
     );
   }
 
   Widget _buildList(bool isDark) {
-    List data = _activeTabIndex == 0 ? _mockTemplates : (_activeTabIndex == 1 ? _mockCompetencies : _mockScales);
+    List data = _activeTabIndex == 0 ? _templates : (_activeTabIndex == 1 ? _competencies : _scales);
     
     if (data.isEmpty) {
       return Center(child: Text("No items found.", style: AppTypography.caption));
@@ -207,10 +229,10 @@ class _PerformanceTemplatesTabState extends State<PerformanceTemplatesTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item['name'], style: AppTypography.subtitle),
+                    Text(item['name'] ?? '', style: AppTypography.subtitle),
                     const SizedBox(height: 4),
                     Text(
-                      _activeTabIndex == 0 ? item['type'] : (_activeTabIndex == 1 ? item['category'] : '${item['levels']} Levels'),
+                      _activeTabIndex == 0 ? (item['type'] ?? '') : (_activeTabIndex == 1 ? (item['category'] ?? '') : '${item['levels'] ?? 0} Levels'),
                       style: AppTypography.caption.copyWith(color: Colors.grey),
                     ),
                   ],
@@ -224,22 +246,22 @@ class _PerformanceTemplatesTabState extends State<PerformanceTemplatesTab> {
                     children: [
                       Text('Weightage', style: AppTypography.caption.copyWith(color: Colors.grey)),
                       const SizedBox(height: 4),
-                      Text("${item['weightage']}%", style: AppTypography.body.copyWith(fontWeight: FontWeight.w600)),
+                      Text("${item['weightage'] ?? 0}%", style: AppTypography.body.copyWith(fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: ((item['active'] ?? item['status'] == 'Active') ? Colors.green : Colors.orange).withValues(alpha: 0.1),
+                  color: ((item['active'] == true || item['status'] == 'Active') ? Colors.green : Colors.orange).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  item['status'] ?? (item['active'] ? 'Active' : 'Inactive'),
+                  item['status'] ?? (item['active'] == true ? 'Active' : 'Inactive'),
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: (item['active'] ?? item['status'] == 'Active') ? Colors.green : Colors.orange,
+                    color: (item['active'] == true || item['status'] == 'Active') ? Colors.green : Colors.orange,
                   ),
                 ),
               ),

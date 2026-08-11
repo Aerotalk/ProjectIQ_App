@@ -48,6 +48,25 @@ class ExpenseRepository {
     }
   }
 
+  Future<List<dynamic>> getApprovals() async {
+    try {
+      final response = await _dio.get('/hrms/expense-claims/approvals');
+      if (response.data is List) {
+        return (response.data as List).map((c) => {
+          'id': c['id'] ?? '',
+          'claimNo': c['claimNo'] ?? '',
+          'title': c['title'] ?? '',
+          'totalClaimed': (c['totalClaimed'] ?? 0).toDouble(),
+          'status': c['status'] ?? 'Pending Approval',
+          'submittedOn': c['submittedOn']?.toString() ?? c['createdAt']?.toString() ?? '',
+        }).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
   Future<List<dynamic>> getBatches() async {
     try {
       final response = await _dio.get('/hrms/expense-claims/batches');

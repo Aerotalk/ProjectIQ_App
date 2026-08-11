@@ -45,78 +45,17 @@ class _PerformanceReportsTabState extends ConsumerState<PerformanceReportsTab> {
     setState(() => _isLoading = true);
     try {
       final repo = ref.read(performanceRepositoryProvider);
-      final goals = await repo.getGoals();
-
-      // Department Map
-      final Map<String, Map<String, dynamic>> deptMap = {};
-      
-      int totalCompleted = 0;
-      int totalNeedsImp = 0;
-
-      for (var g in goals) {
-        final dept = g.employee.department.isNotEmpty ? g.employee.department : 'Unknown';
-        final empId = g.employee.id;
-
-        if (!deptMap.containsKey(dept)) {
-          deptMap[dept] = {
-            'totalEmployeesSet': <String>{},
-            'completed': 0,
-            'needsImprovement': 0,
-            'totalRating': 0.0,
-          };
-        }
-
-        final data = deptMap[dept]!;
-        (data['totalEmployeesSet'] as Set<String>).add(empId);
-        
-        if (g.status == 'Completed' || g.progress >= 100) {
-          data['completed'] = (data['completed'] as int) + 1;
-          data['totalRating'] = (data['totalRating'] as double) + 5.0;
-          totalCompleted++;
-        } else if (g.progress < 50 && g.status != 'Draft') {
-          data['needsImprovement'] = (data['needsImprovement'] as int) + 1;
-          data['totalRating'] = (data['totalRating'] as double) + 2.0;
-          totalNeedsImp++;
-        } else {
-          data['totalRating'] = (data['totalRating'] as double) + 3.5;
-        }
-      }
-
-      final newDeptData = deptMap.entries.map((e) {
-        final data = e.value;
-        final count = (data['totalEmployeesSet'] as Set).length;
-        final completed = data['completed'] as int;
-        final needsImp = data['needsImprovement'] as int;
-        double avg = (data['totalRating'] as double) / (count + completed + needsImp > 0 ? (count + completed + needsImp) : 1);
-        
-        return {
-          'department': e.key,
-          'avgRating': double.parse(avg.toStringAsFixed(1)),
-          'topPerformers': completed,
-          'needsImprovement': needsImp,
-          'totalEmployees': count,
-        };
-      }).toList();
-
-      final newGoalData = [
-        {
-          'title': 'Overall Goals',
-          'completion': goals.isEmpty ? 0 : ((totalCompleted / goals.length) * 100).toInt(),
-          'onTrack': goals.length - totalCompleted - totalNeedsImp,
-          'atRisk': totalNeedsImp,
-          'completed': totalCompleted,
-        }
-      ];
+      final reportsData = await repo.getReportsData();
 
       setState(() {
-        _departmentData = newDeptData;
-        _goalData = newGoalData;
-        _promotionData = []; // waiting on actual promotion APIs
+        _departmentData = List<Map<String, dynamic>>.from(reportsData['departments'] ?? []);
+        _goalData = List<Map<String, dynamic>>.from(reportsData['goals'] ?? []);
+        _promotionData = List<Map<String, dynamic>>.from(reportsData['promotions'] ?? []);
         _isLoading = false;
       });
 
     } catch (e) {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

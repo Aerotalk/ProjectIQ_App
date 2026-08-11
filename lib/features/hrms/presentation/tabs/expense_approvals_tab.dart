@@ -15,7 +15,7 @@ class ExpenseApprovalsTab extends ConsumerWidget {
     final repo = ref.watch(expenseRepositoryProvider);
 
     return FutureBuilder(
-      future: repo.getClaims(), // Mock using claims for pending approvals
+      future: repo.getApprovals(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

@@ -115,4 +115,42 @@ class PerformanceRepository {
       return [];
     }
   }
+  Future<List<dynamic>> getTemplates() async {
+    try {
+      final response = await _dio.get('/hrms/performance/templates');
+      return _extractList(response.data);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> getCompetencies() async {
+    try {
+      final response = await _dio.get('/hrms/performance/competencies');
+      return _extractList(response.data);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> getScales() async {
+    try {
+      final response = await _dio.get('/hrms/performance/scales');
+      return _extractList(response.data);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<Map<String, dynamic>> getReportsData() async {
+    try {
+      final response = await _dio.get('/hrms/performance/reports/data');
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      }
+      return {};
+    } catch (e) {
+      return {};
+    }
+  }
 }

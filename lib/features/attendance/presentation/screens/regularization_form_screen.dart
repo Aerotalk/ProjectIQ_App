@@ -8,6 +8,7 @@ import '../../../../shared/widgets/inputs/app_time_picker.dart';
 import '../../data/models/regularization_model.dart';
 import '../providers/regularization_providers.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../features/authentication/presentation/auth_controller.dart';
 
 class RegularizationFormScreen extends ConsumerStatefulWidget {
   const RegularizationFormScreen({super.key});
@@ -37,9 +38,12 @@ class _RegularizationFormScreenState extends ConsumerState<RegularizationFormScr
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
 
+    final user = ref.read(authControllerProvider).user;
+    final userName = user?.username ?? 'Unknown Employee';
+
     final newReq = RegularizationModel(
       id: const Uuid().v4(),
-      employeeName: 'Current User', // Mocked
+      employeeName: userName,
       date: _dateController.text,
       inTime: _inTimeController.text,
       outTime: _outTimeController.text,
