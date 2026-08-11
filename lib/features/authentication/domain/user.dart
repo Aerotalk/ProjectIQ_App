@@ -12,6 +12,7 @@ class User {
   final String? companyLogoId;
   final String? primaryColor;
   final String? secondaryColor;
+  final String? employeeId;
 
   const User({
     required this.id,
@@ -27,6 +28,7 @@ class User {
     this.companyLogoId,
     this.primaryColor,
     this.secondaryColor,
+    this.employeeId,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -44,6 +46,7 @@ class User {
       companyLogoId: json['companyLogoId'],
       primaryColor: json['primaryColor'],
       secondaryColor: json['secondaryColor'],
+      employeeId: json['employeeId'],
     );
   }
 
@@ -62,6 +65,7 @@ class User {
       'companyLogoId': companyLogoId,
       'primaryColor': primaryColor,
       'secondaryColor': secondaryColor,
+      'employeeId': employeeId,
     };
   }
 
@@ -79,6 +83,7 @@ class User {
     String? companyLogoId,
     String? primaryColor,
     String? secondaryColor,
+    String? employeeId,
   }) {
     return User(
       id: id ?? this.id,
@@ -94,6 +99,7 @@ class User {
       companyLogoId: companyLogoId ?? this.companyLogoId,
       primaryColor: primaryColor ?? this.primaryColor,
       secondaryColor: secondaryColor ?? this.secondaryColor,
+      employeeId: employeeId ?? this.employeeId,
     );
   }
 

@@ -1,6 +1,7 @@
 class PermissionModel {
   final String id;
   final String permissionNumber;
+  final String? employeeId;
   final String employeeName;
   final String department;
   final String permissionDate;
@@ -11,9 +12,10 @@ class PermissionModel {
   final String reason;
   final String status;
 
-  PermissionModel({
+  const PermissionModel({
     required this.id,
     required this.permissionNumber,
+    this.employeeId,
     required this.employeeName,
     required this.department,
     required this.permissionDate,
@@ -29,6 +31,7 @@ class PermissionModel {
     return PermissionModel(
       id: json['id'] as String,
       permissionNumber: json['permissionNumber'] as String,
+      employeeId: json['employeeId'] as String?,
       employeeName: json['employeeName'] as String,
       department: json['department'] as String,
       permissionDate: json['permissionDate'] as String,

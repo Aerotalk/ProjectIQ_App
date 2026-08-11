@@ -1,5 +1,6 @@
 class RegularizationModel {
   final String id;
+  final String? employeeId;
   final String employeeName;
   final String date;
   final String inTime;
@@ -10,6 +11,7 @@ class RegularizationModel {
 
   const RegularizationModel({
     required this.id,
+    this.employeeId,
     required this.employeeName,
     required this.date,
     required this.inTime,
@@ -21,6 +23,7 @@ class RegularizationModel {
 
   RegularizationModel copyWith({
     String? id,
+    String? employeeId,
     String? employeeName,
     String? date,
     String? inTime,
@@ -31,6 +34,7 @@ class RegularizationModel {
   }) {
     return RegularizationModel(
       id: id ?? this.id,
+      employeeId: employeeId ?? this.employeeId,
       employeeName: employeeName ?? this.employeeName,
       date: date ?? this.date,
       inTime: inTime ?? this.inTime,

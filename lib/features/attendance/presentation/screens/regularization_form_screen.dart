@@ -43,6 +43,7 @@ class _RegularizationFormScreenState extends ConsumerState<RegularizationFormScr
 
     final newReq = RegularizationModel(
       id: const Uuid().v4(),
+      employeeId: user?.employeeId,
       employeeName: userName,
       date: _dateController.text,
       inTime: _inTimeController.text,

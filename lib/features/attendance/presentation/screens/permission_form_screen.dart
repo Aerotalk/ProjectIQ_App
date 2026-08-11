@@ -36,10 +36,14 @@ class _PermissionFormScreenState extends ConsumerState<PermissionFormScreen> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
+      final user = ref.read(authControllerProvider).user;
+      final userName = user?.username ?? 'Unknown Employee';
+
       final newPerm = PermissionModel(
         id: const Uuid().v4(),
         permissionNumber: 'PRM-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
-        employeeName: 'Current User', // TODO: Get from auth provider
+        employeeId: user?.employeeId,
+        employeeName: userName,
         department: 'Engineering',
         permissionDate: _dateController.text,
         permissionType: _permissionTypeController.text,

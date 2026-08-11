@@ -49,6 +49,7 @@ class _LeaveFormScreenState extends ConsumerState<LeaveFormScreen> {
     final newReq = LeaveModel(
       id: const Uuid().v4(),
       leaveType: _leaveTypeController.text,
+      employeeId: user?.employeeId,
       employeeName: userName,
       startDate: _startDateController.text,
       endDate: _endDateController.text,

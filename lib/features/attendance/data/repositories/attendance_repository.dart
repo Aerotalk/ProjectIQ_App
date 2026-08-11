@@ -138,7 +138,7 @@ class AttendanceRepository {
       'reason': model.reason,
       'requestedCheckIn': '${model.date}T${model.inTime}',
       'requestedCheckOut': '${model.date}T${model.outTime}',
-      'employee': {'id': '00000000-0000-0000-0000-000000000001'},
+      if (model.employeeId != null) 'employee': {'id': model.employeeId},
     };
     final response = await _dio.post('/hrms/attendance/regularizations', data: payload);
     return model;
@@ -171,7 +171,7 @@ class AttendanceRepository {
       'fromDate': model.startDate,
       'toDate': model.endDate,
       'reason': model.reason,
-      'employee': {'id': '00000000-0000-0000-0000-000000000001'},
+      if (model.employeeId != null) 'employee': {'id': model.employeeId},
     };
     await _dio.post('/hrms/leave/applications', data: payload);
     return model;
@@ -198,7 +198,27 @@ class AttendanceRepository {
   }
 
   Future<ShiftModel> submitShift(ShiftModel model) async {
-    return model;
+    final payload = {
+      'shiftCode': model.shiftCode,
+      'shiftName': model.shiftName,
+      'startTime': '${model.startTime}',
+      'endTime': '${model.endTime}',
+      'graceTime': model.graceTimeMinutes,
+    };
+    try {
+      final response = await _dio.post('/hrms/shifts', data: payload);
+      final s = response.data;
+      return ShiftModel(
+        id: s['id'] ?? '',
+        shiftName: s['shiftName'] ?? '',
+        shiftCode: s['shiftCode'] ?? '',
+        startTime: s['startTime']?.toString().split('T').last ?? '',
+        endTime: s['endTime']?.toString().split('T').last ?? '',
+        graceTimeMinutes: s['graceTime'] ?? 0,
+      );
+    } catch (e) {
+      throw Exception('Failed to create shift: $e');
+    }
   }
 
   // --- Calendar ---
@@ -299,7 +319,7 @@ class AttendanceRepository {
       'startTime': '${model.permissionDate}T${model.startTime}',
       'endTime': '${model.permissionDate}T${model.endTime}',
       'reason': model.reason,
-      'employee': {'id': '00000000-0000-0000-0000-000000000001'},
+      if (model.employeeId != null) 'employee': {'id': model.employeeId},
     };
     await _dio.post('/hrms/attendance/permissions', data: payload);
     return model;
