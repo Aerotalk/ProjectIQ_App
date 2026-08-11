@@ -293,14 +293,14 @@ class PayrollDashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildRecentRuns(BuildContext context, WidgetRef ref, bool isDark) {
-    final runsState = ref.watch(payrollRunsProvider);
+    final runsState = ref.watch(payslipsProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Recent Payroll Runs', style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
+            Text('Recent Employee Payrolls', style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.bold)),
             TextButton(
               onPressed: () => context.push('/hrms/payroll/runs'),
               child: const Text('View All'),
@@ -309,34 +309,57 @@ class PayrollDashboardScreen extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.s8),
         runsState.when(
-          data: (runs) {
-            if (runs.isEmpty) return const Text('No recent runs.');
+          data: (payslips) {
+            if (payslips.isEmpty) return const Text('No recent payrolls.');
             return Column(
-              children: runs.take(2).map<Widget>((run) {
+              children: payslips.take(3).map<Widget>((payslip) {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.s12),
-                  child: AppCard(
-                    padding: const EdgeInsets.all(AppSpacing.s16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(run.period, style: AppTypography.body.copyWith(fontWeight: FontWeight.w600)),
-                            const SizedBox(height: 4),
-                            Text('${run.employeeCount} Employees', style: AppTypography.caption.copyWith(color: Colors.grey)),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(run.netAmount, style: AppTypography.body.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 4),
-                            Text(run.status, style: AppTypography.caption.copyWith(color: run.status == 'Processed' ? Colors.green : Colors.orange)),
-                          ],
-                        ),
-                      ],
+                  child: InkWell(
+                    onTap: () => context.push('/hrms/payroll/runs'),
+                    borderRadius: BorderRadius.circular(12),
+                    child: AppCard(
+                      padding: const EdgeInsets.all(AppSpacing.s16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    payslip.employeeName.substring(0, payslip.employeeName.length >= 2 ? 2 : payslip.employeeName.length).toUpperCase(),
+                                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(payslip.employeeName, style: AppTypography.body.copyWith(fontWeight: FontWeight.w600)),
+                                  const SizedBox(height: 4),
+                                  Text('${payslip.period} • ${payslip.department}', style: AppTypography.caption.copyWith(color: Colors.grey)),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(payslip.netSalary, style: AppTypography.body.copyWith(fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 4),
+                              Text(payslip.status, style: AppTypography.caption.copyWith(color: payslip.status == 'Processed' ? Colors.green : Colors.orange)),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -344,7 +367,7 @@ class PayrollDashboardScreen extends ConsumerWidget {
             );
           },
           loading: () => const Skeleton(height: 100, width: double.infinity),
-          error: (e, _) => Text('Error loading runs: $e'),
+          error: (e, _) => Text('Error loading payrolls: $e'),
         ),
       ],
     );

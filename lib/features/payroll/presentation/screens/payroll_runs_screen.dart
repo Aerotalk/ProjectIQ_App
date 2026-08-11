@@ -11,12 +11,12 @@ class PayrollRunsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(payrollRunsProvider);
+    final state = ref.watch(payslipsProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Payroll Runs',
+          'Employee Payrolls',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         leading: IconButton(
@@ -25,19 +25,19 @@ class PayrollRunsScreen extends ConsumerWidget {
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: () async => ref.refresh(payrollRunsProvider.future),
+        onRefresh: () async => ref.refresh(payslipsProvider.future),
         child: state.when(
-          data: (runs) {
-            if (runs.isEmpty) {
-              return const Center(child: Text('No payroll runs found.'));
+          data: (payslips) {
+            if (payslips.isEmpty) {
+              return const Center(child: Text('No employee payrolls found.'));
             }
             return ListView.separated(
               padding: const EdgeInsets.all(AppSpacing.s16),
-              itemCount: runs.length,
+              itemCount: payslips.length,
               separatorBuilder: (_, _) =>
                   const SizedBox(height: AppSpacing.s12),
               itemBuilder: (context, index) {
-                final run = runs[index];
+                final payslip = payslips[index];
                 return Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
@@ -54,15 +54,17 @@ class PayrollRunsScreen extends ConsumerWidget {
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(AppSpacing.s8),
+                                width: 44,
+                                height: 44,
                                 decoration: BoxDecoration(
-                                  color: Colors.blue.shade50,
-                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.blue.withValues(alpha: 0.1),
+                                  shape: BoxShape.circle,
                                 ),
-                                child: const Icon(
-                                  LucideIcons.calendar,
-                                  color: Colors.blue,
-                                  size: 20,
+                                child: Center(
+                                  child: Text(
+                                    payslip.employeeName.substring(0, payslip.employeeName.length >= 2 ? 2 : payslip.employeeName.length).toUpperCase(),
+                                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16),
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: AppSpacing.s12),
@@ -70,7 +72,7 @@ class PayrollRunsScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    run.period,
+                                    payslip.employeeName,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -78,7 +80,7 @@ class PayrollRunsScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '${run.employeeCount} Employees',
+                                    '${payslip.period} • ${payslip.department}',
                                     style: TextStyle(
                                       color: Colors.grey.shade700,
                                       fontSize: 13,
@@ -88,7 +90,7 @@ class PayrollRunsScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          _buildStatusBadge(run.status),
+                          _buildStatusBadge(payslip.status),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.s16),
@@ -109,7 +111,7 @@ class PayrollRunsScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  run.grossAmount,
+                                  payslip.grossSalary,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
@@ -131,7 +133,7 @@ class PayrollRunsScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  run.netAmount,
+                                  payslip.netSalary,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
@@ -149,12 +151,12 @@ class PayrollRunsScreen extends ConsumerWidget {
                           onPressed: () {
                             // Route to Payroll Processing or Verification
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Opening run details...'),
+                              SnackBar(
+                                content: Text('Opening details for ${payslip.employeeName}...'),
                               ),
                             );
                           },
-                          child: const Text('View Details'),
+                          child: const Text('View Employee Actions'),
                         ),
                       ),
                     ],

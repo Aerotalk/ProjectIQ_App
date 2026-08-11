@@ -93,7 +93,7 @@ class _PayrollProcessingScreenState extends State<PayrollProcessingScreen> {
         },
         steps: [
           Step(
-            title: const Text('Select Period'),
+            title: const Text('Select Employee'),
             content: Container(
               padding: const EdgeInsets.all(AppSpacing.s16),
               decoration: BoxDecoration(
@@ -105,10 +105,10 @@ class _PayrollProcessingScreenState extends State<PayrollProcessingScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'July 2026',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    'Search employee...',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
-                  Icon(LucideIcons.calendar),
+                  Icon(LucideIcons.search, color: Colors.grey),
                 ],
               ),
             ),
@@ -119,19 +119,19 @@ class _PayrollProcessingScreenState extends State<PayrollProcessingScreen> {
             content: Container(
               padding: const EdgeInsets.all(AppSpacing.s16),
               decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                border: Border.all(color: Colors.orange.shade200),
+                color: Colors.blue.shade50,
+                border: Border.all(color: Colors.blue.shade200),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
                   Icon(
-                    LucideIcons.alertTriangle,
-                    color: Colors.orange.shade700,
+                    LucideIcons.info,
+                    color: Colors.blue.shade700,
                   ),
                   const SizedBox(width: 12),
                   const Expanded(
-                    child: Text('2 employees have missing attendance records.'),
+                    child: Text('Attendance records and inputs validated for this employee.'),
                   ),
                 ],
               ),
@@ -141,7 +141,7 @@ class _PayrollProcessingScreenState extends State<PayrollProcessingScreen> {
           Step(
             title: const Text('Confirm Run'),
             content: const Text(
-              'Running payroll for 150 employees. This action cannot be easily undone.',
+              'Processing payroll action for the selected employee.',
             ),
             isActive: _currentStep >= 2,
           ),
