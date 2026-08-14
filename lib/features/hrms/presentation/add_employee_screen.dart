@@ -86,8 +86,9 @@ class _AddEmployeeScreenState extends ConsumerState<AddEmployeeScreen> {
     }
 
     // Validate CTC limit
-    final ctc = double.tryParse(data['revisionAnnualCTC']?.toString() ?? '0') ?? 0;
-    if (ctc > 0 && data['revisionSalaryComponents'] is List) {
+    final ctcStr = data['revisionAnnualCTC']?.toString() ?? '';
+    final ctc = double.tryParse(ctcStr) ?? 0;
+    if (ctcStr.isNotEmpty && data['revisionSalaryComponents'] is List) {
       final components = data['revisionSalaryComponents'] as List;
       double totalEarnings = 0;
       for (final comp in components) {
@@ -328,6 +329,7 @@ class _AddEmployeeScreenState extends ConsumerState<AddEmployeeScreen> {
                 }
 
                 return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => formNotifier.setStep(index),
                   child: Container(
                     padding: const EdgeInsets.symmetric(

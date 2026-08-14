@@ -138,6 +138,7 @@ class _PerformanceTemplatesTabState extends ConsumerState<PerformanceTemplatesTa
               final isActive = _activeTabIndex == index;
               return Expanded(
                 child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => setState(() => _activeTabIndex = index),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: AppSpacing.s8),

@@ -40,6 +40,7 @@ Widget _appCheckTile({
   required ValueChanged<bool> onChanged,
 }) {
   return GestureDetector(
+    behavior: HitTestBehavior.opaque,
     onTap: () => onChanged(!value),
     child: Row(
       children: [
@@ -1652,7 +1653,32 @@ class SalaryRevisionStep extends ConsumerWidget {
             label: 'Annual CTC',
             initialValue: d['revisionAnnualCTC']?.toString(),
             keyboardType: TextInputType.number,
-            onChanged: (v) => n.updateField('revisionAnnualCTC', v),
+            onChanged: (v) {
+              n.updateField('revisionAnnualCTC', v);
+              final newCTC = double.tryParse(v) ?? 0;
+              if (newCTC > 0) {
+                final components = List<dynamic>.from(d['revisionSalaryComponents'] ?? []);
+                bool changed = false;
+                for (int i = 0; i < components.length; i++) {
+                  final comp = Map<String, dynamic>.from(components[i] as Map);
+                  final pStr = comp['percentage']?.toString() ?? '';
+                  final aStr = comp['amount']?.toString() ?? '';
+                  if (pStr.isNotEmpty) {
+                    final p = double.tryParse(pStr) ?? 0;
+                    comp['amount'] = (newCTC * p / 100).toStringAsFixed(2);
+                    changed = true;
+                  } else if (aStr.isNotEmpty) {
+                    final a = double.tryParse(aStr) ?? 0;
+                    comp['percentage'] = (a / newCTC * 100).toStringAsFixed(2);
+                    changed = true;
+                  }
+                  components[i] = comp;
+                }
+                if (changed) {
+                  n.updateField('revisionSalaryComponents', components);
+                }
+              }
+            },
           ),
           sp,
           AppTextField(
@@ -1699,7 +1725,8 @@ class SalaryRevisionStep extends ConsumerWidget {
         }
       }
     }
-    final bool exceedsCtc = ctc > 0 && totalEarnings > ctc;
+    final ctcStr = d['revisionAnnualCTC']?.toString() ?? '';
+    final bool exceedsCtc = ctcStr.isNotEmpty && totalEarnings > ctc;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
