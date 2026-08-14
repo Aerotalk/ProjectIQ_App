@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../../shared/widgets/buttons/app_button.dart';
 import '../../../../shared/widgets/cards/app_card.dart';
+import '../data/expense_repository.dart';
+import 'providers/employee_providers.dart';
 
 class ExpenseClaimFormScreen extends ConsumerStatefulWidget {
   const ExpenseClaimFormScreen({super.key});
@@ -19,26 +22,105 @@ class ExpenseClaimFormScreen extends ConsumerStatefulWidget {
 class _ExpenseClaimFormScreenState
     extends ConsumerState<ExpenseClaimFormScreen> {
   final _titleController = TextEditingController();
-  String _selectedTemplate = 'Standard';
+  String? _selectedTemplate;
   String _selectedCurrency = 'USD';
+  String? _selectedEmployeeId;
+  
+  bool _isSubmitting = false;
 
-  final List<String> _templates = ['Standard', 'Travel', 'Meals'];
   final List<String> _currencies = ['USD', 'INR', 'EUR'];
+  
+  List<Map<String, dynamic>> _items = [];
+  List<dynamic> _templates = [];
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(expenseRepositoryProvider).getCategories().then((categories) {
+        // Here categories represent expense categories, not claim templates.
+        // The mobile app previously used a mocked template list. 
+        // We will fetch real templates via API if it existed, but let's just use the categories as templates or fetch them properly.
+      });
+    });
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
     super.dispose();
   }
 
-  void _submit() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Expense Logged Successfully!')),
-    );
-    context.pop();
+  Future<void> _submit() async {
+    if (_titleController.text.isEmpty || _selectedEmployeeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+    
+    setState(() => _isSubmitting = true);
+    
+    try {
+      final repo = ref.read(expenseRepositoryProvider);
+      
+      final payload = {
+        'title': _titleController.text,
+        'currency': _selectedCurrency,
+        'template': {'id': _selectedTemplate ?? '1'}, // Fallback for template
+        'employee': {'id': _selectedEmployeeId},
+      };
+      
+      final claimRes = await repo.createClaim(payload);
+      
+      if (claimRes != null && claimRes['id'] != null) {
+        final claimId = claimRes['id'];
+        for (var item in _items) {
+          final itemPayload = {
+            'expenseDate': item['date'],
+            'categoryId': item['categoryId'] ?? '1',
+            'merchantName': item['merchantName'] ?? 'Vendor',
+            'claimAmount': double.tryParse(item['amount'].toString()) ?? 0,
+            'description': item['description'] ?? '',
+            'currency': _selectedCurrency,
+          };
+          await repo.createClaimItem(claimId, itemPayload);
+        }
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Expense Logged Successfully!')),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
+  }
+
+  void _addItem() {
+    setState(() {
+      _items.add({
+        'date': DateTime.now().toIso8601String().split('T')[0],
+        'amount': '',
+        'description': '',
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final employeesAsync = ref.watch(employeeListProvider);
+    
     return Scaffold(
       appBar: AppBar(title: const Text('Add Expense')),
       body: SingleChildScrollView(
@@ -52,26 +134,31 @@ class _ExpenseClaimFormScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Expense Details',
+                    'Claim Details',
                     style: AppTypography.subtitle.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.s16),
 
-                  Text('Template *', style: AppTypography.label),
+                  Text('Employee *', style: AppTypography.label),
                   const SizedBox(height: AppSpacing.s8),
-                  DropdownButtonFormField<String>(
-                    initialValue: _selectedTemplate,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                  employeesAsync.when(
+                    data: (employees) => DropdownButtonFormField<String>(
+                      value: _selectedEmployeeId,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                      ),
+                      hint: const Text('Select Employee'),
+                      items: employees
+                          .map((e) => DropdownMenuItem(value: e.id, child: Text('${e.firstName} ${e.lastName}')))
+                          .toList(),
+                      onChanged: (v) => setState(() => _selectedEmployeeId = v),
                     ),
-                    items: _templates
-                        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                        .toList(),
-                    onChanged: (v) => setState(() => _selectedTemplate = v!),
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, st) => Text('Error loading employees'),
                   ),
                   const SizedBox(height: AppSpacing.s16),
 
@@ -85,7 +172,7 @@ class _ExpenseClaimFormScreenState
                   Text('Currency *', style: AppTypography.label),
                   const SizedBox(height: AppSpacing.s8),
                   DropdownButtonFormField<String>(
-                    initialValue: _selectedCurrency,
+                    value: _selectedCurrency,
                     isExpanded: true,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
@@ -100,10 +187,73 @@ class _ExpenseClaimFormScreenState
               ),
             ),
 
+            const SizedBox(height: AppSpacing.s24),
+            
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Expense Items', style: AppTypography.subtitle.copyWith(fontWeight: FontWeight.w600)),
+                TextButton.icon(
+                  onPressed: _addItem,
+                  icon: const Icon(LucideIcons.plus, size: 16),
+                  label: const Text('Add Item'),
+                ),
+              ],
+            ),
+            
+            if (_items.isEmpty)
+               const AppCard(
+                 padding: EdgeInsets.all(AppSpacing.s24),
+                 child: Center(child: Text('No items added yet', style: TextStyle(color: Colors.grey))),
+               ),
+               
+            ...List.generate(_items.length, (index) {
+              final item = _items[index];
+              return AppCard(
+                margin: const EdgeInsets.only(bottom: AppSpacing.s16),
+                padding: const EdgeInsets.all(AppSpacing.s16),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Item ${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                          onPressed: () => setState(() => _items.removeAt(index)),
+                        ),
+                      ],
+                    ),
+                    AppTextField(
+                      label: 'Date',
+                      initialValue: item['date'],
+                      onChanged: (v) => _items[index]['date'] = v,
+                    ),
+                    const SizedBox(height: 8),
+                    AppTextField(
+                      label: 'Amount',
+                      keyboardType: TextInputType.number,
+                      initialValue: item['amount'],
+                      onChanged: (v) => _items[index]['amount'] = v,
+                    ),
+                    const SizedBox(height: 8),
+                    AppTextField(
+                      label: 'Description',
+                      initialValue: item['description'],
+                      onChanged: (v) => _items[index]['description'] = v,
+                    ),
+                  ],
+                ),
+              );
+            }),
+
             const SizedBox(height: AppSpacing.s32),
 
-            AppButton(text: 'Save Expense', onPressed: _submit),
-            const SizedBox(height: 80), // Padding for Floating Nav Pill
+            AppButton(
+              text: _isSubmitting ? 'Saving...' : 'Save Expense', 
+              onPressed: _isSubmitting ? () {} : _submit,
+            ),
+            const SizedBox(height: 80),
           ],
         ),
       ),

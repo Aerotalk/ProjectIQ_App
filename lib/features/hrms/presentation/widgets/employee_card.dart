@@ -114,6 +114,33 @@ class EmployeeCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: AppSpacing.s8),
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.mail,
+                          size: 14,
+                          color: isDark
+                              ? AppColors.mutedForegroundDark
+                              : AppColors.mutedForegroundLight,
+                        ),
+                        const SizedBox(width: AppSpacing.s4),
+                        Expanded(
+                          child: Text(
+                            employee.email?.isNotEmpty == true
+                                ? employee.email!
+                                : 'No Email Linked',
+                            style: AppTypography.label.copyWith(
+                              color: isDark
+                                  ? AppColors.mutedForegroundDark
+                                  : AppColors.mutedForegroundLight,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

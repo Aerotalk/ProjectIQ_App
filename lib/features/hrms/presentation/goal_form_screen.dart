@@ -5,6 +5,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
+import '../data/performance_repository.dart';
+import 'providers/employee_providers.dart';
 
 class GoalFormScreen extends ConsumerStatefulWidget {
   const GoalFormScreen({super.key});
@@ -25,6 +27,29 @@ class _GoalFormScreenState extends ConsumerState<GoalFormScreen> {
   String _category = 'Strategic';
   String _priority = 'Medium';
   String _status = 'On Track';
+  
+  String? _selectedEmployeeId;
+  String? _selectedCycleId;
+  
+  List<dynamic> _cycles = [];
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(performanceRepositoryProvider).getActiveCycles().then((cycles) {
+        if (mounted) {
+          setState(() {
+            _cycles = cycles;
+            if (_cycles.isNotEmpty) {
+              _selectedCycleId = _cycles.first.id;
+            }
+          });
+        }
+      });
+    });
+  }
 
   @override
   void dispose() {
@@ -38,17 +63,57 @@ class _GoalFormScreenState extends ConsumerState<GoalFormScreen> {
     super.dispose();
   }
 
-  void _saveGoal() {
-    // In a real app, you would validate and save to the repository
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Goal Saved Successfully')),
-    );
-    Navigator.of(context).pop();
+  Future<void> _saveGoal() async {
+    if (_titleController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Goal Title is required')),
+      );
+      return;
+    }
+    
+    setState(() => _isSubmitting = true);
+    
+    try {
+      final payload = {
+        'title': _titleController.text,
+        'employeeId': _selectedEmployeeId,
+        'cycleId': _selectedCycleId,
+        'category': _category,
+        'priority': _priority,
+        'status': _status,
+        'kpi': _kpiController.text,
+        'targetValue': double.tryParse(_targetController.text) ?? 0,
+        'currentValue': double.tryParse(_currentController.text) ?? 0,
+        'unit': _unitController.text,
+        'weightage': double.tryParse(_weightageController.text) ?? 0,
+        'dueDate': _dueDateController.text,
+      };
+      
+      await ref.read(performanceRepositoryProvider).createGoal(payload);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Goal Saved Successfully')),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving goal: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final employeesAsync = ref.watch(employeeListProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -56,14 +121,20 @@ class _GoalFormScreenState extends ConsumerState<GoalFormScreen> {
         backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
         elevation: 0,
         actions: [
-          TextButton.icon(
-            onPressed: _saveGoal,
-            icon: const Icon(LucideIcons.save, size: 16),
-            label: const Text('Save'),
-            style: TextButton.styleFrom(
-              foregroundColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+          if (_isSubmitting)
+            const Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: Center(child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))),
+            )
+          else
+            TextButton.icon(
+              onPressed: _saveGoal,
+              icon: const Icon(LucideIcons.save, size: 16),
+              label: const Text('Save'),
+              style: TextButton.styleFrom(
+                foregroundColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+              ),
             ),
-          ),
           const SizedBox(width: 8),
         ],
       ),
@@ -96,11 +167,74 @@ class _GoalFormScreenState extends ConsumerState<GoalFormScreen> {
             ),
             const SizedBox(height: AppSpacing.s24),
             
-            Text('Goal Title', style: AppTypography.caption.copyWith(fontWeight: FontWeight.w600)),
+            Text('Goal Title *', style: AppTypography.caption.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: AppSpacing.s8),
             AppTextField(
               controller: _titleController,
               placeholder: 'Enter goal title',
+            ),
+            const SizedBox(height: AppSpacing.s16),
+            
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Employee', style: AppTypography.caption.copyWith(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: AppSpacing.s8),
+                      employeesAsync.when(
+                        data: (employees) => Container(
+                          height: 48,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: _selectedEmployeeId,
+                              hint: const Text('Select Employee'),
+                              items: employees.map((e) => DropdownMenuItem(value: e.id, child: Text('${e.firstName} ${e.lastName}'))).toList(),
+                              onChanged: (v) => setState(() => _selectedEmployeeId = v),
+                            ),
+                          ),
+                        ),
+                        loading: () => const CircularProgressIndicator(),
+                        error: (e, st) => const Text('Error loading'),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.s16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Appraisal Cycle', style: AppTypography.caption.copyWith(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: AppSpacing.s8),
+                      Container(
+                        height: 48,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            isExpanded: true,
+                            value: _selectedCycleId,
+                            hint: const Text('Select Cycle'),
+                            items: _cycles.map((c) => DropdownMenuItem<String>(value: c.id, child: Text(c.name))).toList(),
+                            onChanged: (v) => setState(() => _selectedCycleId = v),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: AppSpacing.s16),
             

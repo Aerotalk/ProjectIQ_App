@@ -191,6 +191,29 @@ class BasicInfoStep extends ConsumerWidget {
             initialValue: d['nationality']?.toString(),
             onChanged: (v) => n.updateField('nationality', v),
           ),
+          sp,
+          _sectionTitle('Profile Photo *'),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFF3F4F6),
+              foregroundColor: const Color(0xFF4B5563),
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () async {
+              FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
+              if (result != null) {
+                n.updateField('profilePhoto', result.files.single.path ?? 'uploaded_id');
+              }
+            },
+            icon: const Icon(Icons.upload_file, size: 20),
+            label: Text(d['profilePhoto'] != null ? 'Change Photo' : 'Upload Profile Photo'),
+          ),
+          if (d['profilePhoto'] != null) ...[
+            const SizedBox(height: 4),
+            const Text('Photo selected ✓', style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.w600)),
+          ],
 
           // ── Employment Details ──────────────────────────────────────────────
           _divider(),
@@ -263,6 +286,7 @@ class BasicInfoStep extends ConsumerWidget {
             initialValue: d['weeklyOff']?.toString(),
             onChanged: (v) => n.updateField('weeklyOff', v),
           ),
+
           sp,
           AppTextField(
             label: "Father's Name",
@@ -707,11 +731,9 @@ class BankDetailsStep extends ConsumerWidget {
             label: 'Payment Mode',
             placeholder: 'Select',
             items: [
-              'NEFT',
-              'RTGS',
-              'IMPS',
-              'Cash',
+              'Bank Transfer',
               'Cheque',
+              'Cash',
             ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
             onChanged: (v) => n.updateField('paymentMode', v),
           ),
@@ -780,10 +802,10 @@ class StatutoryDetailsStep extends ConsumerWidget {
             value: d['taxRegime'] as String?,
             label: 'Tax Regime',
             placeholder: 'Select',
-            items: [
-              'Old Regime',
-              'New Regime',
-            ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            items: const [
+              DropdownMenuItem(value: 'Old', child: Text('Old Regime')),
+              DropdownMenuItem(value: 'New', child: Text('New Regime')),
+            ],
             onChanged: (v) => n.updateField('taxRegime', v),
           ),
           sp,
@@ -1664,9 +1686,37 @@ class SalaryRevisionStep extends ConsumerWidget {
       components = List.from(d['revisionSalaryComponents']);
     }
 
+    final ctc = double.tryParse(d['revisionAnnualCTC']?.toString() ?? '0') ?? 0;
+    double totalEarnings = 0;
+    for (var c in components) {
+      if (c['type'] == 'EARNING') {
+        final a = double.tryParse(c['amount']?.toString() ?? '0') ?? 0;
+        if (a > 0) {
+          totalEarnings += a;
+        } else {
+          final p = double.tryParse(c['percentage']?.toString() ?? '0') ?? 0;
+          totalEarnings += (ctc * p / 100);
+        }
+      }
+    }
+    final bool exceedsCtc = ctc > 0 && totalEarnings > ctc;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (exceedsCtc)
+          Container(
+            padding: const EdgeInsets.all(8),
+            margin: const EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(4)),
+            child: const Row(
+              children: [
+                Icon(Icons.warning, color: Colors.red, size: 16),
+                SizedBox(width: 8),
+                Expanded(child: Text('Total earnings cannot exceed Annual CTC', style: TextStyle(color: Colors.red, fontSize: 13))),
+              ],
+            ),
+          ),
         if (components.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -1698,6 +1748,21 @@ class SalaryRevisionStep extends ConsumerWidget {
                   initialValue: comp['componentName']?.toString(),
                   onChanged: (v) {
                     components[index]['componentName'] = v;
+                    n.updateField('revisionSalaryComponents', components);
+                  },
+                ),
+                const SizedBox(height: 8),
+                AppSelect<String>(
+                  value: comp['type'] as String? ?? 'EARNING',
+                  label: 'Type',
+                  placeholder: 'Select Type',
+                  items: const [
+                    DropdownMenuItem(value: 'EARNING', child: Text('Earning')),
+                    DropdownMenuItem(value: 'DEDUCTION', child: Text('Deduction')),
+                    DropdownMenuItem(value: 'REIMBURSEMENT', child: Text('Reimbursement')),
+                  ],
+                  onChanged: (v) {
+                    components[index]['type'] = v;
                     n.updateField('revisionSalaryComponents', components);
                   },
                 ),
@@ -1752,7 +1817,7 @@ class SalaryRevisionStep extends ConsumerWidget {
         const SizedBox(height: 8),
         OutlinedButton.icon(
           onPressed: () {
-            components.add({'componentName': '', 'percentage': '', 'amount': ''});
+            components.add({'componentName': '', 'type': 'EARNING', 'percentage': '', 'amount': ''});
             n.updateField('revisionSalaryComponents', components);
           },
           icon: const Icon(Icons.add, size: 16),

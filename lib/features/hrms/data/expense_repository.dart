@@ -102,4 +102,23 @@ class ExpenseRepository {
       return [];
     }
   }
+
+  Future<dynamic> createClaim(Map<String, dynamic> payload) async {
+    final response = await _dio.post('/hrms/expense-claims/claims', data: payload);
+    return response.data;
+  }
+
+  Future<dynamic> createClaimItem(String claimId, Map<String, dynamic> itemPayload) async {
+    final response = await _dio.post('/hrms/expense-claims/claims/$claimId/items', data: itemPayload);
+    return response.data;
+  }
+
+  Future<dynamic> uploadReceipt(dynamic file, String fileName) async {
+    final formData = FormData.fromMap({
+      'file': MultipartFile.fromBytes(file, filename: fileName),
+      'module': 'expense_claims',
+    });
+    final response = await _dio.post('/admin/files/upload', data: formData);
+    return response.data;
+  }
 }

@@ -153,4 +153,9 @@ class PerformanceRepository {
       return {};
     }
   }
+
+  Future<dynamic> createGoal(Map<String, dynamic> payload) async {
+    final response = await _dio.post('/hrms/performance/goals', data: payload);
+    return response.data;
+  }
 }

@@ -46,7 +46,7 @@ class Employee {
       designationName: json['designation'] != null ? json['designation']['designationName'] : null,
       designationId: json['designation'] != null ? json['designation']['id'] : null,
       employmentStatus: json['employmentStatus'] ?? 'Unknown',
-      email: json['user'] != null ? json['user']['email'] : null,
+      email: json['workEmail'] ?? (json['user'] != null ? json['user']['email'] : null),
       profilePhotoId: json['profilePicture'],
       joiningDate: json['joiningDate'],
       gender: json['gender'],

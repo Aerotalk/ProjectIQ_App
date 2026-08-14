@@ -91,6 +91,16 @@ class _LeaveFormScreenState extends ConsumerState<LeaveFormScreen> {
                 },
                 isRequired: true,
               ),
+              const SizedBox(height: AppSpacing.s8),
+              DropdownButtonFormField<String>(
+                value: 'Session 1',
+                decoration: const InputDecoration(labelText: 'From Session', border: OutlineInputBorder()),
+                items: const [
+                  DropdownMenuItem(value: 'Session 1', child: Text('Session 1 (Morning)')),
+                  DropdownMenuItem(value: 'Session 2', child: Text('Session 2 (Afternoon)')),
+                ],
+                onChanged: (v) {},
+              ),
               const SizedBox(height: AppSpacing.s16),
               AppDatePicker(
                 label: 'End Date *',
@@ -101,6 +111,16 @@ class _LeaveFormScreenState extends ConsumerState<LeaveFormScreen> {
                   }
                 },
                 isRequired: true,
+              ),
+              const SizedBox(height: AppSpacing.s8),
+              DropdownButtonFormField<String>(
+                value: 'Session 2',
+                decoration: const InputDecoration(labelText: 'To Session', border: OutlineInputBorder()),
+                items: const [
+                  DropdownMenuItem(value: 'Session 1', child: Text('Session 1 (Morning)')),
+                  DropdownMenuItem(value: 'Session 2', child: Text('Session 2 (Afternoon)')),
+                ],
+                onChanged: (v) {},
               ),
               const SizedBox(height: AppSpacing.s16),
               AppTextField(
