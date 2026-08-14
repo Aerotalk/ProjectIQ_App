@@ -119,14 +119,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
         SnackBar(
           content: Text(error ?? 'Login failed'),
           backgroundColor: AppColors.destructiveLight,
-          action: SnackBarAction(
-            label: 'DEV BYPASS', 
-            textColor: Colors.white,
-            onPressed: () {
-              authController.developerBypass();
-              context.go('/dashboard');
-            }
-          ),
         )
       );
     } else if (mounted) {
