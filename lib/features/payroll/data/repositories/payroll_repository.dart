@@ -159,4 +159,36 @@ class PayrollRepository {
       throw Exception('Failed to run payroll: $e');
     }
   }
+
+  Future<void> createSalaryInput(Map<String, dynamic> data) async {
+    try {
+      await _dio.post('/hrms/payroll/salary-inputs', data: data);
+    } catch (e) {
+      throw Exception('Failed to create salary input: $e');
+    }
+  }
+
+  Future<void> createSettlement(Map<String, dynamic> data) async {
+    try {
+      await _dio.post('/hrms/payroll/settlements', data: data);
+    } catch (e) {
+      throw Exception('Failed to process settlement: $e');
+    }
+  }
+
+  Future<void> createITDeclaration(Map<String, dynamic> data) async {
+    try {
+      await _dio.post('/hrms/payroll/it-declarations', data: data);
+    } catch (e) {
+      throw Exception('Failed to submit IT declaration: $e');
+    }
+  }
+
+  Future<void> createReimbursement(Map<String, dynamic> data) async {
+    try {
+      await _dio.post('/hrms/payroll/reimbursements', data: data);
+    } catch (e) {
+      throw Exception('Failed to submit reimbursement: $e');
+    }
+  }
 }

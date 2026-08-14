@@ -60,9 +60,11 @@ class _DepartmentFormScreenState extends ConsumerState<DepartmentFormScreen> {
     }
 
     final error = ref.read(departmentActionProvider).error;
-    if (error == null && mounted) {
+    if (!mounted) return;
+    
+    if (error == null) {
       context.pop();
-    } else if (error != null && mounted) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.toString()),

@@ -65,9 +65,11 @@ class _DesignationFormScreenState extends ConsumerState<DesignationFormScreen> {
     }
 
     final error = ref.read(designationActionProvider).error;
-    if (error == null && mounted) {
+    if (!mounted) return;
+    
+    if (error == null) {
       context.pop();
-    } else if (error != null && mounted) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.toString()),

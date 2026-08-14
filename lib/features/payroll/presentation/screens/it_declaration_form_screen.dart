@@ -8,6 +8,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../../../shared/widgets/buttons/app_button.dart';
 import '../../../../../shared/widgets/cards/app_card.dart';
+import '../../data/repositories/payroll_repository.dart';
 
 class ITDeclarationFormScreen extends ConsumerStatefulWidget {
   const ITDeclarationFormScreen({super.key});
@@ -52,11 +53,37 @@ class _ITDeclarationFormScreenState
     });
   }
 
-  void _submit() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('IT Declaration Updated Successfully!')),
-    );
-    context.pop();
+  bool _isLoading = false;
+
+  Future<void> _submit() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final payload = {
+        'financialYear': _selectedYear,
+        'taxRegime': _selectedRegime,
+        'declarations': _items.map((i) => {
+          'section': i.section,
+          'amount': double.tryParse(i.amount) ?? 0,
+          'remarks': i.remarks,
+        }).toList(),
+      };
+
+      await ref.read(payrollRepositoryProvider).createITDeclaration(payload);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('IT Declaration Updated Successfully!')),
+      );
+      context.pop();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -266,7 +293,11 @@ class _ITDeclarationFormScreenState
             }),
 
             const SizedBox(height: AppSpacing.s24),
-            AppButton(text: 'Save Declarations', onPressed: _submit),
+            AppButton(
+              text: 'Save Declarations',
+              onPressed: _isLoading ? null : _submit,
+              isLoading: _isLoading,
+            ),
             const SizedBox(height: 80),
           ],
         ),

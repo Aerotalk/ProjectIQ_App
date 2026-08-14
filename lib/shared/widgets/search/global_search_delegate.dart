@@ -70,17 +70,20 @@ class GlobalSearchDelegate extends SearchDelegate<String?> {
       );
     }
     
-    // Dummy suggestions
-    return ListView(
-      children: [
-        ListTile(
+    // Future-proofing for real dynamic search results
+    final suggestions = ['Search for "$query"'];
+
+    return ListView.builder(
+      itemCount: suggestions.length,
+      itemBuilder: (context, index) {
+        return ListTile(
           leading: const Icon(LucideIcons.search),
-          title: Text('Search for "$query"', style: AppTypography.body),
+          title: Text(suggestions[index], style: AppTypography.body),
           onTap: () {
             showResults(context);
           },
-        ),
-      ],
+        );
+      },
     );
   }
 }

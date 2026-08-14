@@ -7,6 +7,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../shared/widgets/buttons/app_button.dart';
 import '../../../../../shared/widgets/cards/app_card.dart';
+import '../../data/repositories/payroll_repository.dart';
 
 class SettlementFormScreen extends ConsumerStatefulWidget {
   const SettlementFormScreen({super.key});
@@ -20,6 +21,7 @@ class _SettlementFormScreenState extends ConsumerState<SettlementFormScreen> {
   String _employee = 'Alice Smith (Exiting)';
   DateTime? _settlementDate;
   DateTime? _lastWorkingDate;
+  bool _isLoading = false;
 
   final List<String> _employees = [
     'Alice Smith (Exiting)',
@@ -33,7 +35,7 @@ class _SettlementFormScreenState extends ConsumerState<SettlementFormScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
     );
-    if (picked != null) {
+    if (picked != null && mounted) {
       setState(() {
         if (isLastWorking) {
           _lastWorkingDate = picked;
@@ -44,11 +46,32 @@ class _SettlementFormScreenState extends ConsumerState<SettlementFormScreen> {
     }
   }
 
-  void _submit() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Final Settlement Processed Successfully!')),
-    );
-    context.pop();
+  Future<void> _submit() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final payload = {
+        'employee': _employee,
+        'lastWorkingDate': _lastWorkingDate?.toIso8601String(),
+        'settlementDate': _settlementDate?.toIso8601String(),
+        // other fields can be dynamically fetched or calculated
+      };
+
+      await ref.read(payrollRepositoryProvider).createSettlement(payload);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Final Settlement Processed Successfully!')),
+      );
+      context.pop();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -203,7 +226,11 @@ class _SettlementFormScreenState extends ConsumerState<SettlementFormScreen> {
 
             const SizedBox(height: AppSpacing.s32),
 
-            AppButton(text: 'Submit Settlement', onPressed: _submit),
+            AppButton(
+              text: 'Submit Settlement',
+              onPressed: _isLoading ? null : _submit,
+              isLoading: _isLoading,
+            ),
             const SizedBox(height: 80),
           ],
         ),

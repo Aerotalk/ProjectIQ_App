@@ -7,6 +7,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../../../shared/widgets/buttons/app_button.dart';
 import '../../../../../shared/widgets/cards/app_card.dart';
+import '../../data/repositories/payroll_repository.dart';
 
 class SalaryInputFormScreen extends ConsumerStatefulWidget {
   const SalaryInputFormScreen({super.key});
@@ -23,6 +24,7 @@ class _SalaryInputFormScreenState extends ConsumerState<SalaryInputFormScreen> {
   String _type = 'Addition';
   bool _recurring = false;
   DateTime? _recurringUntil;
+  bool _isLoading = false;
 
   final _amountController = TextEditingController();
   final _reasonController = TextEditingController();
@@ -37,11 +39,45 @@ class _SalaryInputFormScreenState extends ConsumerState<SalaryInputFormScreen> {
   ];
   final List<String> _types = ['Addition', 'Override', 'Deduction'];
 
-  void _submit() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Salary Input Added Successfully!')),
-    );
-    context.pop();
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_amountController.text.trim().isEmpty) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final payload = {
+        'employee': _employee,
+        'period': _period,
+        'component': _component,
+        'type': _type,
+        'amount': double.tryParse(_amountController.text) ?? 0,
+        'reason': _reasonController.text,
+        'recurring': _recurring,
+        'recurringUntil': _recurringUntil?.toIso8601String(),
+      };
+      
+      await ref.read(payrollRepositoryProvider).createSalaryInput(payload);
+      
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Salary Input Added Successfully!')),
+      );
+      context.pop();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _pickDate() async {
@@ -51,7 +87,7 @@ class _SalaryInputFormScreenState extends ConsumerState<SalaryInputFormScreen> {
       firstDate: DateTime.now(),
       lastDate: DateTime(2030),
     );
-    if (picked != null) {
+    if (picked != null && mounted) {
       setState(() => _recurringUntil = picked);
     }
   }
@@ -246,7 +282,11 @@ class _SalaryInputFormScreenState extends ConsumerState<SalaryInputFormScreen> {
             ),
 
             const SizedBox(height: AppSpacing.s24),
-            AppButton(text: 'Save Input', onPressed: _submit),
+            AppButton(
+              text: 'Save Input',
+              onPressed: _isLoading ? null : _submit,
+              isLoading: _isLoading,
+            ),
             const SizedBox(height: 80),
           ],
         ),

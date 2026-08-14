@@ -10,6 +10,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../../../shared/widgets/buttons/app_button.dart';
 import '../../../../../shared/widgets/cards/app_card.dart';
+import '../../data/repositories/payroll_repository.dart';
 
 class ReimbursementFormScreen extends ConsumerStatefulWidget {
   const ReimbursementFormScreen({super.key});
@@ -29,6 +30,7 @@ class _ReimbursementFormScreenState
   DateTime? _billDate;
   DateTime? _claimPeriod;
   String? _attachmentName;
+  bool _isLoading = false;
 
   final List<String> _types = [
     'Travel',
@@ -38,6 +40,14 @@ class _ReimbursementFormScreenState
     'Other',
   ];
 
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _billNoController.dispose();
+    _remarksController.dispose();
+    super.dispose();
+  }
+
   void _pickDate(bool isBillDate) async {
     final picked = await showDatePicker(
       context: context,
@@ -45,7 +55,7 @@ class _ReimbursementFormScreenState
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
-    if (picked != null) {
+    if (picked != null && mounted) {
       setState(() {
         if (isBillDate) {
           _billDate = picked;
@@ -71,20 +81,46 @@ class _ReimbursementFormScreenState
       ],
     );
 
-    if (result != null) {
+    if (result != null && mounted) {
       setState(() {
         _attachmentName = result.files.single.name;
       });
     }
   }
 
-  void _submit() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Reimbursement Claim Submitted Successfully!'),
-      ),
-    );
-    context.pop();
+  Future<void> _submit() async {
+    if (_amountController.text.trim().isEmpty) return;
+    
+    setState(() => _isLoading = true);
+    
+    try {
+      final payload = {
+        'expenseType': _selectedType,
+        'claimedAmount': double.tryParse(_amountController.text) ?? 0,
+        'billDate': _billDate?.toIso8601String(),
+        'claimPeriod': _claimPeriod?.toIso8601String(),
+        'billNumber': _billNoController.text,
+        'remarks': _remarksController.text,
+        'attachment': _attachmentName,
+      };
+
+      await ref.read(payrollRepositoryProvider).createReimbursement(payload);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Reimbursement Claim Submitted Successfully!'),
+        ),
+      );
+      context.pop();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -250,7 +286,11 @@ class _ReimbursementFormScreenState
 
             const SizedBox(height: AppSpacing.s32),
 
-            AppButton(text: 'Submit Claim', onPressed: _submit),
+            AppButton(
+              text: 'Submit Claim',
+              onPressed: _isLoading ? null : _submit,
+              isLoading: _isLoading,
+            ),
             const SizedBox(height: 80), // Padding for Floating Nav Pill
           ],
         ),
