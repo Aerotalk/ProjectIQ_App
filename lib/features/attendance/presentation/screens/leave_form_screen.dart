@@ -58,14 +58,25 @@ class _LeaveFormScreenState extends ConsumerState<LeaveFormScreen> {
       status: 'Pending',
     );
 
-    ref.read(submitLeaveProvider.notifier).submit(newReq).then((_) {
-      if (mounted) context.pop();
-    });
+    ref.read(submitLeaveProvider.notifier).submit(newReq);
   }
 
   @override
   Widget build(BuildContext context) {
     final submitState = ref.watch(submitLeaveProvider);
+
+    ref.listen(submitLeaveProvider, (prev, next) {
+      if (next.hasError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: ${next.error}'), backgroundColor: Colors.red),
+        );
+      } else if (!next.isLoading && next.hasValue && prev?.isLoading == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Leave applied successfully')),
+        );
+        context.pop();
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Apply Leave')),

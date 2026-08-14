@@ -104,9 +104,11 @@ class _PerformanceReportsTabState extends ConsumerState<PerformanceReportsTab> {
         await Share.shareXFiles([XFile(file.path)], text: 'Performance Report - $_activeReport');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Export failed: $e'), backgroundColor: Colors.red),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Export failed: $e'), backgroundColor: Colors.red),
+        );
+      }
     }
   }
 
