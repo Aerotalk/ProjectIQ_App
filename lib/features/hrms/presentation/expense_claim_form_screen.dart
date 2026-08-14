@@ -209,10 +209,11 @@ class _ExpenseClaimFormScreenState
                
             ...List.generate(_items.length, (index) {
               final item = _items[index];
-              return AppCard(
-                margin: const EdgeInsets.only(bottom: AppSpacing.s16),
-                padding: const EdgeInsets.all(AppSpacing.s16),
-                child: Column(
+              return Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.s16),
+                child: AppCard(
+                  padding: const EdgeInsets.all(AppSpacing.s16),
+                  child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -244,9 +245,9 @@ class _ExpenseClaimFormScreenState
                     ),
                   ],
                 ),
+                ),
               );
             }),
-
             const SizedBox(height: AppSpacing.s32),
 
             AppButton(

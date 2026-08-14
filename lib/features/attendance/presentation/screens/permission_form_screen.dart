@@ -8,6 +8,7 @@ import '../../../../shared/widgets/inputs/app_time_picker.dart';
 import '../../data/models/permission_model.dart';
 import '../providers/permission_providers.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../features/authentication/presentation/auth_controller.dart';
 
 class PermissionFormScreen extends ConsumerStatefulWidget {
   const PermissionFormScreen({super.key});

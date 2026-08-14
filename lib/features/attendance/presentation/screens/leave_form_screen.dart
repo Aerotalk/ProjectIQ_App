@@ -53,7 +53,7 @@ class _LeaveFormScreenState extends ConsumerState<LeaveFormScreen> {
       employeeName: userName,
       startDate: _startDateController.text,
       endDate: _endDateController.text,
-      durationDays: duration.toDouble(),
+      durationDays: duration,
       reason: _reasonController.text,
       status: 'Pending',
     );
