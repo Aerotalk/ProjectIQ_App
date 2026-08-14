@@ -100,7 +100,7 @@ class ProfileScreen extends ConsumerWidget {
                                     displayRole,
                                     style: AppTypography.caption.copyWith(
                                       fontSize: 11,
-                                      color: isDark ? AppColors.primaryForegroundDark : AppColors.primaryLight,
+                                      color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
