@@ -1706,11 +1706,19 @@ class SalaryRevisionStep extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: AppTextField(
+                        key: ValueKey('pct_${index}_${comp['percentage']}'),
                         label: 'Percentage (%)',
                         initialValue: comp['percentage']?.toString(),
                         keyboardType: TextInputType.number,
                         onChanged: (v) {
                           components[index]['percentage'] = v;
+                          final ctc = double.tryParse(d['revisionAnnualCTC']?.toString() ?? '0') ?? 0;
+                          final p = double.tryParse(v) ?? 0;
+                          if (ctc > 0 && v.isNotEmpty) {
+                            components[index]['amount'] = (ctc * p / 100).toStringAsFixed(2);
+                          } else if (v.isEmpty) {
+                            components[index]['amount'] = '';
+                          }
                           n.updateField('revisionSalaryComponents', components);
                         },
                       ),
@@ -1718,11 +1726,19 @@ class SalaryRevisionStep extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: AppTextField(
+                        key: ValueKey('amt_${index}_${comp['amount']}'),
                         label: 'Amount (Fixed)',
                         initialValue: comp['amount']?.toString(),
                         keyboardType: TextInputType.number,
                         onChanged: (v) {
                           components[index]['amount'] = v;
+                          final ctc = double.tryParse(d['revisionAnnualCTC']?.toString() ?? '0') ?? 0;
+                          final a = double.tryParse(v) ?? 0;
+                          if (ctc > 0 && v.isNotEmpty) {
+                            components[index]['percentage'] = (a / ctc * 100).toStringAsFixed(2);
+                          } else if (v.isEmpty) {
+                            components[index]['percentage'] = '';
+                          }
                           n.updateField('revisionSalaryComponents', components);
                         },
                       ),

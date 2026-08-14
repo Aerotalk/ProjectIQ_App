@@ -28,8 +28,8 @@ class _AddEmployeeScreenState extends ConsumerState<AddEmployeeScreen> {
     'Statutory', // 3  statutory
     'Bank Details', // 4  bank
     'Documents', // 5  documents
-    // 'Position', // 6  position
-    // 'Separation', // 7  separation
+    'Position', // 6  position
+    'Separation', // 7  separation
     'Salary', // 8  salary
     'Education', // 9  education
     'Family', // 10 family
@@ -81,6 +81,23 @@ class _AddEmployeeScreenState extends ConsumerState<AddEmployeeScreen> {
     for (final entry in requiredKeys.entries) {
       if (data[entry.key] == null || data[entry.key].toString().trim().isEmpty) {
         ref.read(employeeFormProvider.notifier).setError('${entry.value} is required (Basic Info)');
+        return;
+      }
+    }
+
+    // Validate CTC limit
+    final ctc = double.tryParse(data['revisionAnnualCTC']?.toString() ?? '0') ?? 0;
+    if (ctc > 0 && data['revisionSalaryComponents'] is List) {
+      final components = data['revisionSalaryComponents'] as List;
+      double totalEarnings = 0;
+      for (final comp in components) {
+        if (comp is Map) {
+           final amount = double.tryParse(comp['amount']?.toString() ?? '0') ?? 0;
+           totalEarnings += amount;
+        }
+      }
+      if (totalEarnings > ctc + 0.01) {
+        ref.read(employeeFormProvider.notifier).setError('Total earnings in salary components cannot exceed Annual CTC.');
         return;
       }
     }
@@ -179,6 +196,25 @@ class _AddEmployeeScreenState extends ConsumerState<AddEmployeeScreen> {
           'annualCTC': data['contractAnnualCTC'],
           'noticePeriodDays': data['contractNoticePeriod'],
           'terms': data['contractTerms'],
+        }),
+        repo.savePositionChange(employeeId, {
+          'type': data['positionChangeType'],
+          'effectiveDate': data['positionChangeEffectiveDate'],
+          'departmentId': data['positionChangeDepartmentId'],
+          'designationId': data['positionChangeDesignationId'],
+          'grade': data['positionChangeGrade'],
+          'location': data['positionChangeLocation'],
+          'reportingManagerId': data['positionChangeReportingManagerId'],
+          'remarks': data['positionChangeRemarks'],
+        }),
+        repo.saveSeparation(employeeId, {
+          'type': data['separationType'],
+          'resignationDate': data['resignationDate'],
+          'lastWorkingDate': data['lastWorkingDate'],
+          'noticePeriod': data['exitNoticePeriod'],
+          'reason': data['separationReason'],
+          'exitInterviewDone': data['exitInterview'],
+          'remarks': data['separationRemarks'],
         }),
       ]);
 
@@ -339,8 +375,8 @@ class _AddEmployeeScreenState extends ConsumerState<AddEmployeeScreen> {
                 StatutoryDetailsStep(), // 3  statutory
                 BankDetailsStep(), // 4  bank
                 DocumentsStep(), // 5  documents
-                // PositionChangeStep(), // 6  position
-                // SeparationExitStep(), // 7  separation
+                PositionChangeStep(), // 6  position
+                SeparationExitStep(), // 7  separation
                 SalaryRevisionStep(), // 8  salary
                 EducationStep(), // 9  education
                 FamilyNomineeStep(), // 10 family

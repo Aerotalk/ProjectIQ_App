@@ -76,4 +76,12 @@ class EmployeeRepository {
   Future<void> saveContract(String employeeId, Map<String, dynamic> data) async {
     await _dio.post('/admin/employees/$employeeId/contract', data: data);
   }
+
+  Future<void> savePositionChange(String employeeId, Map<String, dynamic> data) async {
+    await _dio.put('/admin/employees/$employeeId/position-change', data: data);
+  }
+
+  Future<void> saveSeparation(String employeeId, Map<String, dynamic> data) async {
+    await _dio.put('/admin/employees/$employeeId/separation', data: data);
+  }
 }
