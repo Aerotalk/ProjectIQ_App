@@ -60,6 +60,7 @@ class _AddEmployeeScreenState extends ConsumerState<AddEmployeeScreen> {
       'dateOfBirth': 'Date of Birth',
       'workEmail': 'Work Email',
       'phone': 'Phone',
+      'alternatePhone': 'Alternate Phone',
       'gender': 'Gender',
       'maritalStatus': 'Marital Status',
       'bloodGroup': 'Blood Group',

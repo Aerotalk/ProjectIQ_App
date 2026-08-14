@@ -139,7 +139,7 @@ class BasicInfoStep extends ConsumerWidget {
           ),
           sp,
           AppPhoneField(
-            label: 'Alternate Phone',
+            label: 'Alternate Phone *',
             initialValue: d['alternatePhone']?.toString(),
             onChanged: (v) => n.updateField('alternatePhone', v),
           ),
