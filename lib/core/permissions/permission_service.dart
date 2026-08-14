@@ -3,8 +3,17 @@ import '../../features/authentication/presentation/auth_controller.dart';
 
 final permissionServiceProvider = Provider<PermissionService>((ref) {
   // Watch stringified roles and permissions to only rebuild when they change
-  final rolesStr = ref.watch(authControllerProvider.select((s) => s.user?.roles.join(',') ?? ''));
-  final permsStr = ref.watch(authControllerProvider.select((s) => s.user?.effectivePermissions.join(',') ?? ''));
+  // Sort them first because the backend uses a HashSet and the order may change randomly
+  final rolesStr = ref.watch(authControllerProvider.select((s) {
+    final roles = s.user?.roles.toList() ?? [];
+    roles.sort();
+    return roles.join(',');
+  }));
+  final permsStr = ref.watch(authControllerProvider.select((s) {
+    final perms = s.user?.effectivePermissions.toList() ?? [];
+    perms.sort();
+    return perms.join(',');
+  }));
   final isAuthenticated = ref.watch(authControllerProvider.select((s) => s.isAuthenticated));
 
   return PermissionService(
