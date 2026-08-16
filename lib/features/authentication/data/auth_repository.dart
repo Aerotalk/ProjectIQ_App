@@ -23,18 +23,8 @@ class AuthRepository {
 
   Future<User> me() async {
     final response = await _dio.get('/auth/me');
-    var userData = response.data as Map<String, dynamic>;
-    
-    // Attempt to fetch employeeId
-    try {
-      final empResponse = await _dio.get('/admin/employees/me');
-      if (empResponse.data != null && empResponse.data['id'] != null) {
-        userData['employeeId'] = empResponse.data['id'];
-      }
-    } catch (e) {
-      // Ignored if employee profile is not found or not created yet
-    }
-    
+    final userData = response.data as Map<String, dynamic>;
+    // employeeId is now returned directly by /auth/me — no second call needed
     return User.fromJson(userData);
   }
 
