@@ -89,7 +89,13 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
 
   Future<void> checkIn() async {
     final user = ref.read(authControllerProvider).user;
-    if (user?.employeeId == null) return;
+    if (user?.employeeId == null) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Employee profile not linked to your account. Please contact HR.',
+      );
+      return;
+    }
 
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -120,7 +126,13 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
 
   Future<void> checkOut() async {
     final user = ref.read(authControllerProvider).user;
-    if (user?.employeeId == null) return;
+    if (user?.employeeId == null) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Employee profile not linked to your account. Please contact HR.',
+      );
+      return;
+    }
 
     state = state.copyWith(isLoading: true, error: null);
     try {
