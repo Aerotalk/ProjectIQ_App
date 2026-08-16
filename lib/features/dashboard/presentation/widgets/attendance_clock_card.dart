@@ -73,14 +73,16 @@ class AttendanceClockCard extends ConsumerWidget {
                     const SizedBox(width: 6),
                     Text(
                       isCheckedIn 
-                          ? 'Checked In' 
-                          : (isCheckedOut ? 'Checked Out' : 'Not Checked In'),
+                          ? (clockState.isSyncPending ? 'Checked In (Sync Pending)' : 'Checked In')
+                          : (isCheckedOut 
+                              ? (clockState.isSyncPending ? 'Checked Out (Sync Pending)' : 'Checked Out')
+                              : 'Not Checked In'),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: isCheckedIn 
+                        color: clockState.isSyncPending ? Colors.orange : (isCheckedIn 
                             ? Colors.green 
-                            : (isCheckedOut ? Colors.orange : AppColors.primaryLight),
+                            : (isCheckedOut ? Colors.orange : AppColors.primaryLight)),
                       ),
                     ),
                   ],
@@ -145,11 +147,11 @@ class AttendanceClockCard extends ConsumerWidget {
           
           if (!isCheckedOut)
             SlideAction(
+              key: ValueKey(clockState.status),
               text: isCheckedIn ? 'Slide to Check Out' : 'Slide to Check In',
               submittingText: 'Recording...',
               completedText: 'Success',
               outerColor: isCheckedIn ? Colors.orange : AppColors.primaryLight,
-              isCompleted: clockState.isLoading,
               onSubmit: () async {
                 if (isCheckedIn) {
                   await ref.read(attendanceClockProvider.notifier).checkOut();

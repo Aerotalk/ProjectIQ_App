@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../../authentication/presentation/auth_controller.dart';
 import '../../data/repositories/attendance_repository.dart';
 import '../../../../core/utils/location_service.dart';
@@ -13,6 +16,7 @@ class AttendanceClockState {
   final Duration elapsed;
   final bool isLoading;
   final String? error;
+  final bool isSyncPending;
 
   const AttendanceClockState({
     this.status = ClockStatus.notCheckedIn,
@@ -21,6 +25,7 @@ class AttendanceClockState {
     this.elapsed = Duration.zero,
     this.isLoading = false,
     this.error,
+    this.isSyncPending = false,
   });
 
   AttendanceClockState copyWith({
@@ -30,6 +35,7 @@ class AttendanceClockState {
     Duration? elapsed,
     bool? isLoading,
     String? error,
+    bool? isSyncPending,
   }) {
     return AttendanceClockState(
       status: status ?? this.status,
@@ -38,16 +44,28 @@ class AttendanceClockState {
       elapsed: elapsed ?? this.elapsed,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      isSyncPending: isSyncPending ?? this.isSyncPending,
     );
   }
 }
 
 class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
   Timer? _timer;
+  StreamSubscription? _connectivitySubscription;
 
   @override
   AttendanceClockState build() {
-    ref.onDispose(() => _timer?.cancel());
+    ref.onDispose(() {
+      _timer?.cancel();
+      _connectivitySubscription?.cancel();
+    });
+    
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((result) {
+      if (result != ConnectivityResult.none) {
+        _syncOfflinePunches();
+      }
+    });
+
     _restoreStateFromServer(); // fire-and-forget on build
     return const AttendanceClockState(isLoading: true);
   }
@@ -58,6 +76,9 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
       state = const AttendanceClockState();
       return;
     }
+    
+    await _syncOfflinePunches();
+
     final repo = ref.read(attendanceRepositoryProvider);
     final status = await repo.getCheckInStatus(user!.employeeId!);
 
@@ -66,6 +87,10 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
         ? DateTime.tryParse(status['firstCheckIn'].toString())
         : null;
 
+    final prefs = await SharedPreferences.getInstance();
+    final String? offlineData = prefs.getString('offline_punches');
+    final bool hasPending = offlineData != null && jsonDecode(offlineData).isNotEmpty;
+
     state = AttendanceClockState(
       status: currentlyIn ? ClockStatus.checkedIn : ClockStatus.notCheckedIn,
       checkInTime: firstIn,
@@ -73,6 +98,7 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
           ? DateTime.now().difference(firstIn)
           : Duration.zero,
       isLoading: false,
+      isSyncPending: hasPending,
     );
     if (currentlyIn) _startTimer();
   }
@@ -93,24 +119,38 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
 
     state = state.copyWith(isLoading: true, error: null);
     try {
-      // 1. Capture GPS (best-effort, non-blocking on failure)
-      final position = await LocationService.getCurrentPosition();
+      final locResult = await LocationService.getSecureLocation();
+      if (locResult.isMocked) throw Exception(locResult.error);
+
       final repo = ref.read(attendanceRepositoryProvider);
-
-      // 2. Call API
-      await repo.checkIn(
-        user!.employeeId!,
-        lat: position?.latitude,
-        lng: position?.longitude,
-      );
-
       final now = DateTime.now();
-      final firstIn = state.checkInTime ?? now; // preserve first punch of day
+
+      try {
+        await repo.checkIn(
+          user!.employeeId!,
+          lat: locResult.position?.latitude,
+          lng: locResult.position?.longitude,
+          locationLabel: locResult.locationLabel,
+        );
+      } catch (e) {
+        // Cache offline
+        await _cachePunchOffline({
+          'type': 'In',
+          'employeeId': user!.employeeId!,
+          'lat': locResult.position?.latitude,
+          'lng': locResult.position?.longitude,
+          'locationLabel': locResult.locationLabel,
+          'timestamp': now.toIso8601String(),
+        });
+      }
+
+      final firstIn = state.checkInTime ?? now;
       state = state.copyWith(
         status: ClockStatus.checkedIn,
         checkInTime: firstIn,
         elapsed: Duration.zero,
         isLoading: false,
+        isSyncPending: await _hasOfflinePunches(),
       );
       _startTimer();
     } catch (e) {
@@ -124,30 +164,106 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
 
     state = state.copyWith(isLoading: true, error: null);
     try {
-      // 1. Capture GPS
-      final position = await LocationService.getCurrentPosition();
-      final repo = ref.read(attendanceRepositoryProvider);
+      final locResult = await LocationService.getSecureLocation();
+      if (locResult.isMocked) throw Exception(locResult.error);
 
-      // 2. Call API
-      await repo.checkOut(
-        user!.employeeId!,
-        lat: position?.latitude,
-        lng: position?.longitude,
-      );
+      final repo = ref.read(attendanceRepositoryProvider);
+      
+      try {
+        await repo.checkOut(
+          user!.employeeId!,
+          lat: locResult.position?.latitude,
+          lng: locResult.position?.longitude,
+          locationLabel: locResult.locationLabel,
+        );
+      } catch (e) {
+        // Cache offline
+        await _cachePunchOffline({
+          'type': 'Out',
+          'employeeId': user!.employeeId!,
+          'lat': locResult.position?.latitude,
+          'lng': locResult.position?.longitude,
+          'locationLabel': locResult.locationLabel,
+          'timestamp': DateTime.now().toIso8601String(),
+        });
+      }
 
       _timer?.cancel();
       state = state.copyWith(
         status: ClockStatus.checkedOut,
         checkOutTime: DateTime.now(),
         isLoading: false,
+        isSyncPending: await _hasOfflinePunches(),
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
+
+  Future<void> _cachePunchOffline(Map<String, dynamic> punch) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? offlineData = prefs.getString('offline_punches');
+    List<dynamic> punches = offlineData != null ? jsonDecode(offlineData) : [];
+    punches.add(punch);
+    await prefs.setString('offline_punches', jsonEncode(punches));
+  }
+
+  Future<bool> _hasOfflinePunches() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? offlineData = prefs.getString('offline_punches');
+    return offlineData != null && jsonDecode(offlineData).isNotEmpty;
+  }
+
+  Future<void> _syncOfflinePunches() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? offlineData = prefs.getString('offline_punches');
+    if (offlineData != null) {
+      final List<dynamic> punches = jsonDecode(offlineData);
+      if (punches.isEmpty) return;
+      
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) return;
+
+      final repo = ref.read(attendanceRepositoryProvider);
+      List<dynamic> failedPunches = [];
+      
+      for (var p in punches) {
+        try {
+          if (p['type'] == 'In') {
+             await repo.checkIn(
+               p['employeeId'], 
+               lat: p['lat'], 
+               lng: p['lng'], 
+               locationLabel: p['locationLabel']
+             );
+          } else {
+             await repo.checkOut(
+               p['employeeId'], 
+               lat: p['lat'], 
+               lng: p['lng'], 
+               locationLabel: p['locationLabel']
+             );
+          }
+        } catch (e) {
+          failedPunches.add(p);
+        }
+      }
+      
+      if (failedPunches.isEmpty) {
+        await prefs.remove('offline_punches');
+        if (state.isSyncPending) {
+          state = state.copyWith(isSyncPending: false);
+        }
+      } else {
+        await prefs.setString('offline_punches', jsonEncode(failedPunches));
+        if (!state.isSyncPending) {
+          state = state.copyWith(isSyncPending: true);
+        }
+      }
+    }
+  }
 }
 
-final attendanceClockProvider =
-    NotifierProvider<AttendanceClockNotifier, AttendanceClockState>(
+final attendanceClockProvider = NotifierProvider<AttendanceClockNotifier, AttendanceClockState>(
   AttendanceClockNotifier.new,
 );

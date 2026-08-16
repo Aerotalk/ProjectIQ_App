@@ -59,6 +59,9 @@ dependencies:
   csc_picker: ^0.2.7
   csv: ^8.0.0
   share_plus: ^12.0.2
+  geocoding: ^3.0.0
+  url_launcher: ^6.2.0
+  connectivity_plus: ^5.0.0
 
 dev_dependencies:
   flutter_test:

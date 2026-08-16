@@ -49,9 +49,12 @@ class _SlideActionState extends State<SlideAction> {
         _isSubmitting = true;
       });
       await widget.onSubmit();
-      setState(() {
-        _isSubmitting = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+          _position = 0;
+        });
+      }
     } else {
       // Snap back
       setState(() {

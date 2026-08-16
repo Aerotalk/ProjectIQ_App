@@ -35,28 +35,31 @@ class AttendanceRepository {
   }
 
   /// Perform check-in — captures GPS before the API call
-  Future<void> checkIn(String employeeId, {double? lat, double? lng}) async {
+  Future<void> checkIn(String employeeId, {double? lat, double? lng, String? locationLabel}) async {
     await _dio.post('/hrms/attendance/records/check-in', data: {
       'employeeId': employeeId,
       'source': 'Mobile',
       if (lat != null) 'latitude': lat,
       if (lng != null) 'longitude': lng,
+      if (locationLabel != null) 'locationLabel': locationLabel,
     });
   }
 
   /// Perform check-out — captures GPS before the API call
-  Future<void> checkOut(String employeeId, {double? lat, double? lng}) async {
+  Future<void> checkOut(String employeeId, {double? lat, double? lng, String? locationLabel}) async {
     await _dio.post('/hrms/attendance/records/check-out', data: {
       'employeeId': employeeId,
       if (lat != null) 'latitude': lat,
       if (lng != null) 'longitude': lng,
+      if (locationLabel != null) 'locationLabel': locationLabel,
     });
   }
 
   Future<DashboardKPIs> getDashboardKPIs() async {
     try {
+      final today = DateTime.now().toIso8601String().split('T').first;
       final responses = await Future.wait([
-        _dio.get('/hrms/attendance/records').catchError((_) => Response(requestOptions: RequestOptions(path: ''), data: [])),
+        _dio.get('/hrms/attendance/records', queryParameters: {'startDate': today, 'endDate': today}).catchError((_) => Response(requestOptions: RequestOptions(path: ''), data: [])),
         _dio.get('/hrms/leave/applications').catchError((_) => Response(requestOptions: RequestOptions(path: ''), data: [])),
         _dio.get('/hrms/attendance/regularizations').catchError((_) => Response(requestOptions: RequestOptions(path: ''), data: [])),
       ]);
@@ -109,7 +112,11 @@ class AttendanceRepository {
 
   Future<List<TodayAttendanceSummary>> getTodayAttendance() async {
     try {
-      final response = await _dio.get('/hrms/attendance/records');
+      final today = DateTime.now().toIso8601String().split('T').first;
+      final response = await _dio.get(
+        '/hrms/attendance/records',
+        queryParameters: {'startDate': today, 'endDate': today},
+      );
       if (response.data is List) {
         return (response.data as List).map((r) => TodayAttendanceSummary(
           employeeName: '${r['employee']?['firstName'] ?? ''} ${r['employee']?['lastName'] ?? ''}'.trim(),
