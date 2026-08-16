@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../authentication/presentation/auth_controller.dart';
+import '../../data/repositories/attendance_repository.dart';
+import '../../../../core/utils/location_service.dart';
 
 enum ClockStatus { notCheckedIn, checkedIn, checkedOut }
 
@@ -44,10 +47,34 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
 
   @override
   AttendanceClockState build() {
-    ref.onDispose(() {
-      _timer?.cancel();
-    });
-    return const AttendanceClockState();
+    ref.onDispose(() => _timer?.cancel());
+    _restoreStateFromServer(); // fire-and-forget on build
+    return const AttendanceClockState(isLoading: true);
+  }
+
+  Future<void> _restoreStateFromServer() async {
+    final user = ref.read(authControllerProvider).user;
+    if (user?.employeeId == null) {
+      state = const AttendanceClockState();
+      return;
+    }
+    final repo = ref.read(attendanceRepositoryProvider);
+    final status = await repo.getCheckInStatus(user!.employeeId!);
+
+    final bool currentlyIn = status['currentlyCheckedIn'] == true;
+    final DateTime? firstIn = status['firstCheckIn'] != null
+        ? DateTime.tryParse(status['firstCheckIn'].toString())
+        : null;
+
+    state = AttendanceClockState(
+      status: currentlyIn ? ClockStatus.checkedIn : ClockStatus.notCheckedIn,
+      checkInTime: firstIn,
+      elapsed: firstIn != null && currentlyIn
+          ? DateTime.now().difference(firstIn)
+          : Duration.zero,
+      isLoading: false,
+    );
+    if (currentlyIn) _startTimer();
   }
 
   void _startTimer() {
@@ -55,41 +82,68 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (state.checkInTime != null) {
         state = state.copyWith(
-          elapsed: DateTime.now().difference(state.checkInTime!),
-        );
+            elapsed: DateTime.now().difference(state.checkInTime!));
       }
     });
   }
 
   Future<void> checkIn() async {
+    final user = ref.read(authControllerProvider).user;
+    if (user?.employeeId == null) return;
+
     state = state.copyWith(isLoading: true, error: null);
-    
-    // Simulate API Call
-    await Future.delayed(const Duration(seconds: 1));
-    
-    final now = DateTime.now();
-    state = state.copyWith(
-      status: ClockStatus.checkedIn,
-      checkInTime: now,
-      elapsed: Duration.zero,
-      isLoading: false,
-    );
-    _startTimer();
+    try {
+      // 1. Capture GPS (best-effort, non-blocking on failure)
+      final position = await LocationService.getCurrentPosition();
+      final repo = ref.read(attendanceRepositoryProvider);
+
+      // 2. Call API
+      await repo.checkIn(
+        user!.employeeId!,
+        lat: position?.latitude,
+        lng: position?.longitude,
+      );
+
+      final now = DateTime.now();
+      final firstIn = state.checkInTime ?? now; // preserve first punch of day
+      state = state.copyWith(
+        status: ClockStatus.checkedIn,
+        checkInTime: firstIn,
+        elapsed: Duration.zero,
+        isLoading: false,
+      );
+      _startTimer();
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
   }
 
   Future<void> checkOut() async {
+    final user = ref.read(authControllerProvider).user;
+    if (user?.employeeId == null) return;
+
     state = state.copyWith(isLoading: true, error: null);
-    
-    // Simulate API Call
-    await Future.delayed(const Duration(seconds: 1));
-    
-    _timer?.cancel();
-    final now = DateTime.now();
-    state = state.copyWith(
-      status: ClockStatus.checkedOut,
-      checkOutTime: now,
-      isLoading: false,
-    );
+    try {
+      // 1. Capture GPS
+      final position = await LocationService.getCurrentPosition();
+      final repo = ref.read(attendanceRepositoryProvider);
+
+      // 2. Call API
+      await repo.checkOut(
+        user!.employeeId!,
+        lat: position?.latitude,
+        lng: position?.longitude,
+      );
+
+      _timer?.cancel();
+      state = state.copyWith(
+        status: ClockStatus.checkedOut,
+        checkOutTime: DateTime.now(),
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
   }
 }
 

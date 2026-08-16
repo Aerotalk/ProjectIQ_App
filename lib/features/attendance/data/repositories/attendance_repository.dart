@@ -21,6 +21,38 @@ class AttendanceRepository {
 
   AttendanceRepository(this._dio);
 
+  /// Fetch today's check-in status for an employee
+  Future<Map<String, dynamic>> getCheckInStatus(String employeeId) async {
+    try {
+      final response = await _dio.get(
+        '/hrms/attendance/records/check-in/status',
+        queryParameters: {'employeeId': employeeId},
+      );
+      return Map<String, dynamic>.from(response.data as Map);
+    } catch (e) {
+      return {'currentlyCheckedIn': false};
+    }
+  }
+
+  /// Perform check-in — captures GPS before the API call
+  Future<void> checkIn(String employeeId, {double? lat, double? lng}) async {
+    await _dio.post('/hrms/attendance/records/check-in', data: {
+      'employeeId': employeeId,
+      'source': 'Mobile',
+      if (lat != null) 'latitude': lat,
+      if (lng != null) 'longitude': lng,
+    });
+  }
+
+  /// Perform check-out — captures GPS before the API call
+  Future<void> checkOut(String employeeId, {double? lat, double? lng}) async {
+    await _dio.post('/hrms/attendance/records/check-out', data: {
+      'employeeId': employeeId,
+      if (lat != null) 'latitude': lat,
+      if (lng != null) 'longitude': lng,
+    });
+  }
+
   Future<DashboardKPIs> getDashboardKPIs() async {
     try {
       final responses = await Future.wait([
