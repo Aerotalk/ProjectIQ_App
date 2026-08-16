@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - jug
   workflow_dispatch: # Allows you to manually trigger the build from the GitHub UI
 
 jobs:
