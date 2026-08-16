@@ -114,7 +114,22 @@ class PayrollRepository {
   }
 
   Future<List<ITDeclarationModel>> getITDeclarations() async {
-    return []; // Backend not implemented for this
+    try {
+      final response = await _dio.get('/hrms/payroll/it-declarations');
+      if (response.data is List) {
+        return (response.data as List).map((i) => ITDeclarationModel(
+          id: i['id'] ?? '',
+          employeeName: '${i['employee']?['firstName'] ?? ''} ${i['employee']?['lastName'] ?? ''}'.trim(),
+          regime: i['taxRegime'] ?? '',
+          declaredAmount: AppFormatters.formatCurrency(i['totalDeclaredAmount']),
+          status: i['status'] ?? 'Pending',
+          submittedDate: AppFormatters.formatDate(i['createdAt']),
+        )).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<List<SalaryInputModel>> getSalaryInputs() async {

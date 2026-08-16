@@ -48,14 +48,22 @@ class AttendanceDashboardScreen extends ConsumerWidget {
                 ),
               ],
               const SizedBox(height: AppSpacing.s24),
-              _buildSectionTitle(context, isManagerOrHR ? "Today's Attendance" : "My Attendance Today", LucideIcons.users),
+              _buildSectionTitle(context, "My Attendance Today", LucideIcons.userCheck),
               const SizedBox(height: AppSpacing.s16),
               state.when(
-                data: (data) => _buildTodayAttendance(context, data.todayAttendance),
+                data: (data) => _buildTodayAttendance(context, data.myAttendance),
                 loading: () => const Skeleton(height: 150, width: double.infinity),
                 error: (err, stack) => _buildError(err),
               ),
               if (isManagerOrHR) ...[
+                const SizedBox(height: AppSpacing.s24),
+                _buildSectionTitle(context, "Workforce Attendance Today", LucideIcons.users),
+                const SizedBox(height: AppSpacing.s16),
+                state.when(
+                  data: (data) => _buildTodayAttendance(context, data.workforceAttendance),
+                  loading: () => const Skeleton(height: 150, width: double.infinity),
+                  error: (err, stack) => _buildError(err),
+                ),
                 const SizedBox(height: AppSpacing.s24),
                 _buildSectionTitle(context, 'Pending Leave Requests', LucideIcons.fileText),
                 const SizedBox(height: AppSpacing.s16),
@@ -123,7 +131,7 @@ class AttendanceDashboardScreen extends ConsumerWidget {
         ),
         QuickActionButton(
           icon: LucideIcons.clipboardList,
-          label: isManagerOrHR ? 'Daily Logs' : 'My Logs',
+          label: isManagerOrHR ? 'Workforce Logs' : 'My Logs',
           color: Colors.indigo,
           onTap: () => context.push('/hrms/attendance/daily-logs'),
         ),
