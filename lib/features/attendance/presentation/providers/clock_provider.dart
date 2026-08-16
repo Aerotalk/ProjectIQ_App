@@ -267,6 +267,7 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
         await prefs.remove('offline_punches');
         if (state.isSyncPending) {
           state = state.copyWith(isSyncPending: false);
+          ref.invalidate(attendanceDashboardProvider);
         }
       } else {
         await prefs.setString('offline_punches', jsonEncode(failedPunches));

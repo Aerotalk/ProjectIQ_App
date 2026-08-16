@@ -150,7 +150,10 @@ class DailyAttendanceListScreen extends ConsumerWidget {
                                   GestureDetector(
                                     onTap: () {
                                       if (log.checkInLat != null && log.checkInLng != null) {
-                                        launchUrl(Uri.parse('https://www.google.com/maps/search/?api=1&query=${log.checkInLat},${log.checkInLng}'));
+                                        launchUrl(
+                                          Uri.parse('https://www.google.com/maps/search/?api=1&query=${log.checkInLat},${log.checkInLng}'),
+                                          mode: LaunchMode.externalApplication,
+                                        );
                                       }
                                     },
                                     child: Row(
@@ -189,7 +192,10 @@ class DailyAttendanceListScreen extends ConsumerWidget {
                                   GestureDetector(
                                     onTap: () {
                                       if (log.checkOutLat != null && log.checkOutLng != null) {
-                                        launchUrl(Uri.parse('https://www.google.com/maps/search/?api=1&query=${log.checkOutLat},${log.checkOutLng}'));
+                                        launchUrl(
+                                          Uri.parse('https://www.google.com/maps/search/?api=1&query=${log.checkOutLat},${log.checkOutLng}'),
+                                          mode: LaunchMode.externalApplication,
+                                        );
                                       }
                                     },
                                     child: Row(
