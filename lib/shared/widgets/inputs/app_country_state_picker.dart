@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:csc_picker/csc_picker.dart';
+import 'package:csc_picker_plus/csc_picker_plus.dart';
 import '../../../core/theme/app_spacing.dart';
 
 class AppCountryStatePicker extends StatelessWidget {
