@@ -37,7 +37,7 @@ class AppCountryStatePicker extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.s8),
         ],
-        CSCPicker(
+        CSCPickerPlus(
           showStates: true,
           showCities: showCities,
           flagState: CountryFlag.ENABLE,
