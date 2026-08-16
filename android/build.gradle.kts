@@ -19,10 +19,6 @@ subprojects {
 }
 
 subprojects {
-    project.evaluationDependsOn(":app")
-}
-
-subprojects {
     afterEvaluate {
         if (plugins.hasPlugin("com.android.library")) {
             extensions.configure<LibraryExtension>("android") {
@@ -30,6 +26,7 @@ subprojects {
             }
         }
     }
+    project.evaluationDependsOn(":app")
 }
 
 tasks.register<Delete>("clean") {
