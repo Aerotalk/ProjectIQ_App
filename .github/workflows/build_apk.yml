@@ -1,0 +1,48 @@
+name: Build Android APK (Release)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch: # Allows you to manually trigger the build from the GitHub UI
+
+jobs:
+  build:
+    name: Build APKs (Split per ABI)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Set up Java (Required for Android build)
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17' # Flutter usually requires Java 11 or 17
+
+      # 3. Set up Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          # You can specify a flutter version here if needed, e.g., flutter-version: '3.19.x'
+
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 5. Build the APKs (Split per ABI)
+      - name: Build Release APKs
+        run: flutter build apk --release --split-per-abi
+
+      # 6. Upload the generated APKs to GitHub Artifacts
+      - name: Upload APK Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apks
+          path: build/app/outputs/flutter-apk/app-*-release.apk
+          retention-days: 7
