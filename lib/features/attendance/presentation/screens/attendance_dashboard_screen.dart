@@ -9,6 +9,7 @@ import '../providers/attendance_dashboard_providers.dart';
 import '../widgets/attendance_kpi_card.dart';
 import '../widgets/quick_action_button.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../../authentication/presentation/auth_controller.dart';
 
 class AttendanceDashboardScreen extends ConsumerWidget {
   const AttendanceDashboardScreen({super.key});
@@ -16,6 +17,12 @@ class AttendanceDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(attendanceDashboardProvider);
+    final user = ref.watch(authControllerProvider).user;
+    
+    final isManagerOrHR = user?.hasRole('ROLE_SUPER_ADMIN') == true || 
+                          user?.hasRole('ROLE_HR') == true || 
+                          user?.hasRole('ROLE_COMPANY_ADMIN') == true || 
+                          user?.hasRole('ROLE_MANAGER') == true;
 
     return Scaffold(
       appBar: AppBar(
@@ -29,31 +36,35 @@ class AttendanceDashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildQuickActions(context),
+              _buildQuickActions(context, isManagerOrHR),
+              if (isManagerOrHR) ...[
+                const SizedBox(height: AppSpacing.s24),
+                _buildSectionTitle(context, 'Dashboard Summary', LucideIcons.barChart2),
+                const SizedBox(height: AppSpacing.s16),
+                state.when(
+                  data: (data) => _buildKpiGrid(context, data.kpis),
+                  loading: () => _buildKpiSkeletons(),
+                  error: (err, stack) => _buildError(err),
+                ),
+              ],
               const SizedBox(height: AppSpacing.s24),
-              _buildSectionTitle(context, 'Dashboard Summary', LucideIcons.barChart2),
-              const SizedBox(height: AppSpacing.s16),
-              state.when(
-                data: (data) => _buildKpiGrid(context, data.kpis),
-                loading: () => _buildKpiSkeletons(),
-                error: (err, stack) => _buildError(err),
-              ),
-              const SizedBox(height: AppSpacing.s24),
-              _buildSectionTitle(context, "Today's Attendance", LucideIcons.users),
+              _buildSectionTitle(context, isManagerOrHR ? "Today's Attendance" : "My Attendance Today", LucideIcons.users),
               const SizedBox(height: AppSpacing.s16),
               state.when(
                 data: (data) => _buildTodayAttendance(context, data.todayAttendance),
                 loading: () => const Skeleton(height: 150, width: double.infinity),
                 error: (err, stack) => _buildError(err),
               ),
-              const SizedBox(height: AppSpacing.s24),
-              _buildSectionTitle(context, 'Pending Leave Requests', LucideIcons.fileText),
-              const SizedBox(height: AppSpacing.s16),
-              state.when(
-                data: (data) => _buildPendingLeaves(context, data.pendingLeaves),
-                loading: () => const Skeleton(height: 100, width: double.infinity),
-                error: (err, stack) => _buildError(err),
-              ),
+              if (isManagerOrHR) ...[
+                const SizedBox(height: AppSpacing.s24),
+                _buildSectionTitle(context, 'Pending Leave Requests', LucideIcons.fileText),
+                const SizedBox(height: AppSpacing.s16),
+                state.when(
+                  data: (data) => _buildPendingLeaves(context, data.pendingLeaves),
+                  loading: () => const Skeleton(height: 100, width: double.infinity),
+                  error: (err, stack) => _buildError(err),
+                ),
+              ],
               const SizedBox(height: AppSpacing.s32),
             ],
           ),
@@ -77,7 +88,7 @@ class AttendanceDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuickActions(BuildContext context) {
+  Widget _buildQuickActions(BuildContext context, bool isManagerOrHR) {
     return GridView.count(
       crossAxisCount: 4,
       shrinkWrap: true,
@@ -112,16 +123,17 @@ class AttendanceDashboardScreen extends ConsumerWidget {
         ),
         QuickActionButton(
           icon: LucideIcons.clipboardList,
-          label: 'Daily Logs',
+          label: isManagerOrHR ? 'Daily Logs' : 'My Logs',
           color: Colors.indigo,
           onTap: () => context.push('/hrms/attendance/daily-logs'),
         ),
-        QuickActionButton(
-          icon: LucideIcons.alertTriangle,
-          label: 'Exceptions',
-          color: Colors.red,
-          onTap: () => context.push('/hrms/attendance/exceptions'),
-        ),
+        if (isManagerOrHR)
+          QuickActionButton(
+            icon: LucideIcons.alertTriangle,
+            label: 'Exceptions',
+            color: Colors.red,
+            onTap: () => context.push('/hrms/attendance/exceptions'),
+          ),
         QuickActionButton(
           icon: LucideIcons.doorOpen,
           label: 'Out-pass',

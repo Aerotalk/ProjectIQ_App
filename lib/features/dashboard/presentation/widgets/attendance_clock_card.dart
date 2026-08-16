@@ -160,6 +160,19 @@ class AttendanceClockCard extends ConsumerWidget {
                 }
               },
             ),
+          if (clockState.error != null)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.s12),
+              child: Text(
+                clockState.error!,
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
         ],
       ),
     );

@@ -6,6 +6,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../../authentication/presentation/auth_controller.dart';
 import '../../data/repositories/attendance_repository.dart';
 import '../../../../core/utils/location_service.dart';
+import 'attendance_dashboard_providers.dart';
 
 enum ClockStatus { notCheckedIn, checkedIn, checkedOut }
 
@@ -115,7 +116,13 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
 
   Future<void> checkIn() async {
     final user = ref.read(authControllerProvider).user;
-    if (user?.employeeId == null) return;
+    if (user == null) {
+      state = state.copyWith(error: 'No employee profile linked to your account.', isLoading: false);
+      return;
+    }
+    
+    // For admin users testing the UI who don't have an employeeId, fallback to a dummy UUID
+    final effectiveEmployeeId = user.employeeId ?? '00000000-0000-0000-0000-000000000000';
 
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -127,7 +134,7 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
 
       try {
         await repo.checkIn(
-          user!.employeeId!,
+          effectiveEmployeeId,
           lat: locResult.position?.latitude,
           lng: locResult.position?.longitude,
           locationLabel: locResult.locationLabel,
@@ -136,7 +143,7 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
         // Cache offline
         await _cachePunchOffline({
           'type': 'In',
-          'employeeId': user!.employeeId!,
+          'employeeId': effectiveEmployeeId,
           'lat': locResult.position?.latitude,
           'lng': locResult.position?.longitude,
           'locationLabel': locResult.locationLabel,
@@ -153,6 +160,7 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
         isSyncPending: await _hasOfflinePunches(),
       );
       _startTimer();
+      ref.invalidate(attendanceDashboardProvider);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
@@ -160,7 +168,12 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
 
   Future<void> checkOut() async {
     final user = ref.read(authControllerProvider).user;
-    if (user?.employeeId == null) return;
+    if (user == null){
+      state = state.copyWith(error: 'No employee profile linked to your account.', isLoading: false);
+      return;
+    };
+
+    final effectiveEmployeeId = user.employeeId ?? '00000000-0000-0000-0000-000000000000';
 
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -171,7 +184,7 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
       
       try {
         await repo.checkOut(
-          user!.employeeId!,
+          effectiveEmployeeId,
           lat: locResult.position?.latitude,
           lng: locResult.position?.longitude,
           locationLabel: locResult.locationLabel,
@@ -180,7 +193,7 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
         // Cache offline
         await _cachePunchOffline({
           'type': 'Out',
-          'employeeId': user!.employeeId!,
+          'employeeId': effectiveEmployeeId,
           'lat': locResult.position?.latitude,
           'lng': locResult.position?.longitude,
           'locationLabel': locResult.locationLabel,
@@ -195,6 +208,7 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
         isLoading: false,
         isSyncPending: await _hasOfflinePunches(),
       );
+      ref.invalidate(attendanceDashboardProvider);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }

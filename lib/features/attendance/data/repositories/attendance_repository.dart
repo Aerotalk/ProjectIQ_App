@@ -110,12 +110,16 @@ class AttendanceRepository {
     }
   }
 
-  Future<List<TodayAttendanceSummary>> getTodayAttendance() async {
+  Future<List<TodayAttendanceSummary>> getTodayAttendance({String? employeeId}) async {
     try {
       final today = DateTime.now().toIso8601String().split('T').first;
       final response = await _dio.get(
-        '/hrms/attendance/records',
-        queryParameters: {'startDate': today, 'endDate': today},
+        '/hrms/attendance/records', 
+        queryParameters: {
+          'startDate': today, 
+          'endDate': today,
+          if (employeeId != null) 'employeeId': employeeId,
+        },
       );
       if (response.data is List) {
         return (response.data as List).map((r) => TodayAttendanceSummary(
@@ -282,21 +286,62 @@ class AttendanceRepository {
   }
 
   // --- Daily Attendance Logs ---
-  Future<List<DailyAttendanceModel>> getDailyAttendanceLogs() async {
+  Future<List<DailyAttendanceModel>> getDailyAttendanceLogs({String? employeeId}) async {
     try {
-      final response = await _dio.get('/hrms/attendance/records');
-      if (response.data is List) {
-        return (response.data as List).map((r) => DailyAttendanceModel(
-          id: r['id'] ?? '',
-          employeeName: '${r['employee']?['firstName'] ?? ''} ${r['employee']?['lastName'] ?? ''}'.trim(),
-          employeeCode: r['employee']?['employeeCode'] ?? '',
-          department: r['department']?['departmentName'] ?? '',
-          shiftName: r['shift']?['shiftName'] ?? '',
-          checkIn: r['checkIn']?.toString().split('T').last ?? '--:--',
-          checkOut: r['checkOut']?.toString().split('T').last ?? '--:--',
-          workingHours: (r['workingHours'] ?? 0).toString(),
-          status: r['status'] ?? 'Present',
-        )).toList();
+      final today = DateTime.now().toIso8601String().split('T').first;
+      final responses = await Future.wait([
+        _dio.get('/hrms/attendance/records', queryParameters: {
+          'startDate': today, 
+          'endDate': today,
+          if (employeeId != null) 'employeeId': employeeId,
+        }).catchError((_) => Response(requestOptions: RequestOptions(path: ''), data: [])),
+        _dio.get('/hrms/attendance/logs').catchError((_) => Response(requestOptions: RequestOptions(path: ''), data: [])),
+      ]);
+      
+      final recordsResponse = responses[0];
+      final logsResponse = responses[1];
+      
+      List<dynamic> allLogs = logsResponse.data is List ? logsResponse.data as List : [];
+
+      if (recordsResponse.data is List) {
+        return (recordsResponse.data as List).map((r) {
+          final empId = r['employee']?['id'];
+          // Find logs for this employee from today
+          final empLogs = allLogs.where((log) => 
+            log['employee']?['id'] == empId && 
+            log['timestamp'] != null && 
+            log['timestamp'].toString().startsWith(today)
+          ).toList();
+          
+          // Sort chronologically
+          empLogs.sort((a, b) => a['timestamp'].toString().compareTo(b['timestamp'].toString()));
+          
+          final inLogs = empLogs.where((l) => l['direction'] == 'In').toList();
+          final outLogs = empLogs.where((l) => l['direction'] == 'Out').toList();
+          
+          final firstIn = inLogs.isNotEmpty ? inLogs.first : null;
+          final lastOut = outLogs.isNotEmpty ? outLogs.last : null;
+
+          return DailyAttendanceModel(
+            id: r['id'] ?? '',
+            employeeName: '${r['employee']?['firstName'] ?? ''} ${r['employee']?['lastName'] ?? ''}'.trim(),
+            employeeCode: r['employee']?['employeeCode'] ?? '',
+            department: r['department']?['departmentName'] ?? '',
+            shiftName: r['shift']?['shiftName'] ?? '',
+            checkIn: r['checkIn']?.toString().split('T').last ?? '--:--',
+            checkOut: r['checkOut']?.toString().split('T').last ?? '--:--',
+            workingHours: (r['workingHours'] ?? 0).toString(),
+            status: r['status'] ?? 'Present',
+            exceptionType: r['exceptionType'],
+            isRegularized: r['regularized'] ?? false,
+            checkInLocation: firstIn?['locationLabel'],
+            checkInLat: firstIn?['latitude'] != null ? double.tryParse(firstIn!['latitude'].toString()) : null,
+            checkInLng: firstIn?['longitude'] != null ? double.tryParse(firstIn!['longitude'].toString()) : null,
+            checkOutLocation: lastOut?['locationLabel'],
+            checkOutLat: lastOut?['latitude'] != null ? double.tryParse(lastOut!['latitude'].toString()) : null,
+            checkOutLng: lastOut?['longitude'] != null ? double.tryParse(lastOut!['longitude'].toString()) : null,
+          );
+        }).toList();
       }
       return [];
     } catch (e) {

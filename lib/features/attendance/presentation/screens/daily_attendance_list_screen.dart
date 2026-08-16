@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../providers/daily_attendance_providers.dart';
 
@@ -144,6 +145,29 @@ class DailyAttendanceListScreen extends ConsumerWidget {
                                   log.checkIn,
                                   style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                                 ),
+                                if (log.checkInLocation != null) ...[
+                                  const SizedBox(height: 4),
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (log.checkInLat != null && log.checkInLng != null) {
+                                        launchUrl(Uri.parse('https://www.google.com/maps/search/?api=1&query=${log.checkInLat},${log.checkInLng}'));
+                                      }
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Icon(LucideIcons.mapPin, size: 12, color: Theme.of(context).primaryColor),
+                                        const SizedBox(width: 2),
+                                        Expanded(
+                                          child: Text(
+                                            log.checkInLocation!,
+                                            style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 10),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
@@ -160,6 +184,29 @@ class DailyAttendanceListScreen extends ConsumerWidget {
                                   log.checkOut,
                                   style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                                 ),
+                                if (log.checkOutLocation != null) ...[
+                                  const SizedBox(height: 4),
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (log.checkOutLat != null && log.checkOutLng != null) {
+                                        launchUrl(Uri.parse('https://www.google.com/maps/search/?api=1&query=${log.checkOutLat},${log.checkOutLng}'));
+                                      }
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Icon(LucideIcons.mapPin, size: 12, color: Theme.of(context).primaryColor),
+                                        const SizedBox(width: 2),
+                                        Expanded(
+                                          child: Text(
+                                            log.checkOutLocation!,
+                                            style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 10),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),

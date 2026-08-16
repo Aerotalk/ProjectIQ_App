@@ -103,7 +103,6 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
-  // A method for developers to bypass login when backend is offline
   void developerBypass() {
     final devUser = User(
       id: 'dev-id-123',
@@ -111,6 +110,7 @@ class AuthController extends Notifier<AuthState> {
       email: 'admin@bumbleerp.com',
       roles: ['ROLE_SUPER_ADMIN'],
       organizationName: 'BumbleERP Dev',
+      employeeId: '550e8400-e29b-41d4-a716-446655440000',
       effectivePermissions: [
         'ticket.view', 'role.view', 'user.view', 'sales.view', 
         'finance.view', 'employee.view', 'department.view', 'designation.view', 'payroll.view', 'approvals.view'
