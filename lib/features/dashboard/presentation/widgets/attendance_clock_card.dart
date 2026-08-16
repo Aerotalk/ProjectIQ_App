@@ -145,21 +145,20 @@ class AttendanceClockCard extends ConsumerWidget {
             ),
           const SizedBox(height: AppSpacing.s32),
           
-          if (!isCheckedOut)
-            SlideAction(
-              key: ValueKey(clockState.status),
-              text: isCheckedIn ? 'Slide to Check Out' : 'Slide to Check In',
-              submittingText: 'Recording...',
-              completedText: 'Success',
-              outerColor: isCheckedIn ? Colors.orange : AppColors.primaryLight,
-              onSubmit: () async {
-                if (isCheckedIn) {
-                  await ref.read(attendanceClockProvider.notifier).checkOut();
-                } else {
-                  await ref.read(attendanceClockProvider.notifier).checkIn();
-                }
-              },
-            ),
+          SlideAction(
+            key: ValueKey(clockState.status),
+            text: isCheckedIn ? 'Slide to Check Out' : 'Slide to Check In',
+            submittingText: 'Recording...',
+            completedText: 'Success',
+            outerColor: isCheckedIn ? Colors.orange : AppColors.primaryLight,
+            onSubmit: () async {
+              if (isCheckedIn) {
+                await ref.read(attendanceClockProvider.notifier).checkOut();
+              } else {
+                await ref.read(attendanceClockProvider.notifier).checkIn();
+              }
+            },
+          ),
           if (clockState.error != null)
             Padding(
               padding: const EdgeInsets.only(top: AppSpacing.s12),

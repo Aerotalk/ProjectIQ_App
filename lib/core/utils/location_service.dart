@@ -59,13 +59,19 @@ class LocationService {
         List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
         if (placemarks.isNotEmpty) {
           final place = placemarks.first;
-          locationLabel = [place.subLocality, place.locality, place.administrativeArea]
+          final parts = [place.subLocality, place.locality, place.administrativeArea]
               .where((e) => e != null && e.isNotEmpty)
-              .join(', ');
+              .toList();
+          if (parts.isNotEmpty) {
+            locationLabel = parts.join(', ');
+          }
         }
       } catch (e) {
         debugPrint("Reverse geocoding failed: $e");
       }
+
+      // Fallback if geocoding fails or returns nothing
+      locationLabel ??= "Location (${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)})";
 
       return LocationResult(position: position, locationLabel: locationLabel);
     } catch (e) {

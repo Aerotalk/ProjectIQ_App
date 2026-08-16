@@ -40,7 +40,14 @@ final attendanceDashboardProvider = FutureProvider<AttendanceDashboardState>((re
     final todayAttendance = await repo.getTodayAttendance(employeeId: user?.employeeId);
     
     return AttendanceDashboardState(
-      kpis: const DashboardKPIs(present: 0, absent: 0, lateArrivals: 0, onLeave: 0),
+      kpis: const DashboardKPIs(
+        present: 0, 
+        absent: 0, 
+        lateArrivals: 0, 
+        onLeave: 0,
+        pendingLeaveRequests: 0,
+        regularizationRequests: 0,
+      ),
       todayAttendance: todayAttendance,
       pendingLeaves: [],
     );
