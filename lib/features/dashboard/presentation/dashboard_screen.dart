@@ -117,6 +117,7 @@ class DashboardScreen extends ConsumerWidget {
         ],
       ),
       actions: [
+        /*
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -148,6 +149,7 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ],
         ),
+        */
         IconButton(
           icon: Icon(isDark ? LucideIcons.sun : LucideIcons.moon, size: 20),
           onPressed: () {

@@ -41,23 +41,27 @@ class AttendanceRepository {
 
   /// Perform check-in — captures GPS before the API call
   Future<void> checkIn(String employeeId, {double? lat, double? lng, String? locationLabel}) async {
-    await _dio.post('/hrms/attendance/records/check-in', data: {
+    final data = <String, dynamic>{
       'employeeId': employeeId,
       'source': 'Mobile',
-      if (lat != null) 'latitude': lat,
-      if (lng != null) 'longitude': lng,
-      if (locationLabel != null) 'locationLabel': locationLabel,
-    });
+    };
+    if (lat != null) data['latitude'] = lat;
+    if (lng != null) data['longitude'] = lng;
+    if (locationLabel != null) data['locationLabel'] = locationLabel;
+
+    await _dio.post('/hrms/attendance/records/check-in', data: data);
   }
 
   /// Perform check-out — captures GPS before the API call
   Future<void> checkOut(String employeeId, {double? lat, double? lng, String? locationLabel}) async {
-    await _dio.post('/hrms/attendance/records/check-out', data: {
+    final data = <String, dynamic>{
       'employeeId': employeeId,
-      if (lat != null) 'latitude': lat,
-      if (lng != null) 'longitude': lng,
-      if (locationLabel != null) 'locationLabel': locationLabel,
-    });
+    };
+    if (lat != null) data['latitude'] = lat;
+    if (lng != null) data['longitude'] = lng;
+    if (locationLabel != null) data['locationLabel'] = locationLabel;
+
+    await _dio.post('/hrms/attendance/records/check-out', data: data);
   }
 
   Future<DashboardKPIs> getDashboardKPIs() async {
@@ -88,13 +92,15 @@ class AttendanceRepository {
   Future<List<TodayAttendanceSummary>> getTodayAttendance({String? employeeId}) async {
     try {
       final today = DateTime.now().toIso8601String().split('T').first;
+      final query = <String, dynamic>{
+        'startDate': today, 
+        'endDate': today,
+      };
+      if (employeeId != null) query['employeeId'] = employeeId;
+      
       final response = await _dio.get(
         '/hrms/attendance/records', 
-        queryParameters: {
-          'startDate': today, 
-          'endDate': today,
-          if (employeeId != null) 'employeeId': employeeId,
-        },
+        queryParameters: query,
       );
       if (response.data is List) {
         return (response.data as List).map((r) => TodayAttendanceSummary(
@@ -158,7 +164,7 @@ class AttendanceRepository {
       'requestedCheckOut': '${model.date}T${model.outTime}',
       if (model.employeeId != null) 'employee': {'id': model.employeeId},
     };
-    final response = await _dio.post('/hrms/attendance/regularizations', data: payload);
+    await _dio.post('/hrms/attendance/regularizations', data: payload);
     return model;
   }
 
@@ -219,8 +225,8 @@ class AttendanceRepository {
     final payload = {
       'shiftCode': model.shiftCode,
       'shiftName': model.shiftName,
-      'startTime': '${model.startTime}',
-      'endTime': '${model.endTime}',
+      'startTime': model.startTime,
+      'endTime': model.endTime,
       'graceTime': model.graceTimeMinutes,
     };
     try {
@@ -264,11 +270,13 @@ class AttendanceRepository {
   Future<List<DailyAttendanceModel>> getDailyAttendanceLogs({String? employeeId}) async {
     try {
       final today = DateTime.now().toIso8601String().split('T').first;
-      final response = await _dio.get('/hrms/attendance/records', queryParameters: {
+      final query = <String, dynamic>{
         'startDate': today, 
         'endDate': today,
-        if (employeeId != null) 'employeeId': employeeId,
-      });
+      };
+      if (employeeId != null) query['employeeId'] = employeeId;
+      
+      final response = await _dio.get('/hrms/attendance/records', queryParameters: query);
       
       if (response.data is List) {
         return (response.data as List).map((r) {

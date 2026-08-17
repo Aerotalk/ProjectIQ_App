@@ -25,7 +25,6 @@ class HomeShell extends ConsumerWidget {
     
     // We get the authenticated user
     final authState = ref.watch(authControllerProvider);
-    final user = authState.user;
     
     return Scaffold(
       body: navigationShell,
