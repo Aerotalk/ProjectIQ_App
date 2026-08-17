@@ -264,39 +264,14 @@ class AttendanceRepository {
   Future<List<DailyAttendanceModel>> getDailyAttendanceLogs({String? employeeId}) async {
     try {
       final today = DateTime.now().toIso8601String().split('T').first;
-      final responses = await Future.wait([
-        _dio.get('/hrms/attendance/records', queryParameters: {
-          'startDate': today, 
-          'endDate': today,
-          if (employeeId != null) 'employeeId': employeeId,
-        }).catchError((_) => Response(requestOptions: RequestOptions(path: ''), data: [])),
-        _dio.get('/hrms/attendance/logs').catchError((_) => Response(requestOptions: RequestOptions(path: ''), data: [])),
-      ]);
+      final response = await _dio.get('/hrms/attendance/records', queryParameters: {
+        'startDate': today, 
+        'endDate': today,
+        if (employeeId != null) 'employeeId': employeeId,
+      });
       
-      final recordsResponse = responses[0];
-      final logsResponse = responses[1];
-      
-      List<dynamic> allLogs = logsResponse.data is List ? logsResponse.data as List : [];
-
-      if (recordsResponse.data is List) {
-        return (recordsResponse.data as List).map((r) {
-          final empId = r['employee']?['id'];
-          // Find logs for this employee from today
-          final empLogs = allLogs.where((log) => 
-            log['employee']?['id'] == empId && 
-            log['timestamp'] != null && 
-            log['timestamp'].toString().startsWith(today)
-          ).toList();
-          
-          // Sort chronologically
-          empLogs.sort((a, b) => a['timestamp'].toString().compareTo(b['timestamp'].toString()));
-          
-          final inLogs = empLogs.where((l) => l['direction'] == 'In').toList();
-          final outLogs = empLogs.where((l) => l['direction'] == 'Out').toList();
-          
-          final firstIn = inLogs.isNotEmpty ? inLogs.first : null;
-          final lastOut = outLogs.isNotEmpty ? outLogs.last : null;
-
+      if (response.data is List) {
+        return (response.data as List).map((r) {
           return DailyAttendanceModel(
             id: r['id'] ?? '',
             employeeName: '${r['employee']?['firstName'] ?? ''} ${r['employee']?['lastName'] ?? ''}'.trim(),
@@ -309,12 +284,12 @@ class AttendanceRepository {
             status: _toTitleCase(r['status']?.toString(), 'Present'),
             exceptionType: r['exceptionType'],
             isRegularized: r['regularized'] ?? false,
-            checkInLocation: firstIn?['locationLabel'],
-            checkInLat: firstIn?['latitude'] != null ? double.tryParse(firstIn!['latitude'].toString()) : null,
-            checkInLng: firstIn?['longitude'] != null ? double.tryParse(firstIn!['longitude'].toString()) : null,
-            checkOutLocation: lastOut?['locationLabel'],
-            checkOutLat: lastOut?['latitude'] != null ? double.tryParse(lastOut!['latitude'].toString()) : null,
-            checkOutLng: lastOut?['longitude'] != null ? double.tryParse(lastOut!['longitude'].toString()) : null,
+            checkInLocation: r['checkInLocation'],
+            checkInLat: r['checkInLatitude'] != null ? double.tryParse(r['checkInLatitude'].toString()) : null,
+            checkInLng: r['checkInLongitude'] != null ? double.tryParse(r['checkInLongitude'].toString()) : null,
+            checkOutLocation: r['checkOutLocation'],
+            checkOutLat: r['checkOutLatitude'] != null ? double.tryParse(r['checkOutLatitude'].toString()) : null,
+            checkOutLng: r['checkOutLongitude'] != null ? double.tryParse(r['checkOutLongitude'].toString()) : null,
           );
         }).toList();
       }
