@@ -21,6 +21,11 @@ class AttendanceRepository {
 
   AttendanceRepository(this._dio);
 
+  String _toTitleCase(String? text, String defaultText) {
+    if (text == null || text.isEmpty) return defaultText;
+    return text.split('_').map((word) => word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}' : '').join(' ');
+  }
+
   /// Fetch today's check-in status for an employee
   Future<Map<String, dynamic>> getCheckInStatus(String employeeId) async {
     try {
@@ -57,46 +62,16 @@ class AttendanceRepository {
 
   Future<DashboardKPIs> getDashboardKPIs() async {
     try {
-      final today = DateTime.now().toIso8601String().split('T').first;
-      final responses = await Future.wait([
-        _dio.get('/hrms/attendance/records', queryParameters: {'startDate': today, 'endDate': today}).catchError((_) => Response(requestOptions: RequestOptions(path: ''), data: [])),
-        _dio.get('/hrms/leave/applications').catchError((_) => Response(requestOptions: RequestOptions(path: ''), data: [])),
-        _dio.get('/hrms/attendance/regularizations').catchError((_) => Response(requestOptions: RequestOptions(path: ''), data: [])),
-      ]);
-
-      final attendanceData = responses[0].data is List ? responses[0].data as List : [];
-      final leaveData = responses[1].data is List ? responses[1].data as List : [];
-      final regData = responses[2].data is List ? responses[2].data as List : [];
-
-      int present = 0;
-      int absent = 0;
-      int lateArrivals = 0;
-      int onLeave = 0;
-      int pendingLeaveRequests = 0;
-      int regularizationRequests = 0;
-
-      for (var att in attendanceData) {
-        if (att['status'] == 'Present') present++;
-        if (att['status'] == 'Absent') absent++;
-        if (att['status'] == 'Late' || (att['lateBy'] != null && att['lateBy'] > 0)) lateArrivals++;
-      }
-
-      for (var leave in leaveData) {
-        if (leave['status'] == 'Approved') onLeave++;
-        if (leave['status'] == 'Pending') pendingLeaveRequests++;
-      }
-
-      for (var reg in regData) {
-        if (reg['status'] == 'Pending') regularizationRequests++;
-      }
-
+      final response = await _dio.get('/hrms/attendance/dashboard/kpis');
+      final data = response.data;
+      
       return DashboardKPIs(
-        present: present,
-        absent: absent,
-        lateArrivals: lateArrivals,
-        onLeave: onLeave,
-        pendingLeaveRequests: pendingLeaveRequests,
-        regularizationRequests: regularizationRequests,
+        present: data['present'] ?? 0,
+        absent: data['absent'] ?? 0,
+        lateArrivals: data['lateArrivals'] ?? 0,
+        onLeave: data['onLeave'] ?? 0,
+        pendingLeaveRequests: data['pendingLeaveRequests'] ?? 0,
+        regularizationRequests: data['regularizationRequests'] ?? 0,
       );
     } catch (e) {
       return const DashboardKPIs(
@@ -127,7 +102,7 @@ class AttendanceRepository {
           shift: r['shift']?['shiftName'] ?? '',
           checkInTime: r['checkIn']?.toString().split('T').last ?? '--:--',
           checkOutTime: r['checkOut']?.toString().split('T').last ?? '--:--',
-          status: r['status'] ?? 'Absent',
+          status: _toTitleCase(r['status']?.toString(), 'Absent'),
         )).toList();
       }
       return [];
@@ -144,7 +119,7 @@ class AttendanceRepository {
           employeeName: '${l['employee']?['firstName'] ?? ''} ${l['employee']?['lastName'] ?? ''}'.trim(),
           leaveType: l['leaveType']?['name'] ?? '',
           days: (l['duration'] ?? 0).toInt(),
-          status: l['status'] ?? 'Pending',
+          status: _toTitleCase(l['status']?.toString(), 'Pending'),
         )).toList();
       }
       return [];
@@ -166,7 +141,7 @@ class AttendanceRepository {
           outTime: r['requestedCheckOut']?.toString().split('T').last ?? '',
           reason: r['reason'] ?? '',
           remarks: r['approvalRemarks'] ?? '',
-          status: r['status'] ?? 'Pending',
+          status: _toTitleCase(r['status']?.toString(), 'Pending'),
         )).toList();
       }
       return [];
@@ -200,7 +175,7 @@ class AttendanceRepository {
           endDate: l['toDate']?.toString().split('T')[0] ?? '',
           durationDays: (l['duration'] ?? 0).toDouble(),
           reason: l['reason'] ?? '',
-          status: l['status'] ?? 'Pending',
+          status: _toTitleCase(l['status']?.toString(), 'Pending'),
         )).toList();
       }
       return [];
@@ -331,7 +306,7 @@ class AttendanceRepository {
             checkIn: r['checkIn']?.toString().split('T').last ?? '--:--',
             checkOut: r['checkOut']?.toString().split('T').last ?? '--:--',
             workingHours: (r['workingHours'] ?? 0).toString(),
-            status: r['status'] ?? 'Present',
+            status: _toTitleCase(r['status']?.toString(), 'Present'),
             exceptionType: r['exceptionType'],
             isRegularized: r['regularized'] ?? false,
             checkInLocation: firstIn?['locationLabel'],
@@ -387,7 +362,7 @@ class AttendanceRepository {
           endTime: p['endTime']?.toString().split('T').last ?? '',
           totalHours: (p['totalHours'] ?? 0).toString(),
           reason: p['reason'] ?? '',
-          status: p['status'] ?? 'Pending',
+          status: _toTitleCase(p['status']?.toString(), 'Pending'),
         )).toList();
       }
       return [];

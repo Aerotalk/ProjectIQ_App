@@ -139,16 +139,26 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
           lng: locResult.position?.longitude,
           locationLabel: locResult.locationLabel,
         );
-      } catch (e) {
-        // Cache offline
-        await _cachePunchOffline({
-          'type': 'In',
-          'employeeId': effectiveEmployeeId,
-          'lat': locResult.position?.latitude,
-          'lng': locResult.position?.longitude,
-          'locationLabel': locResult.locationLabel,
-          'timestamp': now.toIso8601String(),
-        });
+      } on Exception catch (e) {
+        bool isNetworkError = true;
+        if (e.runtimeType.toString() == 'DioException') {
+          final dioError = e as dynamic;
+          if (dioError.response != null && dioError.response.statusCode >= 400 && dioError.response.statusCode < 500) {
+            isNetworkError = false;
+            throw Exception(dioError.response.data['message'] ?? dioError.response.data['error'] ?? 'API Error ${dioError.response.statusCode}');
+          }
+        }
+        if (isNetworkError) {
+          // Cache offline
+          await _cachePunchOffline({
+            'type': 'In',
+            'employeeId': effectiveEmployeeId,
+            'lat': locResult.position?.latitude,
+            'lng': locResult.position?.longitude,
+            'locationLabel': locResult.locationLabel,
+            'timestamp': now.toIso8601String(),
+          });
+        }
       }
 
       final firstIn = state.checkInTime ?? now;
@@ -189,16 +199,26 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
           lng: locResult.position?.longitude,
           locationLabel: locResult.locationLabel,
         );
-      } catch (e) {
-        // Cache offline
-        await _cachePunchOffline({
-          'type': 'Out',
-          'employeeId': effectiveEmployeeId,
-          'lat': locResult.position?.latitude,
-          'lng': locResult.position?.longitude,
-          'locationLabel': locResult.locationLabel,
-          'timestamp': DateTime.now().toIso8601String(),
-        });
+      } on Exception catch (e) {
+        bool isNetworkError = true;
+        if (e.runtimeType.toString() == 'DioException') {
+          final dioError = e as dynamic;
+          if (dioError.response != null && dioError.response.statusCode >= 400 && dioError.response.statusCode < 500) {
+            isNetworkError = false;
+            throw Exception(dioError.response.data['message'] ?? dioError.response.data['error'] ?? 'API Error ${dioError.response.statusCode}');
+          }
+        }
+        if (isNetworkError) {
+          // Cache offline
+          await _cachePunchOffline({
+            'type': 'Out',
+            'employeeId': effectiveEmployeeId,
+            'lat': locResult.position?.latitude,
+            'lng': locResult.position?.longitude,
+            'locationLabel': locResult.locationLabel,
+            'timestamp': DateTime.now().toIso8601String(),
+          });
+        }
       }
 
       _timer?.cancel();
