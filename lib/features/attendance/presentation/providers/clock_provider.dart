@@ -93,7 +93,13 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
         : null;
         
     final double workingHours = double.tryParse(status['workingHours']?.toString() ?? '0') ?? 0.0;
-    final Duration accumulated = Duration(seconds: (workingHours * 3600).toInt());
+    final Duration totalWorkingHours = Duration(seconds: (workingHours * 3600).toInt());
+    
+    final Duration ongoingTime = currentlyIn && lastPunchTime != null ? DateTime.now().difference(lastPunchTime) : Duration.zero;
+    // Backend workingHours now includes ongoingTime. Subtract it to get completed time for the timer offset.
+    final Duration accumulated = totalWorkingHours.inSeconds > ongoingTime.inSeconds 
+        ? totalWorkingHours - ongoingTime 
+        : Duration.zero;
 
     final prefs = await SharedPreferences.getInstance();
     final String? offlineData = prefs.getString('offline_punches');

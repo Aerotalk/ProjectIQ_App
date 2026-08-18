@@ -45,6 +45,10 @@ class EmployeeRepository {
     return response.data as Map<String, dynamic>;
   }
 
+  Future<void> deleteEmployee(String id) async {
+    await _dio.delete('/admin/employees/$id');
+  }
+
   Future<void> saveAddress(String employeeId, Map<String, dynamic> data) async {
     await _dio.post('/admin/employees/$employeeId/address', data: data);
   }

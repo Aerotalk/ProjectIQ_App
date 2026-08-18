@@ -36,7 +36,9 @@ class EmployeeProfileScreen extends ConsumerWidget {
             IconButton(
               icon: const Icon(LucideIcons.pencil),
               onPressed: () {
-                // TODO: Implement Edit
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Edit functionality is available via the Web Portal.')),
+                );
               },
             ),
         ],
@@ -92,18 +94,80 @@ class EmployeeProfileScreen extends ConsumerWidget {
                       LucideIcons.powerOff,
                       'Deactivate',
                       Colors.orange,
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Deactivate functionality coming soon.')),
+                        );
+                      }
                     ),
                     _buildActionButton(
                       context,
                       LucideIcons.arrowRightLeft,
                       'Transfer',
                       AppColors.primaryLight,
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Transfer functionality coming soon.')),
+                        );
+                      }
                     ),
                     _buildActionButton(
                       context,
                       LucideIcons.trash2,
                       'Delete',
                       AppColors.destructiveLight,
+                      onTap: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Confirm Delete'),
+                            content: const Text('Are you sure you want to delete this employee? This action cannot be undone.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, true),
+                                style: TextButton.styleFrom(foregroundColor: AppColors.destructiveLight),
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true) {
+                          try {
+                            // Show loading indicator
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (ctx) => const Center(child: CircularProgressIndicator()),
+                            );
+                            
+                            final repo = ref.read(employeeRepositoryProvider);
+                            await repo.deleteEmployee(employeeId);
+                            
+                            // Close loading indicator
+                            if (context.mounted) Navigator.pop(context);
+                            
+                            ref.invalidate(employeeListProvider);
+                            
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Employee deleted successfully')),
+                              );
+                              Navigator.pop(context);
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              Navigator.pop(context); // Close loading
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Failed to delete employee: $e'), backgroundColor: AppColors.destructiveLight),
+                              );
+                            }
+                          }
+                        }
+                      }
                     ),
                   ],
                 ),
@@ -253,11 +317,12 @@ class EmployeeProfileScreen extends ConsumerWidget {
     BuildContext context,
     IconData icon,
     String label,
-    Color color,
-  ) {
+    Color color, {
+    VoidCallback? onTap,
+  }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Padding(
         padding: const EdgeInsets.symmetric(
