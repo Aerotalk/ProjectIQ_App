@@ -76,6 +76,8 @@ class AttendanceRepository {
         onLeave: data['onLeave'] ?? 0,
         pendingLeaveRequests: data['pendingLeaveRequests'] ?? 0,
         regularizationRequests: data['regularizationRequests'] ?? 0,
+        missingSwipes: data['missingSwipes'] ?? 0,
+        upcomingHolidays: List<Map<String, dynamic>>.from(data['upcomingHolidays'] ?? []),
       );
     } catch (e) {
       return const DashboardKPIs(

@@ -42,7 +42,13 @@ class AttendanceDashboardScreen extends ConsumerWidget {
                 _buildSectionTitle(context, 'Dashboard Summary', LucideIcons.barChart2),
                 const SizedBox(height: AppSpacing.s16),
                 state.when(
-                  data: (data) => _buildKpiGrid(context, data.kpis),
+                  data: (data) => Column(
+                    children: [
+                      _buildKpiGrid(context, data.kpis),
+                      const SizedBox(height: AppSpacing.s24),
+                      _buildExceptionsAndHolidays(context, data.kpis),
+                    ],
+                  ),
                   loading: () => _buildKpiSkeletons(),
                   error: (err, stack) => _buildError(err),
                 ),
@@ -195,6 +201,72 @@ class AttendanceDashboardScreen extends ConsumerWidget {
         ),
       ],
     ).animate().fade(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
+  }
+
+  Widget _buildExceptionsAndHolidays(BuildContext context, dynamic kpis) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
+      ),
+      padding: const EdgeInsets.all(AppSpacing.s16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.shieldAlert, size: 18, color: Colors.red),
+              const SizedBox(width: AppSpacing.s8),
+              Text('Exceptions', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.s16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Missing Swipes'),
+              Text('${kpis.missingSwipes}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.s8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Late Arrivals'),
+              Text('${kpis.lateArrivals}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: AppSpacing.s12),
+            child: Divider(height: 1),
+          ),
+          Text('Upcoming Holidays', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: AppSpacing.s12),
+          if (kpis.upcomingHolidays != null && kpis.upcomingHolidays.isNotEmpty)
+            ...kpis.upcomingHolidays.map<Widget>((holiday) => Container(
+              margin: const EdgeInsets.only(bottom: AppSpacing.s8),
+              padding: const EdgeInsets.all(AppSpacing.s8),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(holiday['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                  Text(holiday['date'] ?? '', style: const TextStyle(color: Colors.green)),
+                ],
+              ),
+            ))
+          else
+            const Center(child: Padding(
+              padding: EdgeInsets.all(AppSpacing.s8),
+              child: Text('No upcoming holidays', style: TextStyle(color: Colors.grey)),
+            )),
+        ],
+      ),
+    ).animate().fade(duration: 400.ms, delay: 150.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
   }
 
   Widget _buildKpiSkeletons() {

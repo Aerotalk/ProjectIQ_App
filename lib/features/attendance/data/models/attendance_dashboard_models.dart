@@ -5,6 +5,8 @@ class DashboardKPIs {
   final int onLeave;
   final int pendingLeaveRequests;
   final int regularizationRequests;
+  final int missingSwipes;
+  final List<Map<String, dynamic>> upcomingHolidays;
 
   const DashboardKPIs({
     required this.present,
@@ -13,6 +15,8 @@ class DashboardKPIs {
     required this.onLeave,
     required this.pendingLeaveRequests,
     required this.regularizationRequests,
+    this.missingSwipes = 0,
+    this.upcomingHolidays = const [],
   });
 }
 
