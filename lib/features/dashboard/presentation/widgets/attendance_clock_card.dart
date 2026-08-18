@@ -73,10 +73,10 @@ class AttendanceClockCard extends ConsumerWidget {
                     const SizedBox(width: 6),
                     Text(
                       isCheckedIn 
-                          ? (clockState.isSyncPending ? 'Checked In (Sync Pending)' : 'Checked In')
+                          ? 'Clocked In'
                           : (isCheckedOut 
-                              ? (clockState.isSyncPending ? 'Checked Out (Sync Pending)' : 'Checked Out')
-                              : 'Not Checked In'),
+                              ? 'Clocked Out'
+                              : 'Not Clocked In'),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -147,7 +147,7 @@ class AttendanceClockCard extends ConsumerWidget {
           
           SlideAction(
             key: ValueKey(clockState.status),
-            text: isCheckedIn ? 'Slide to Check Out' : 'Slide to Check In',
+            text: isCheckedIn ? 'Slide to Clock Out' : 'Slide to Clock In',
             submittingText: 'Recording...',
             completedText: 'Success',
             outerColor: isCheckedIn ? Colors.orange : AppColors.primaryLight,
@@ -156,6 +156,38 @@ class AttendanceClockCard extends ConsumerWidget {
                 await ref.read(attendanceClockProvider.notifier).checkOut();
               } else {
                 await ref.read(attendanceClockProvider.notifier).checkIn();
+              }
+              
+              if (!context.mounted) return;
+              
+              final newState = ref.read(attendanceClockProvider);
+              if (newState.error != null) {
+                 ScaffoldMessenger.of(context).showSnackBar(
+                   SnackBar(
+                     content: Row(children: [const Icon(LucideIcons.alertCircle, color: Colors.white, size: 18), const SizedBox(width: 8), Expanded(child: Text(newState.error!))]),
+                     backgroundColor: Colors.red.shade700,
+                     behavior: SnackBarBehavior.floating,
+                   )
+                 );
+              } else if (newState.isSyncPending) {
+                 ScaffoldMessenger.of(context).showSnackBar(
+                   SnackBar(
+                     content: Row(children: [const Icon(LucideIcons.wifiOff, color: Colors.white, size: 18), const SizedBox(width: 8), const Expanded(child: Text('Network unavailable. Punch saved offline and will sync automatically.'))]),
+                     backgroundColor: Colors.orange.shade800,
+                     behavior: SnackBarBehavior.floating,
+                     duration: const Duration(seconds: 4),
+                   )
+                 );
+              } else {
+                 final actionStr = isCheckedIn ? 'clocked out' : 'clocked in';
+                 ScaffoldMessenger.of(context).showSnackBar(
+                   SnackBar(
+                     content: Row(children: [const Icon(LucideIcons.checkCircle2, color: Colors.white, size: 18), const SizedBox(width: 8), Text('Successfully $actionStr!')]),
+                     backgroundColor: Colors.green.shade700,
+                     behavior: SnackBarBehavior.floating,
+                     duration: const Duration(seconds: 2),
+                   )
+                 );
               }
             },
           ),

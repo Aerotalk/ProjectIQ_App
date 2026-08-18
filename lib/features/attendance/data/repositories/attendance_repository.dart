@@ -246,24 +246,88 @@ class AttendanceRepository {
   }
 
   // --- Calendar ---
-  Future<List<AttendanceDayModel>> getAttendanceCalendar(int year, int month) async {
-    List<AttendanceDayModel> days = [];
-    final daysInMonth = DateUtils.getDaysInMonth(year, month);
-    for (int i = 1; i <= daysInMonth; i++) {
-      final date = DateTime(year, month, i);
-      if (date.weekday == DateTime.saturday || date.weekday == DateTime.sunday) {
-        days.add(AttendanceDayModel(date: date, status: 'Weekend'));
-      } else {
-        days.add(AttendanceDayModel(
-          date: date, 
-          status: 'Present',
-          inTime: '09:00 AM',
-          outTime: '06:00 PM',
-          shiftCode: 'GS',
-        ));
+  Future<List<AttendanceDayModel>> getAttendanceCalendar(int year, int month, {String? employeeId}) async {
+    try {
+      final startDate = DateTime(year, month, 1).toIso8601String().split('T').first;
+      // Find the last day of the month
+      final nextMonth = month < 12 ? month + 1 : 1;
+      final nextMonthYear = month < 12 ? year : year + 1;
+      final endDate = DateTime(nextMonthYear, nextMonth, 0).toIso8601String().split('T').first;
+
+      final query = <String, dynamic>{
+        'startDate': startDate,
+        'endDate': endDate,
+      };
+      if (employeeId != null && employeeId.isNotEmpty) {
+        query['employeeId'] = employeeId;
       }
+
+      final response = await _dio.get('/hrms/attendance/records', queryParameters: query);
+      
+      final Map<String, dynamic> recordMap = {};
+      if (response.data is List) {
+        for (var r in response.data) {
+          if (r['attendanceDate'] != null) {
+            recordMap[r['attendanceDate']] = r;
+          }
+        }
+      }
+
+      List<AttendanceDayModel> days = [];
+      final daysInMonth = DateTime(nextMonthYear, nextMonth, 0).day; // A simple way to get days in month without DateUtils if missing
+      
+      for (int i = 1; i <= daysInMonth; i++) {
+        final date = DateTime(year, month, i);
+        // Format manually to ensure YYYY-MM-DD local, as toIso8601String() on local might differ
+        final mm = month.toString().padLeft(2, '0');
+        final dd = i.toString().padLeft(2, '0');
+        final dateStr = '$year-$mm-$dd';
+        
+        if (recordMap.containsKey(dateStr)) {
+          final r = recordMap[dateStr];
+          
+          String? inTime;
+          String? outTime;
+          if (r['checkIn'] != null) {
+             final inDt = DateTime.tryParse(r['checkIn'])?.toLocal();
+             if (inDt != null) {
+               final hr = inDt.hour > 12 ? inDt.hour - 12 : (inDt.hour == 0 ? 12 : inDt.hour);
+               final ampm = inDt.hour >= 12 ? 'PM' : 'AM';
+               inTime = '${hr.toString().padLeft(2, '0')}:${inDt.minute.toString().padLeft(2, '0')} $ampm';
+             }
+          }
+          if (r['checkOut'] != null) {
+             final outDt = DateTime.tryParse(r['checkOut'])?.toLocal();
+             if (outDt != null) {
+               final hr = outDt.hour > 12 ? outDt.hour - 12 : (outDt.hour == 0 ? 12 : outDt.hour);
+               final ampm = outDt.hour >= 12 ? 'PM' : 'AM';
+               outTime = '${hr.toString().padLeft(2, '0')}:${outDt.minute.toString().padLeft(2, '0')} $ampm';
+             }
+          }
+          
+          days.add(AttendanceDayModel(
+            date: date,
+            status: r['status'] ?? 'Absent',
+            inTime: inTime,
+            outTime: outTime,
+            shiftCode: 'S1',
+          ));
+        } else {
+          if (date.weekday == DateTime.saturday || date.weekday == DateTime.sunday) {
+            days.add(AttendanceDayModel(date: date, status: 'Weekend'));
+          } else {
+            if (date.isAfter(DateTime.now())) {
+              days.add(AttendanceDayModel(date: date, status: 'Pending'));
+            } else {
+              days.add(AttendanceDayModel(date: date, status: 'Absent'));
+            }
+          }
+        }
+      }
+      return days;
+    } catch (e) {
+      return [];
     }
-    return days;
   }
 
   // --- Daily Attendance Logs ---

@@ -10,6 +10,7 @@ import '../../authentication/presentation/auth_controller.dart';
 import '../data/profile_settings_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ProfileSettingsScreen extends ConsumerStatefulWidget {
   const ProfileSettingsScreen({super.key});
@@ -44,6 +45,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
       if (user != null) {
         _usernameController.text = user.username;
         _emailController.text = user.email;
+
         setState(() {
           _photoId = user.profilePhotoId;
         });
@@ -388,9 +390,24 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                     title: 'Push Notifications',
                     subtitle: 'Real-time alerts for active sessions.',
                     value: _pushNotifications,
-                    onChanged: (val) {
-                      setState(() => _pushNotifications = val);
-                      _saveNotificationPrefs();
+                    onChanged: (val) async {
+                      if (val) {
+                        final status = await Permission.notification.request();
+                        if (status.isGranted) {
+                          setState(() => _pushNotifications = true);
+                          _saveNotificationPrefs();
+                        } else {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Notification permission denied by system.')),
+                            );
+                          }
+                          setState(() => _pushNotifications = false);
+                        }
+                      } else {
+                        setState(() => _pushNotifications = false);
+                        _saveNotificationPrefs();
+                      }
                     },
                   ),
                   const Divider(),

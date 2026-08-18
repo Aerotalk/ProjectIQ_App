@@ -32,15 +32,27 @@ class _ExpenseClaimFormScreenState
   
   List<Map<String, dynamic>> _items = [];
   List<dynamic> _templates = [];
+  List<dynamic> _categories = [];
 
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
-      ref.read(expenseRepositoryProvider).getCategories().then((categories) {
-        // Here categories represent expense categories, not claim templates.
-        // The mobile app previously used a mocked template list. 
-        // We will fetch real templates via API if it existed, but let's just use the categories as templates or fetch them properly.
+      final repo = ref.read(expenseRepositoryProvider);
+      
+      repo.getCategories().then((categories) {
+        if (mounted) setState(() => _categories = categories);
+      });
+      
+      repo.getTemplates().then((templates) {
+        if (mounted) {
+          setState(() {
+            _templates = templates;
+            if (templates.isNotEmpty) {
+              _selectedTemplate = templates.first['id'];
+            }
+          });
+        }
       });
     });
   }
@@ -67,7 +79,7 @@ class _ExpenseClaimFormScreenState
       final payload = {
         'title': _titleController.text,
         'currency': _selectedCurrency,
-        'template': {'id': _selectedTemplate ?? '1'}, // Fallback for template
+        'template': {'id': _selectedTemplate},
         'employee': {'id': _selectedEmployeeId},
       };
       
@@ -113,6 +125,7 @@ class _ExpenseClaimFormScreenState
         'date': DateTime.now().toIso8601String().split('T')[0],
         'amount': '',
         'description': '',
+        'categoryId': _categories.isNotEmpty ? _categories.first['id'] : null,
       });
     });
   }
@@ -183,6 +196,23 @@ class _ExpenseClaimFormScreenState
                         .toList(),
                     onChanged: (v) => setState(() => _selectedCurrency = v!),
                   ),
+                  const SizedBox(height: AppSpacing.s16),
+
+                  Text('Expense Template *', style: AppTypography.label),
+                  const SizedBox(height: AppSpacing.s8),
+                  DropdownButtonFormField<String>(
+                    value: _selectedTemplate,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                    hint: const Text('Select Template'),
+                    items: _templates
+                        .map((t) => DropdownMenuItem(value: t['id'].toString(), child: Text(t['templateName'])))
+                        .toList(),
+                    onChanged: (v) => setState(() => _selectedTemplate = v),
+                  ),
                 ],
               ),
             ),
@@ -225,6 +255,23 @@ class _ExpenseClaimFormScreenState
                         ),
                       ],
                     ),
+                    const SizedBox(height: 8),
+                    Text('Category *', style: AppTypography.label),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<String>(
+                      value: item['categoryId'],
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                      ),
+                      hint: const Text('Select Category'),
+                      items: _categories
+                          .map((c) => DropdownMenuItem(value: c['id'].toString(), child: Text(c['category'])))
+                          .toList(),
+                      onChanged: (v) => setState(() => _items[index]['categoryId'] = v),
+                    ),
+                    const SizedBox(height: 16),
                     AppTextField(
                       label: 'Date',
                       initialValue: item['date'],

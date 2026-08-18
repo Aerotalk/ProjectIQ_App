@@ -15,6 +15,7 @@ class AttendanceClockState {
   final DateTime? checkInTime;
   final DateTime? checkOutTime;
   final Duration elapsed;
+  final Duration accumulatedElapsed;
   final bool isLoading;
   final String? error;
   final bool isSyncPending;
@@ -24,6 +25,7 @@ class AttendanceClockState {
     this.checkInTime,
     this.checkOutTime,
     this.elapsed = Duration.zero,
+    this.accumulatedElapsed = Duration.zero,
     this.isLoading = false,
     this.error,
     this.isSyncPending = false,
@@ -34,6 +36,7 @@ class AttendanceClockState {
     DateTime? checkInTime,
     DateTime? checkOutTime,
     Duration? elapsed,
+    Duration? accumulatedElapsed,
     bool? isLoading,
     String? error,
     bool? isSyncPending,
@@ -43,6 +46,7 @@ class AttendanceClockState {
       checkInTime: checkInTime ?? this.checkInTime,
       checkOutTime: checkOutTime ?? this.checkOutTime,
       elapsed: elapsed ?? this.elapsed,
+      accumulatedElapsed: accumulatedElapsed ?? this.accumulatedElapsed,
       isLoading: isLoading ?? this.isLoading,
       error: error,
       isSyncPending: isSyncPending ?? this.isSyncPending,
@@ -84,9 +88,12 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
     final status = await repo.getCheckInStatus(user!.employeeId!);
 
     final bool currentlyIn = status['currentlyCheckedIn'] == true;
-    final DateTime? firstIn = status['firstCheckIn'] != null
-        ? DateTime.tryParse(status['firstCheckIn'].toString())
+    final DateTime? lastPunchTime = status['lastPunchTime'] != null
+        ? DateTime.tryParse(status['lastPunchTime'].toString())
         : null;
+        
+    final double workingHours = double.tryParse(status['workingHours']?.toString() ?? '0') ?? 0.0;
+    final Duration accumulated = Duration(seconds: (workingHours * 3600).toInt());
 
     final prefs = await SharedPreferences.getInstance();
     final String? offlineData = prefs.getString('offline_punches');
@@ -94,10 +101,9 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
 
     state = AttendanceClockState(
       status: currentlyIn ? ClockStatus.checkedIn : ClockStatus.notCheckedIn,
-      checkInTime: firstIn,
-      elapsed: firstIn != null && currentlyIn
-          ? DateTime.now().difference(firstIn)
-          : Duration.zero,
+      checkInTime: currentlyIn ? lastPunchTime : null,
+      elapsed: currentlyIn && lastPunchTime != null ? accumulated + DateTime.now().difference(lastPunchTime) : accumulated,
+      accumulatedElapsed: accumulated,
       isLoading: false,
       isSyncPending: hasPending,
     );
@@ -109,20 +115,19 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (state.checkInTime != null) {
         state = state.copyWith(
-            elapsed: DateTime.now().difference(state.checkInTime!));
+            elapsed: state.accumulatedElapsed + DateTime.now().difference(state.checkInTime!));
       }
     });
   }
 
   Future<void> checkIn() async {
     final user = ref.read(authControllerProvider).user;
-    if (user == null) {
+    if (user == null || user.employeeId == null) {
       state = state.copyWith(error: 'No employee profile linked to your account.', isLoading: false);
       return;
     }
     
-    // For admin users testing the UI who don't have an employeeId, fallback to a dummy UUID
-    final effectiveEmployeeId = user.employeeId ?? '00000000-0000-0000-0000-000000000000';
+    final effectiveEmployeeId = user.employeeId!;
 
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -161,11 +166,10 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
         }
       }
 
-      final firstIn = state.checkInTime ?? now;
       state = state.copyWith(
         status: ClockStatus.checkedIn,
-        checkInTime: firstIn,
-        elapsed: Duration.zero,
+        checkInTime: now,
+        elapsed: state.accumulatedElapsed,
         isLoading: false,
         isSyncPending: await _hasOfflinePunches(),
       );
@@ -178,12 +182,12 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
 
   Future<void> checkOut() async {
     final user = ref.read(authControllerProvider).user;
-    if (user == null){
+    if (user == null || user.employeeId == null) {
       state = state.copyWith(error: 'No employee profile linked to your account.', isLoading: false);
       return;
-    };
+    }
 
-    final effectiveEmployeeId = user.employeeId ?? '00000000-0000-0000-0000-000000000000';
+    final effectiveEmployeeId = user.employeeId!;
 
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -225,6 +229,7 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
       state = state.copyWith(
         status: ClockStatus.checkedOut,
         checkOutTime: DateTime.now(),
+        accumulatedElapsed: state.elapsed,
         isLoading: false,
         isSyncPending: await _hasOfflinePunches(),
       );

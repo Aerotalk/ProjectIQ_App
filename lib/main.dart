@@ -31,11 +31,16 @@ void main() async {
     );
   }
 
+  // Determine local backend URL based on platform
+  // Using the computer's local network IP so APKs on physical devices can connect
+  String localApiUrl = 'http://192.168.0.104:8080';
+
   // Initialize AppConfig (Development by default for now)
   AppConfig.init(
     AppConfig(
       environment: Environment.dev,
-      apiBaseUrl: 'https://projectiqbackend-production.up.railway.app', 
+      // apiBaseUrl: 'https://projectiqbackend-production.up.railway.app', 
+      apiBaseUrl: localApiUrl,
     ),
   );
 

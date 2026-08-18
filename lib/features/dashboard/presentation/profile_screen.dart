@@ -160,6 +160,9 @@ class ProfileScreen extends ConsumerWidget {
             icon: LucideIcons.bell,
             title: 'Push Notifications',
             trailing: const Icon(LucideIcons.chevronRight, size: 20),
+            onTap: () {
+              context.push('/profile-settings');
+            },
           ),
           
           const SizedBox(height: AppSpacing.s32),

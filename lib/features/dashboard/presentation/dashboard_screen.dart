@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -16,6 +17,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../attendance/presentation/providers/clock_provider.dart';
+import '../../attendance/data/models/attendance_dashboard_models.dart';
+import '../../attendance/presentation/providers/attendance_dashboard_providers.dart';
 
 class QuickActionItem {
   final String label;
@@ -38,6 +41,7 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authControllerProvider);
     final permissionService = ref.watch(permissionServiceProvider);
+    final dashboardStateAsync = ref.watch(attendanceDashboardProvider);
     
     final user = authState.user;
     final isLoading = authState.isLoading || user == null;
@@ -59,25 +63,30 @@ class DashboardScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(top: AppSpacing.s8),
             sliver: SliverToBoxAdapter(
               child: DashboardSection(
-                title: 'Today\'s Summary',
+                title: 'Daily Overview',
                 child: _buildSummaryCards(context, ref, isLoading),
               ),
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.only(top: AppSpacing.s24),
-            sliver: SliverToBoxAdapter(
-              child: DashboardSection(
-                title: 'Pending Approvals',
-                child: _buildPendingApprovals(context, permissionService, isLoading),
+          if (permissionService.can('approvals.view'))
+            SliverPadding(
+              padding: const EdgeInsets.only(top: AppSpacing.s24),
+              sliver: SliverToBoxAdapter(
+                child: DashboardSection(
+                  title: 'Pending Approvals',
+                  child: dashboardStateAsync.when(
+                    data: (data) => _buildPendingApprovals(context, permissionService, data.pendingLeaves, false),
+                    loading: () => _buildPendingApprovals(context, permissionService, [], true),
+                    error: (err, stack) => _buildPendingApprovals(context, permissionService, [], false),
+                  ),
+                ),
               ),
             ),
-          ),
           SliverPadding(
             padding: const EdgeInsets.only(top: AppSpacing.s24, bottom: AppSpacing.s40),
             sliver: SliverToBoxAdapter(
               child: DashboardSection(
-                title: 'Recent Activity',
+                title: 'Activity Log',
                 child: _buildRecentActivity(context, ref, isLoading),
               ),
             ),
@@ -117,52 +126,60 @@ class DashboardScreen extends ConsumerWidget {
         ],
       ),
       actions: [
-        /*
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'EMP',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: (user?.hasRole('ROLE_SUPER_ADMIN') == true || user?.hasRole('ROLE_HR') == true || user?.hasRole('ROLE_COMPANY_ADMIN') == true) ? Colors.grey : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
-              ),
+        if (kDebugMode)
+          Tooltip(
+            message: 'Toggle Developer/HR Role',
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'EMP',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: (user?.hasRole('ROLE_SUPER_ADMIN') == true || user?.hasRole('ROLE_HR') == true || user?.hasRole('ROLE_COMPANY_ADMIN') == true) ? Colors.grey : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
+                  ),
+                ),
+                Transform.scale(
+                  scale: 0.6,
+                  child: Switch(
+                    value: user?.hasRole('ROLE_SUPER_ADMIN') == true || user?.hasRole('ROLE_HR') == true || user?.hasRole('ROLE_COMPANY_ADMIN') == true,
+                    activeColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                    onChanged: (_) {
+                      ref.read(authControllerProvider.notifier).toggleDeveloperRole();
+                    },
+                  ),
+                ),
+                Text(
+                  'HR',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: (user?.hasRole('ROLE_SUPER_ADMIN') == true || user?.hasRole('ROLE_HR') == true || user?.hasRole('ROLE_COMPANY_ADMIN') == true) ? (isDark ? AppColors.primaryDark : AppColors.primaryLight) : Colors.grey,
+                  ),
+                ),
+              ],
             ),
-            Transform.scale(
-              scale: 0.6,
-              child: Switch(
-                value: user?.hasRole('ROLE_SUPER_ADMIN') == true || user?.hasRole('ROLE_HR') == true || user?.hasRole('ROLE_COMPANY_ADMIN') == true,
-                activeColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
-                onChanged: (_) {
-                  ref.read(authControllerProvider.notifier).toggleDeveloperRole();
-                },
-              ),
-            ),
-            Text(
-              'HR',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: (user?.hasRole('ROLE_SUPER_ADMIN') == true || user?.hasRole('ROLE_HR') == true || user?.hasRole('ROLE_COMPANY_ADMIN') == true) ? (isDark ? AppColors.primaryDark : AppColors.primaryLight) : Colors.grey,
-              ),
-            ),
-          ],
-        ),
-        */
-        IconButton(
-          icon: Icon(isDark ? LucideIcons.sun : LucideIcons.moon, size: 20),
-          onPressed: () {
-            ref.read(themeProvider.notifier).toggleTheme();
-          },
-        ),
-        IconButton(
-          icon: const Badge(
-            child: Icon(LucideIcons.bell, size: 20),
           ),
-          onPressed: () {
-            context.push('/notifications-modal');
-          },
+        Tooltip(
+          message: 'Toggle Theme',
+          child: IconButton(
+            icon: Icon(isDark ? LucideIcons.sun : LucideIcons.moon, size: 20),
+            onPressed: () {
+              ref.read(themeProvider.notifier).toggleTheme();
+            },
+          ),
+        ),
+        Tooltip(
+          message: 'Notifications',
+          child: IconButton(
+            icon: const Badge(
+              child: Icon(LucideIcons.bell, size: 20),
+            ),
+            onPressed: () {
+              context.push('/notifications-modal');
+            },
+          ),
         ),
         Padding(
           padding: const EdgeInsets.only(right: 16.0, left: 8.0),
@@ -252,7 +269,7 @@ class DashboardScreen extends ConsumerWidget {
     if (clockState.status == ClockStatus.checkedIn || clockState.status == ClockStatus.checkedOut) {
       final duration = clockState.elapsed;
       hoursLogged = "${duration.inHours}h ${duration.inMinutes.remainder(60)}m";
-      attendanceStatus = clockState.status == ClockStatus.checkedIn ? 'Present' : 'Checked Out';
+      attendanceStatus = clockState.status == ClockStatus.checkedIn ? 'Clocked In' : 'Clocked Out';
       attendanceIcon = LucideIcons.checkCircle;
     }
     
@@ -261,11 +278,11 @@ class DashboardScreen extends ConsumerWidget {
       child: Row(
         children: [
           Expanded(
-            child: _buildSummaryCard(context, 'Hours Logged', hoursLogged, LucideIcons.clock, isDark),
+            child: _buildSummaryCard(context, 'Worked Hours', hoursLogged, LucideIcons.clock, isDark),
           ),
           const SizedBox(width: AppSpacing.s16),
           Expanded(
-            child: _buildSummaryCard(context, 'Attendance', attendanceStatus, attendanceIcon, isDark),
+            child: _buildSummaryCard(context, 'Today\'s Status', attendanceStatus, attendanceIcon, isDark),
           ),
         ],
       ).animate().fade(duration: 400.ms).slideY(begin: 0.2, curve: Curves.easeOutQuad),
@@ -306,7 +323,12 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPendingApprovals(BuildContext context, PermissionService permissions, bool isLoading) {
+  Widget _buildPendingApprovals(
+    BuildContext context,
+    PermissionService permissions,
+    List<LeaveRequestSummary> pendingLeaves,
+    bool isLoading,
+  ) {
     if (!permissions.can('approvals.view')) {
       return const SizedBox.shrink(); // Hide if they aren't a manager
     }
@@ -319,45 +341,104 @@ class DashboardScreen extends ConsumerWidget {
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => context.push('/approvals'),
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.s16),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.cardDark : AppColors.cardLight,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
-            ),
-            child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+
+    if (pendingLeaves.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.s16),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.cardDark : AppColors.cardLight,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(LucideIcons.check, color: Colors.green),
               ),
-              child: Icon(LucideIcons.fileSignature, color: isDark ? AppColors.primaryDark : AppColors.primaryLight),
-            ),
-            const SizedBox(width: AppSpacing.s16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Leave Request', style: AppTypography.body.copyWith(fontWeight: FontWeight.w600)),
-                  Text('John Doe - Sick Leave', style: AppTypography.caption),
-                ],
+              const SizedBox(width: AppSpacing.s16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'All Caught Up!',
+                      style: AppTypography.body.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      'No pending approval requests.',
+                      style: AppTypography.caption,
+                    ),
+                  ],
+                ),
               ),
-            ),
-              const Icon(LucideIcons.chevronRight, color: Colors.grey, size: 20),
             ],
           ),
         ),
-      ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+      child: Column(
+        children: pendingLeaves.take(3).map((leave) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.s12),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => context.push('/approvals'),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.all(AppSpacing.s16),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.cardDark : AppColors.cardLight,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          LucideIcons.fileSignature,
+                          color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.s16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${leave.leaveType} Request',
+                              style: AppTypography.body.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            Text(
+                              '${leave.employeeName} — ${leave.days} day${leave.days > 1 ? 's' : ''}',
+                              style: AppTypography.caption,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(LucideIcons.chevronRight, color: Colors.grey, size: 20),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     ).animate().fade(duration: 400.ms, delay: 100.ms).slideY(begin: 0.2, curve: Curves.easeOutQuad);
   }
@@ -380,16 +461,16 @@ class DashboardScreen extends ConsumerWidget {
     List<Map<String, dynamic>> activities = [];
     if (clockState.checkInTime != null) {
       activities.add({
-        'title': 'Checked In',
-        'subtitle': "${DateFormat('hh:mm a').format(clockState.checkInTime!)} - HQ Office",
+        'title': 'Clocked In',
+        'subtitle': DateFormat('hh:mm a').format(clockState.checkInTime!),
         'icon': LucideIcons.checkCircle,
         'color': Colors.green,
       });
     }
     if (clockState.status == ClockStatus.checkedOut && clockState.checkOutTime != null) {
       activities.insert(0, {
-        'title': 'Checked Out',
-        'subtitle': "${DateFormat('hh:mm a').format(clockState.checkOutTime!)} - HQ Office",
+        'title': 'Clocked Out',
+        'subtitle': DateFormat('hh:mm a').format(clockState.checkOutTime!),
         'icon': LucideIcons.logOut,
         'color': Colors.orange,
       });
@@ -399,7 +480,7 @@ class DashboardScreen extends ConsumerWidget {
       return Padding(
         padding: const EdgeInsets.all(AppSpacing.s16),
         child: Center(
-          child: Text('No recent activity', style: AppTypography.caption),
+          child: Text('No activity recorded', style: AppTypography.caption),
         ),
       );
     }

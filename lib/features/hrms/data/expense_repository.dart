@@ -29,6 +29,23 @@ class ExpenseRepository {
     }
   }
 
+  Future<List<dynamic>> getTemplates() async {
+    try {
+      final response = await _dio.get('/hrms/expense-claims/templates');
+      if (response.data is List) {
+        return (response.data as List).map((t) => {
+          'id': t['id'] ?? '',
+          'templateName': t['templateName'] ?? '',
+          'description': t['description'] ?? '',
+          'active': t['active'] ?? true,
+        }).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
   Future<List<dynamic>> getClaims() async {
     try {
       final response = await _dio.get('/hrms/expense-claims/claims');
