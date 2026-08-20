@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../data/performance_repository.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class AppraisalCyclesTab extends ConsumerWidget {
   const AppraisalCyclesTab({super.key});
@@ -18,7 +18,12 @@ class AppraisalCyclesTab extends ConsumerWidget {
       future: repo.getActiveCycles(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return ListView.separated(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          );
         }
         final cycles = snapshot.data ?? [];
         if (cycles.isEmpty) return const Center(child: Text('No cycles found.'));
@@ -26,7 +31,7 @@ class AppraisalCyclesTab extends ConsumerWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.s16),
           itemCount: cycles.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
           itemBuilder: (context, index) {
             final cycle = cycles[index];
             return Container(

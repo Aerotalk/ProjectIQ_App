@@ -8,6 +8,7 @@ import '../../../shared/widgets/avatars/profile_avatar.dart';
 import '../../../shared/widgets/badges/app_badge.dart';
 import '../../authentication/presentation/auth_controller.dart';
 import 'providers/employee_providers.dart';
+import 'package:projectiq_app/shared/widgets/loaders/skeleton.dart';
 
 class EmployeeProfileScreen extends ConsumerWidget {
   final String employeeId;
@@ -137,11 +138,18 @@ class EmployeeProfileScreen extends ConsumerWidget {
                         );
                         if (confirm == true) {
                           try {
+                            if (!context.mounted) return;
                             // Show loading indicator
                             showDialog(
                               context: context,
                               barrierDismissible: false,
-                              builder: (ctx) => const Center(child: CircularProgressIndicator()),
+                              builder: (ctx) => const Column(
+                                children: [
+                                  Skeleton(height: 80, width: double.infinity, borderRadius: 8),
+                                  SizedBox(height: 16),
+                                  Skeleton(height: 80, width: double.infinity, borderRadius: 8),
+                                ],
+                              ),
                             );
                             
                             final repo = ref.read(employeeRepositoryProvider);
@@ -278,7 +286,13 @@ class EmployeeProfileScreen extends ConsumerWidget {
             ],
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Column(
+          children: [
+            Skeleton(height: 80, width: double.infinity, borderRadius: 8),
+            SizedBox(height: 16),
+            Skeleton(height: 80, width: double.infinity, borderRadius: 8),
+          ],
+        ),
         error: (err, stack) =>
             Center(child: Text('Failed to load profile: $err')),
       ),

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../domain/employee.dart';
 
 class EmployeeRepository {
@@ -25,8 +26,8 @@ class EmployeeRepository {
       final data = response.data as List;
       return data.map((json) => Employee.fromJson(json)).toList();
     } on DioException catch (e) {
-      print('DioException in getEmployees: ${e.response?.statusCode} - ${e.response?.data}');
-      rethrow;
+      debugPrint('Error getting employee details: $e');
+      throw Exception('Failed to load employee details');
     }
   }
 

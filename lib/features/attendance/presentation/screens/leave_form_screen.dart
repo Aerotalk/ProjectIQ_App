@@ -104,7 +104,7 @@ class _LeaveFormScreenState extends ConsumerState<LeaveFormScreen> {
               ),
               const SizedBox(height: AppSpacing.s8),
               DropdownButtonFormField<String>(
-                value: 'Session 1',
+                initialValue: 'Session 1',
                 decoration: const InputDecoration(labelText: 'From Session', border: OutlineInputBorder()),
                 items: const [
                   DropdownMenuItem(value: 'Session 1', child: Text('Session 1 (Morning)')),
@@ -125,7 +125,7 @@ class _LeaveFormScreenState extends ConsumerState<LeaveFormScreen> {
               ),
               const SizedBox(height: AppSpacing.s8),
               DropdownButtonFormField<String>(
-                value: 'Session 2',
+                initialValue: 'Session 2',
                 decoration: const InputDecoration(labelText: 'To Session', border: OutlineInputBorder()),
                 items: const [
                   DropdownMenuItem(value: 'Session 1', child: Text('Session 1 (Morning)')),

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_formatters.dart';
 import '../../data/expense_repository.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class ExpenseClaimsDashboardTab extends ConsumerWidget {
   const ExpenseClaimsDashboardTab({super.key});
@@ -19,17 +20,25 @@ class ExpenseClaimsDashboardTab extends ConsumerWidget {
       future: repo.getClaims(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return ListView.separated(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          );
         }
         
         final claims = snapshot.data ?? [];
         final int totalClaims = claims.length;
-        final int pendingClaims = claims.where((c) => c['status'] == 'Pending' || c['status'] == 'Draft').length;
+
         final int approvedClaims = claims.where((c) => c['status'] == 'Approved').length;
         final double totalAmount = claims.where((c) => c['status'] == 'Approved' || c['status'] == 'Pending').fold(0.0, (sum, c) {
           double amount = 0.0;
-          if (c['totalClaimed'] is num) amount = (c['totalClaimed'] as num).toDouble();
-          else if (c['totalClaimed'] is String) amount = double.tryParse(c['totalClaimed']) ?? 0.0;
+          if (c['totalClaimed'] is num) {
+            amount = (c['totalClaimed'] as num).toDouble();
+          } else if (c['totalClaimed'] is String) {
+            amount = double.tryParse(c['totalClaimed']) ?? 0.0;
+          }
           return sum + amount;
         });
 

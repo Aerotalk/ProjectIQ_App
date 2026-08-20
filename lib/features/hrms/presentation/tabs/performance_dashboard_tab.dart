@@ -5,6 +5,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../data/performance_repository.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class PerformanceDashboardTab extends ConsumerWidget {
   const PerformanceDashboardTab({super.key});
@@ -46,7 +47,12 @@ class PerformanceDashboardTab extends ConsumerWidget {
             future: performanceRepo.getGoals(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return ListView.separated(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          );
               }
               if (snapshot.hasError) {
                 return const Text('Error loading goals');
@@ -100,7 +106,12 @@ class PerformanceDashboardTab extends ConsumerWidget {
             future: performanceRepo.getActiveCycles(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return ListView.separated(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          );
               }
               final cycles = snapshot.data ?? [];
               final activeCycles = cycles.where((c) => c.status == 'Active' || c.status == 'Review Phase').toList();

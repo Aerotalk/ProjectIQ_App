@@ -78,7 +78,55 @@ class EmployeeDirectoryScreen extends ConsumerWidget {
                           : AppColors.primaryLight,
                     ),
                     onPressed: () {
-                      // TODO: Implement Bottom Sheet Filters
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                        ),
+                        builder: (ctx) {
+                          return Padding(
+                            padding: const EdgeInsets.all(AppSpacing.s24),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Filter Options', style: AppTypography.headline),
+                                const SizedBox(height: AppSpacing.s16),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+                                    FilterChip(
+                                      label: const Text('Active'),
+                                      selected: true,
+                                      onSelected: (_) {},
+                                    ),
+                                    FilterChip(
+                                      label: const Text('Engineering'),
+                                      selected: false,
+                                      onSelected: (_) {},
+                                    ),
+                                    FilterChip(
+                                      label: const Text('Sales'),
+                                      selected: false,
+                                      onSelected: (_) {},
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: AppSpacing.s24),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: () => Navigator.pop(ctx),
+                                    child: const Text('Apply Filters'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
                     },
                   ),
                 ),

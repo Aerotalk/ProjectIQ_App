@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../providers/attendance_exception_providers.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class AttendanceExceptionListScreen extends ConsumerWidget {
   const AttendanceExceptionListScreen({super.key});
@@ -139,7 +140,12 @@ class AttendanceExceptionListScreen extends ConsumerWidget {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => ListView.separated(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: 5,
+            separatorBuilder: (context, index) => const SizedBox(height: 12.0),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          ),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
     );

@@ -56,9 +56,13 @@ class _PerformanceTemplatesTabState extends ConsumerState<PerformanceTemplatesTa
 
   void _deleteItem(int index) {
     setState(() {
-      if (_activeTabIndex == 0) _templates.removeAt(index);
-      else if (_activeTabIndex == 1) _competencies.removeAt(index);
-      else _scales.removeAt(index);
+      if (_activeTabIndex == 0) {
+        _templates.removeAt(index);
+      } else if (_activeTabIndex == 1) {
+        _competencies.removeAt(index);
+      } else {
+        _scales.removeAt(index);
+      }
     });
   }
 
@@ -213,7 +217,7 @@ class _PerformanceTemplatesTabState extends ConsumerState<PerformanceTemplatesTa
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16, vertical: AppSpacing.s8),
       itemCount: data.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
       itemBuilder: (context, index) {
         final item = data[index];
         return Container(

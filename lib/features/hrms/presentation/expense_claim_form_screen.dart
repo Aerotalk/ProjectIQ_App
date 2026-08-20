@@ -30,7 +30,7 @@ class _ExpenseClaimFormScreenState
 
   final List<String> _currencies = ['USD', 'INR', 'EUR'];
   
-  List<Map<String, dynamic>> _items = [];
+  final List<Map<String, dynamic>> _items = [];
   List<dynamic> _templates = [];
   List<dynamic> _categories = [];
 
@@ -158,7 +158,7 @@ class _ExpenseClaimFormScreenState
                   const SizedBox(height: AppSpacing.s8),
                   employeesAsync.when(
                     data: (employees) => DropdownButtonFormField<String>(
-                      value: _selectedEmployeeId,
+                      initialValue: _selectedEmployeeId,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
@@ -185,7 +185,7 @@ class _ExpenseClaimFormScreenState
                   Text('Currency *', style: AppTypography.label),
                   const SizedBox(height: AppSpacing.s8),
                   DropdownButtonFormField<String>(
-                    value: _selectedCurrency,
+                    initialValue: _selectedCurrency,
                     isExpanded: true,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
@@ -201,7 +201,7 @@ class _ExpenseClaimFormScreenState
                   Text('Expense Template *', style: AppTypography.label),
                   const SizedBox(height: AppSpacing.s8),
                   DropdownButtonFormField<String>(
-                    value: _selectedTemplate,
+                    initialValue: _selectedTemplate,
                     isExpanded: true,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
@@ -259,7 +259,7 @@ class _ExpenseClaimFormScreenState
                     Text('Category *', style: AppTypography.label),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
-                      value: item['categoryId'],
+                      initialValue: item['categoryId'],
                       isExpanded: true,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),

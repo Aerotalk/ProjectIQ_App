@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_formatters.dart';
 import '../../data/expense_repository.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class ExpenseBatchProcessingTab extends ConsumerWidget {
   const ExpenseBatchProcessingTab({super.key});
@@ -18,7 +19,12 @@ class ExpenseBatchProcessingTab extends ConsumerWidget {
       future: repo.getBatches(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return ListView.separated(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          );
         }
         final batches = snapshot.data ?? [];
         if (batches.isEmpty) return const Center(child: Text('No batches found.'));
@@ -26,7 +32,7 @@ class ExpenseBatchProcessingTab extends ConsumerWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.s16),
           itemCount: batches.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
           itemBuilder: (context, index) {
             final batch = batches[index];
             return Container(

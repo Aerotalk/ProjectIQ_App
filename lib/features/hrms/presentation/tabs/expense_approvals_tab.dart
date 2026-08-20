@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_formatters.dart';
 import '../../data/expense_repository.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class ExpenseApprovalsTab extends ConsumerWidget {
   const ExpenseApprovalsTab({super.key});
@@ -18,7 +19,12 @@ class ExpenseApprovalsTab extends ConsumerWidget {
       future: repo.getApprovals(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return ListView.separated(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          );
         }
         final claims = snapshot.data ?? [];
         if (claims.isEmpty) return const Center(child: Text('No pending approvals.'));
@@ -26,7 +32,7 @@ class ExpenseApprovalsTab extends ConsumerWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.s16),
           itemCount: claims.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
           itemBuilder: (context, index) {
             final claim = claims[index];
             return Container(

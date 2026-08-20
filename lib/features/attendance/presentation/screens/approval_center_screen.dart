@@ -7,6 +7,7 @@ import '../providers/leave_providers.dart';
 import '../providers/regularization_providers.dart';
 import '../providers/attendance_exception_providers.dart';
 import '../providers/permission_providers.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class ApprovalCenterScreen extends ConsumerStatefulWidget {
   const ApprovalCenterScreen({super.key});
@@ -128,7 +129,12 @@ class _ApprovalCenterScreenState extends ConsumerState<ApprovalCenterScreen> wit
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => ListView.separated(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: 5,
+            separatorBuilder: (context, index) => const SizedBox(height: 12.0),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          ),
       error: (e, _) => Center(child: Text('Error: $e')),
     );
   }
@@ -186,7 +192,12 @@ class _ApprovalCenterScreenState extends ConsumerState<ApprovalCenterScreen> wit
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => ListView.separated(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: 5,
+            separatorBuilder: (context, index) => const SizedBox(height: 12.0),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          ),
       error: (e, _) => Center(child: Text('Error: $e')),
     );
   }
@@ -246,7 +257,12 @@ class _ApprovalCenterScreenState extends ConsumerState<ApprovalCenterScreen> wit
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => ListView.separated(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: 5,
+            separatorBuilder: (context, index) => const SizedBox(height: 12.0),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          ),
       error: (e, _) => Center(child: Text('Error: $e')),
     );
   }
@@ -294,7 +310,12 @@ class _ApprovalCenterScreenState extends ConsumerState<ApprovalCenterScreen> wit
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => ListView.separated(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: 5,
+            separatorBuilder: (context, index) => const SizedBox(height: 12.0),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          ),
       error: (e, _) => Center(child: Text('Error: $e')),
     );
   }

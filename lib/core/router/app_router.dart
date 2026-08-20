@@ -55,8 +55,8 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   // Only rebuild the router if authentication status or loading status changes
-  final isLoading = ref.watch(authControllerProvider.select((state) => state.isLoading));
-  final isAuthenticated = ref.watch(authControllerProvider.select((state) => state.isAuthenticated));
+  ref.watch(authControllerProvider.select((state) => state.isLoading));
+  ref.watch(authControllerProvider.select((state) => state.isAuthenticated));
   
   final moduleRegistry = ref.watch(moduleRegistryProvider);
 

@@ -4,6 +4,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../data/performance_repository.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class EmployeeReviewsTab extends ConsumerWidget {
   const EmployeeReviewsTab({super.key});
@@ -17,7 +18,12 @@ class EmployeeReviewsTab extends ConsumerWidget {
       future: repo.getSelfReviews(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return ListView.separated(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          );
         }
         final reviews = snapshot.data ?? [];
         if (reviews.isEmpty) return const Center(child: Text('No self reviews found.'));
@@ -25,7 +31,7 @@ class EmployeeReviewsTab extends ConsumerWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.s16),
           itemCount: reviews.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
           itemBuilder: (context, index) {
             final review = reviews[index];
             return Container(

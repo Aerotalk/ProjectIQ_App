@@ -397,12 +397,11 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                           setState(() => _pushNotifications = true);
                           _saveNotificationPrefs();
                         } else {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Notification permission denied by system.')),
-                            );
-                          }
-                          setState(() => _pushNotifications = false);
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Notification permission denied by system.')),
+                        );
+                        setState(() => _pushNotifications = false);
                         }
                       } else {
                         setState(() => _pushNotifications = false);

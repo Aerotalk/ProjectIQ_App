@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/cards/app_card.dart';
 import '../providers/department_providers.dart';
+import 'package:projectiq_app/shared/widgets/loaders/skeleton.dart';
 
 class DepartmentDetailsScreen extends ConsumerWidget {
   final String departmentId;
@@ -69,7 +70,24 @@ class DepartmentDetailsScreen extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => Scaffold(
+        appBar: AppBar(title: const Skeleton(height: 24, width: 150, borderRadius: 4)),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+              SizedBox(height: 24),
+              Skeleton(height: 20, width: 200, borderRadius: 4),
+              SizedBox(height: 12),
+              Skeleton(height: 20, width: 150, borderRadius: 4),
+              SizedBox(height: 24),
+              Skeleton(height: 60, width: double.infinity, borderRadius: 8),
+            ],
+          ),
+        ),
+      ),
       error: (err, stack) => Scaffold(body: Center(child: Text('Error: $err'))),
     );
   }

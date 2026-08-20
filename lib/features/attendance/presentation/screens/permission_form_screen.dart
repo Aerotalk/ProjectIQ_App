@@ -35,6 +35,27 @@ class _PermissionFormScreenState extends ConsumerState<PermissionFormScreen> {
     super.dispose();
   }
 
+  String _calculateTotalHours() {
+    if (_startTimeController.text.isEmpty || _endTimeController.text.isEmpty) return '0.0';
+    try {
+      DateTime parseTime(String timeString) {
+        final parts = timeString.split(' ');
+        final timeParts = parts[0].split(':');
+        int hour = int.parse(timeParts[0]);
+        final int minute = int.parse(timeParts[1]);
+        if (parts[1].toUpperCase() == 'PM' && hour != 12) hour += 12;
+        if (parts[1].toUpperCase() == 'AM' && hour == 12) hour = 0;
+        return DateTime(2000, 1, 1, hour, minute);
+      }
+      final start = parseTime(_startTimeController.text);
+      final end = parseTime(_endTimeController.text);
+      final diff = end.difference(start).inMinutes / 60.0;
+      return diff > 0 ? diff.toStringAsFixed(1) : '0.0';
+    } catch (e) {
+      return '0.0';
+    }
+  }
+
   void _submit() {
     if (_formKey.currentState!.validate()) {
       final user = ref.read(authControllerProvider).user;
@@ -50,7 +71,7 @@ class _PermissionFormScreenState extends ConsumerState<PermissionFormScreen> {
         permissionType: _permissionTypeController.text,
         startTime: _startTimeController.text,
         endTime: _endTimeController.text,
-        totalHours: '1.0', // TODO: calculate difference
+        totalHours: _calculateTotalHours(),
         reason: _reasonController.text,
         status: 'Pending',
       );

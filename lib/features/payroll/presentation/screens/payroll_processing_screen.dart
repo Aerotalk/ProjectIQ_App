@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/inputs/app_select.dart';
 import '../providers/payroll_providers.dart';
 import '../../data/repositories/payroll_repository.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class PayrollProcessingScreen extends ConsumerStatefulWidget {
   const PayrollProcessingScreen({super.key});
@@ -237,9 +238,16 @@ class _PayrollProcessingScreenState extends ConsumerState<PayrollProcessingScree
 
   Widget _buildEligibilityContent() {
     if (_isCheckingEligibility) {
-      return const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Center(child: CircularProgressIndicator()),
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            for (int i = 0; i < 3; i++) ...[
+              const Skeleton(height: 80, width: double.infinity, borderRadius: 8),
+              const SizedBox(height: 12.0),
+            ]
+          ],
+        ),
       );
     }
     

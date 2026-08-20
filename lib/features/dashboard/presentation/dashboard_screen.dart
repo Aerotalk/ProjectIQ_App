@@ -6,7 +6,6 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../authentication/presentation/auth_controller.dart';
-import '../../../../core/router/module_registry.dart';
 import '../../../../core/permissions/permission_service.dart';
 import '../../../shared/widgets/avatars/profile_avatar.dart';
 import 'widgets/dashboard_section.dart';
@@ -144,7 +143,7 @@ class DashboardScreen extends ConsumerWidget {
                   scale: 0.6,
                   child: Switch(
                     value: user?.hasRole('ROLE_SUPER_ADMIN') == true || user?.hasRole('ROLE_HR') == true || user?.hasRole('ROLE_COMPANY_ADMIN') == true,
-                    activeColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                    activeThumbColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                     onChanged: (_) {
                       ref.read(authControllerProvider.notifier).toggleDeveloperRole();
                     },

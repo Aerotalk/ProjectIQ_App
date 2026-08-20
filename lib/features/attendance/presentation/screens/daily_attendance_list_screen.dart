@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../providers/daily_attendance_providers.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class DailyAttendanceListScreen extends ConsumerWidget {
   const DailyAttendanceListScreen({super.key});
@@ -263,7 +264,12 @@ class DailyAttendanceListScreen extends ConsumerWidget {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => ListView.separated(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: 5,
+            separatorBuilder: (context, index) => const SizedBox(height: 12.0),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          ),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
     );

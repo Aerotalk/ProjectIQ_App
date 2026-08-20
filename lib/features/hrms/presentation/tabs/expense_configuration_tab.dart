@@ -4,6 +4,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../data/expense_repository.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class ExpenseConfigurationTab extends ConsumerWidget {
   const ExpenseConfigurationTab({super.key});
@@ -17,7 +18,12 @@ class ExpenseConfigurationTab extends ConsumerWidget {
       future: repo.getCategories(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return ListView.separated(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          );
         }
         final categories = snapshot.data ?? [];
         if (categories.isEmpty) return const Center(child: Text('No categories configured.'));
@@ -25,7 +31,7 @@ class ExpenseConfigurationTab extends ConsumerWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.s16),
           itemCount: categories.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
           itemBuilder: (context, index) {
             final category = categories[index];
             return Container(
@@ -48,7 +54,7 @@ class ExpenseConfigurationTab extends ConsumerWidget {
                   Switch(
                     value: category['active'] as bool,
                     onChanged: (val) {},
-                    activeColor: AppColors.primaryLight,
+                    activeThumbColor: AppColors.primaryLight,
                   ),
                 ],
               ),

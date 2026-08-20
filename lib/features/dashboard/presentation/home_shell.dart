@@ -24,7 +24,7 @@ class HomeShell extends ConsumerWidget {
     final bottomNavModules = moduleRegistry.bottomNavModules;
     
     // We get the authenticated user
-    final authState = ref.watch(authControllerProvider);
+    ref.watch(authControllerProvider);
     
     return Scaffold(
       body: navigationShell,

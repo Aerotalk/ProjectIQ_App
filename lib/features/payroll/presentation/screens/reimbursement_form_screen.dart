@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/theme/app_spacing.dart';
+
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../../../shared/widgets/buttons/app_button.dart';
@@ -90,9 +91,9 @@ class _ReimbursementFormScreenState
 
   Future<void> _submit() async {
     if (_amountController.text.trim().isEmpty) return;
-    
+
     setState(() => _isLoading = true);
-    
+
     try {
       final payload = {
         'expenseType': _selectedType,
@@ -115,9 +116,8 @@ class _ReimbursementFormScreenState
       context.pop();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -255,8 +255,7 @@ class _ReimbursementFormScreenState
                             ),
                             const SizedBox(height: AppSpacing.s8),
                             Text(
-                              _attachmentName ??
-                                  'Tap to upload receipt (PDF, JPG, PNG, Excel, Word)',
+                              _attachmentName ?? 'Tap to upload receipt (PDF, JPG, PNG, Excel, Word)',
                               style: AppTypography.body.copyWith(
                                 color: _attachmentName != null
                                     ? AppColors.primaryLight

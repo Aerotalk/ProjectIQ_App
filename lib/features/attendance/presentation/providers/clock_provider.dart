@@ -65,8 +65,8 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
       _connectivitySubscription?.cancel();
     });
     
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((result) {
-      if (result != ConnectivityResult.none) {
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((results) {
+      if (!results.contains(ConnectivityResult.none)) {
         _syncOfflinePunches();
       }
     });
@@ -267,7 +267,7 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
       if (punches.isEmpty) return;
       
       final connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) return;
+      if (connectivityResult.contains(ConnectivityResult.none)) return;
 
       final repo = ref.read(attendanceRepositoryProvider);
       List<dynamic> failedPunches = [];

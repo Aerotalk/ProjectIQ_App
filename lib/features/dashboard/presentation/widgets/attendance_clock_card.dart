@@ -22,7 +22,6 @@ class AttendanceClockCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final clockState = ref.watch(attendanceClockProvider);
-    final theme = Theme.of(context);
 
     final isCheckedIn = clockState.status == ClockStatus.checkedIn;
     final isCheckedOut = clockState.status == ClockStatus.checkedOut;

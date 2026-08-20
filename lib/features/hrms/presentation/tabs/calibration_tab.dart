@@ -4,6 +4,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../data/performance_repository.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class CalibrationTab extends ConsumerWidget {
   const CalibrationTab({super.key});
@@ -17,7 +18,12 @@ class CalibrationTab extends ConsumerWidget {
       future: repo.getCalibrationRecords(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return ListView.separated(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          );
         }
         final records = snapshot.data ?? [];
         if (records.isEmpty) return const Center(child: Text('No calibration records found.'));
@@ -25,7 +31,7 @@ class CalibrationTab extends ConsumerWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.s16),
           itemCount: records.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
           itemBuilder: (context, index) {
             final record = records[index];
             return Container(

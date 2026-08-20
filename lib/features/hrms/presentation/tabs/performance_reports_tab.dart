@@ -101,6 +101,7 @@ class _PerformanceReportsTabState extends ConsumerState<PerformanceReportsTab> {
       await file.writeAsString(csvData);
       
       if (mounted) {
+        // ignore: deprecated_member_use
         await Share.shareXFiles([XFile(file.path)], text: 'Performance Report - $_activeReport');
       }
     } catch (e) {
@@ -254,7 +255,7 @@ class _PerformanceReportsTabState extends ConsumerState<PerformanceReportsTab> {
     return ListView.separated(
       padding: const EdgeInsets.all(AppSpacing.s16),
       itemCount: _departmentData.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
       itemBuilder: (context, index) {
         final dept = _departmentData[index];
         return AppCard(
@@ -308,7 +309,7 @@ class _PerformanceReportsTabState extends ConsumerState<PerformanceReportsTab> {
     return ListView.separated(
       padding: const EdgeInsets.all(AppSpacing.s16),
       itemCount: _goalData.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
       itemBuilder: (context, index) {
         final goal = _goalData[index];
         return AppCard(
@@ -351,7 +352,7 @@ class _PerformanceReportsTabState extends ConsumerState<PerformanceReportsTab> {
     return ListView.separated(
       padding: const EdgeInsets.all(AppSpacing.s16),
       itemCount: _promotionData.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s12),
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s12),
       itemBuilder: (context, index) {
         final promo = _promotionData[index];
         return AppCard(

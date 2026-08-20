@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../data/performance_repository.dart';
 import '../../data/models/performance_models.dart';
 import '../goal_form_screen.dart';
+import '../../../../shared/widgets/loaders/skeleton.dart';
 
 class GoalsListTab extends ConsumerStatefulWidget {
   const GoalsListTab({super.key});
@@ -66,7 +67,12 @@ class _GoalsListTabState extends ConsumerState<GoalsListTab> {
             future: performanceRepo.getGoals(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return ListView.separated(
+            padding: const EdgeInsets.all(AppSpacing.s16),
+            itemCount: 3,
+            separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.s12),
+            itemBuilder: (context, index) => const Skeleton(height: 100, width: double.infinity, borderRadius: 8),
+          );
               }
               if (snapshot.hasError) {
                 return const Center(child: Text('Error loading goals'));
