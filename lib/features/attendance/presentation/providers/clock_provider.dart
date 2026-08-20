@@ -71,7 +71,7 @@ class AttendanceClockNotifier extends Notifier<AttendanceClockState> {
       }
     });
 
-    _restoreStateFromServer(); // fire-and-forget on build
+    Future.microtask(() => _restoreStateFromServer()); // fire-and-forget on build
     return const AttendanceClockState(isLoading: true);
   }
 

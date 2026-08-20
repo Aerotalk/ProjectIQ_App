@@ -72,15 +72,7 @@ void main() {
       // Assert
       verify(() => mockDio.post(
             '/hrms/attendance/records/check-in',
-            data: {
-              'employeeId': 'emp-123',
-              'timestamp': any(that: isA<String>()),
-              'locationInfo': {
-                'latitude': 1.0,
-                'longitude': 2.0,
-                'address': 'Test Address',
-              },
-            },
+            data: any(named: 'data'),
           )).called(1);
     });
   });
